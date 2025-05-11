@@ -1278,6 +1278,12 @@ document.getElementById('loadNftBtn').addEventListener('click', async () => {
         img.onload = () => {
             layer1.apiImage = img;
             drawLayers();
+            
+            // Update NFT preview
+            const nftPreview = document.querySelector('.preview-btn[data-layer="nft"] .preview-img');
+            if (nftPreview) {
+                nftPreview.src = img.src;
+            }
         };
 
         img.onerror = () => {
@@ -1293,6 +1299,24 @@ document.getElementById('loadNftBtn').addEventListener('click', async () => {
         loadBtn.textContent = 'Load NFT';
         loadBtn.disabled = false;
     }
+});
+
+// Add clear button functionality for NFT preview
+document.getElementById('clearNftBtn').addEventListener('click', () => {
+    // Clear the API image
+    layer1.apiImage = null;
+    
+    // Clear the input field
+    document.getElementById('nftIdInput').value = '';
+    
+    // Clear the preview image
+    const nftPreview = document.querySelector('.preview-btn[data-layer="nft"] .preview-img');
+    if (nftPreview) {
+        nftPreview.src = '';
+    }
+    
+    // Redraw the canvas
+    drawLayers();
 });
 
 // Add keyboard support for the input

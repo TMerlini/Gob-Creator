@@ -1623,6 +1623,12 @@ h1 {
     gap: 8px;
 }
 
+.nft-input-wrapper .preview-btn {
+    margin-left: auto;
+    width: 120px;
+    height: 60px;
+}
+
 #nftIdInput {
     width: 120px;
     padding: 8px;
