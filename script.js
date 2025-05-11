@@ -1051,12 +1051,13 @@ async function loadBackground() {
         '/background/background.gif',
         '/images/background/background.gif',
         'background/background.gif',
+        '/images/background/image1.jpeg',  // Try the uploaded image that exists
         '/images/background/background.png',
         '/images/background/background.jpg',
         '/images/background/background.jpeg'
     ];
     
-    // Also try to load any uploaded background images
+    // Also try to load any uploaded background images from the server
     try {
         const response = await fetch('/api/images/background');
         if (response.ok) {
@@ -1072,31 +1073,35 @@ async function loadBackground() {
         console.error('Error fetching background images:', error);
     }
     
-    let backgroundLoaded = false;
-    
+    // Try each path and set the first one that works
     for (const path of backgroundPaths) {
-        if (backgroundLoaded) break;
-        
-        const img = new Image();
-        img.onload = function() {
-            console.log('Background image loaded successfully from:', path);
-            document.body.style.backgroundImage = `url('${path}')`;
-            backgroundLoaded = true;
-        };
-        img.onerror = function() {
-            console.log(`Failed to load background from: ${path}`);
-        };
-        img.src = path;
-        
-        // Wait a bit to see if the image loads
-        await delay(100);
+        try {
+            // Use a promise to properly handle image loading
+            const loaded = await new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    console.log('Background image loaded from fallback:', path);
+                    document.body.style.backgroundImage = `url('${path}')`;
+                    resolve(true);
+                };
+                img.onerror = () => {
+                    console.log(`Failed to load background from: ${path}`);
+                    resolve(false);
+                };
+                img.src = path;
+            });
+            
+            if (loaded) {
+                return; // Exit after successfully loading an image
+            }
+        } catch (error) {
+            console.error('Error loading background from:', path, error);
+        }
     }
     
-    // If no background loaded, use a fallback color
-    if (!backgroundLoaded) {
-        console.log('Using fallback background color');
-        document.body.style.backgroundColor = "#000000";
-    }
+    // Direct fallback to the known working background that exists in your files
+    console.log('Using direct fallback background');
+    document.body.style.backgroundImage = "url('background/background.gif')";
 }
 
 // Call the function when page loads
