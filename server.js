@@ -310,21 +310,18 @@ app.get('/api/images/:layer', (req, res) => {
             const bgDir1 = path.join(__dirname, 'images', 'background');
             const bgDir2 = path.join(__dirname, 'background');
             
-            // First check the background directory at root (this is where it actually exists)
-            if (fs.existsSync(bgDir2) && fs.readdirSync(bgDir2).length > 0) {
-                console.log('Using background directory at root');
-                dir = bgDir2;
-            }
-            // Then check the images/background directory
-            else if (fs.existsSync(bgDir1) && fs.readdirSync(bgDir1).length > 0) {
-                console.log('Using images/background directory');
+            // First check the images/background directory
+            if (fs.existsSync(bgDir1) && fs.readdirSync(bgDir1).length > 0) {
                 dir = bgDir1;
-            }
-            // Default to background at root
-            else {
+            } 
+            // Then check the background directory at root
+            else if (fs.existsSync(bgDir2) && fs.readdirSync(bgDir2).length > 0) {
                 dir = bgDir2;
+            }
+            // Default to images/background
+            else {
+                dir = bgDir1;
                 if (!fs.existsSync(dir)) {
-                    console.log('Creating missing background directory');
                     fs.mkdirSync(dir, { recursive: true });
                 }
             }
