@@ -929,6 +929,7 @@ function updatePreviews() {
             const currentImage = layer.getCurrentImage();
             if (currentImage) {
                 previewImg.src = currentImage.src;
+                console.log(`Updated preview for layer ${layerId} with image: ${currentImage.src}`);
             }
         }
     });
