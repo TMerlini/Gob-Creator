@@ -1046,32 +1046,38 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
 
 // Background loader function
 async function loadBackground() {
-    // Try multiple background paths in order
-    const backgroundPaths = [
-        '/background/background.gif',
-        '/images/background/background.gif',
-        'background/background.gif',
-        '/images/background/image1.jpeg',  // Try the uploaded image that exists
-        '/images/background/background.png',
-        '/images/background/background.jpg',
-        '/images/background/background.jpeg'
-    ];
+    // Start with an empty array of paths to try
+    let backgroundPaths = [];
     
-    // Also try to load any uploaded background images from the server
+    // First try to load uploaded background images from the server
     try {
         const response = await fetch('/api/images/background');
         if (response.ok) {
             const data = await response.json();
             if (data.images && data.images.length > 0) {
-                // Add uploaded images to the paths to try
+                // Add uploaded images first (highest priority)
                 data.images.forEach(image => {
                     backgroundPaths.push(`/images/background/${image}`);
                 });
+                console.log('Found uploaded backgrounds:', data.images);
             }
         }
     } catch (error) {
         console.error('Error fetching background images:', error);
     }
+    
+    // Then add fallback paths if no uploaded backgrounds worked
+    backgroundPaths = backgroundPaths.concat([
+        '/images/background/image1.png',
+        '/images/background/background.gif',
+        '/background/background.gif',
+        'background/background.gif',
+        '/images/background/background.png',
+        '/images/background/background.jpg',
+        '/images/background/background.jpeg'
+    ]);
+    
+    console.log('Trying to load background from these paths:', backgroundPaths);
     
     // Try each path and set the first one that works
     for (const path of backgroundPaths) {
@@ -1080,7 +1086,7 @@ async function loadBackground() {
             const loaded = await new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
-                    console.log('Background image loaded from fallback:', path);
+                    console.log('Successfully loaded background from:', path);
                     document.body.style.backgroundImage = `url('${path}')`;
                     resolve(true);
                 };
@@ -1092,6 +1098,7 @@ async function loadBackground() {
             });
             
             if (loaded) {
+                console.log('Using background image:', path);
                 return; // Exit after successfully loading an image
             }
         } catch (error) {
@@ -1099,8 +1106,8 @@ async function loadBackground() {
         }
     }
     
-    // Direct fallback to the known working background that exists in your files
-    console.log('Using direct fallback background');
+    // Only fall back to the default if all other options failed
+    console.log('All background images failed to load, using fallback');
     document.body.style.backgroundImage = "url('background/background.gif')";
 }
 
