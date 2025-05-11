@@ -174,8 +174,6 @@ app.get('/api/nft/:tokenId', async (req, res) => {
 app.post('/api/upload', (req, res) => {
     // Process layer field before multer processes file
     const layer = req.query.layer || 'layer1';
-    
-    console.log('Upload request for layer:', layer);
 
     // Create a single-use multer instance with dynamic destination
     const singleUpload = multer({
@@ -187,12 +185,7 @@ app.post('/api/upload', (req, res) => {
                 if (layer === 'music') {
                     dir = path.join(__dirname, 'music');
                 } else if (layer === 'background') {
-                    // Ensure background directory exists
                     dir = path.join(__dirname, 'images', 'background');
-                    if (!fs.existsSync(dir)) {
-                        fs.mkdirSync(dir, { recursive: true });
-                        console.log('Created missing background directory:', dir);
-                    }
                 } else {
                     dir = path.join(__dirname, 'images', layer);
                 }
@@ -208,23 +201,11 @@ app.post('/api/upload', (req, res) => {
             },
             filename: function (req, file, cb) {
                 const layer = req.query.layer || 'layer1';
-                let dir;
-                
-                if (layer === 'music') {
-                    dir = path.join(__dirname, 'music');
-                } else if (layer === 'background') {
-                    dir = path.join(__dirname, 'images', 'background');
-                } else {
-                    dir = path.join(__dirname, 'images', layer);
-                }
-                
+                const dir = layer === 'music' ? path.join(__dirname, 'music') : path.join(__dirname, 'images', layer);
                 let counter = 1;
-                // Preserve original extension for background and music
-                const ext = layer === 'background' ? path.extname(file.originalname).toLowerCase() || '.png' : 
-                           (layer === 'music' ? path.extname(file.originalname).toLowerCase() || '.mp3' : '.png');
+                const ext = path.extname(file.originalname).toLowerCase() || 
+                           (layer === 'music' ? '.mp3' : '.png');
                 const filePrefix = layer === 'music' ? 'track' : 'image';
-                
-                console.log(`Upload to ${layer}, directory: ${dir}, extension: ${ext}`);
 
                 if (fs.existsSync(dir)) {
                     const files = fs.readdirSync(dir);
@@ -296,8 +277,6 @@ app.post('/api/upload', (req, res) => {
 app.get('/api/images/:layer', (req, res) => {
     try {
         const { layer } = req.params;
-        console.log(`API request for images in layer: ${layer}`);
-        
         if (!['layer1', 'layer2', 'background', 'music'].includes(layer)) {
             return res.status(400).json({ error: 'Invalid layer specified' });
         }
@@ -305,43 +284,15 @@ app.get('/api/images/:layer', (req, res) => {
         let dir;
         if (layer === 'music') {
             dir = path.join(__dirname, 'music');
-        } else if (layer === 'background') {
-            // Check both locations for background images
-            const bgDir1 = path.join(__dirname, 'images', 'background');
-            const bgDir2 = path.join(__dirname, 'background');
-            
-            // First check the background directory at root (this is where it actually exists)
-            if (fs.existsSync(bgDir2) && fs.readdirSync(bgDir2).length > 0) {
-                console.log('Using background directory at root');
-                dir = bgDir2;
-            }
-            // Then check the images/background directory
-            else if (fs.existsSync(bgDir1) && fs.readdirSync(bgDir1).length > 0) {
-                console.log('Using images/background directory');
-                dir = bgDir1;
-            }
-            // Default to background at root
-            else {
-                dir = bgDir2;
-                if (!fs.existsSync(dir)) {
-                    console.log('Creating missing background directory');
-                    fs.mkdirSync(dir, { recursive: true });
-                }
-            }
         } else {
             dir = path.join(__dirname, 'images', layer);
         }
 
-        console.log(`Looking for files in directory: ${dir}`);
-        
         if (!fs.existsSync(dir)) {
-            console.log(`Directory ${dir} does not exist, creating it`);
-            fs.mkdirSync(dir, { recursive: true });
-            return res.json({ files: [] });
+            return res.json({ images: [] });
         }
 
         const files = fs.readdirSync(dir);
-        console.log(`Found ${files.length} files in ${dir}`);
         let filteredFiles;
         
         if (layer === 'music') {
@@ -358,7 +309,7 @@ app.get('/api/images/:layer', (req, res) => {
             filteredFiles = files.filter(file => file.endsWith('.png'));
         }
 
-        res.json({ files: filteredFiles });
+        res.json({ images: filteredFiles });
     } catch (error) {
         console.error('Error getting images:', error);
         res.status(500).json({ error: error.message });
