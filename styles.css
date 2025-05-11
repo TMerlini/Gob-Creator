@@ -23,6 +23,7 @@ body {
     background-attachment: fixed;
     display: flex;
     flex-direction: column;
+    background-image: url('/background/background.gif');
 }
 
 .subtext {
@@ -409,7 +410,7 @@ h1 {
         width: 40px;  /* Bigger on mobile */
         height: 40px;
     }
-    
+
     .resize-handle::before {
         font-size: 24px;
     }
@@ -1052,7 +1053,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
+    padding: 4px,
     margin-left: auto;
     overflow: hidden;
 }
@@ -1545,7 +1546,7 @@ h1 {
     .subtitle {
         font-size: 1.6em;
     }
-    
+
     .subtext {
         font-size: 1em;
     }
