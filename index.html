@@ -157,6 +157,11 @@
     </audio>
 
     <div class="audio-control">
+        <button id="prevTrack" class="audio-nav-btn">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M6,6H8V18H6V6M9.5,12L18,18V6L9.5,12Z"/>
+            </svg>
+        </button>
         <button id="audioToggle" class="audio-toggle">
             <svg class="audio-icon-on" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>
@@ -165,6 +170,12 @@
                 <path fill="currentColor" d="M12,4L9.91,6.09L12,8.18V4M4.27,3L3,4.27L7.73,9H3V15H7L12,20V4L7,9H3Z"/>
             </svg>
         </button>
+        <button id="nextTrack" class="audio-nav-btn">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M16,18H18V6H16V18M6,18L14.5,12L6,6V18Z"/>
+            </svg>
+        </button>
+        <div class="track-name"></div>
     </div>
 </body>
 </html>

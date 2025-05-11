@@ -1557,6 +1557,12 @@ h1 {
     top: 20px;
     right: 20px;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 5px 10px;
+    border-radius: 30px;
 }
 
 .audio-toggle {
@@ -1573,11 +1579,26 @@ h1 {
     transition: background-color 0.3s ease;
 }
 
-.audio-toggle:hover {
-    background: rgba(255, 255, 255, 0.3);
+.audio-nav-btn {
+    background: rgba(11, 173, 179, 0.4);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    transition: background-color 0.3s ease;
 }
 
-.audio-toggle svg {
+.audio-toggle:hover, .audio-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.audio-toggle svg, .audio-nav-btn svg {
     width: 24px;
     height: 24px;
     color: white;
@@ -1585,6 +1606,41 @@ h1 {
 
 .audio-icon-on, .audio-icon-off {
     transition: opacity 0.3s ease;
+}
+
+.track-name {
+    color: white;
+    font-size: 12px;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Media queries for mobile */
+@media (max-width: 768px) {
+    .audio-control {
+        top: 10px;
+        right: 10px;
+        padding: 3px 8px;
+    }
+    
+    .audio-toggle {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .audio-nav-btn {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .track-name {
+        max-width: 80px;
+        font-size: 10px;
+    }
 }
 
 /* NFT selector styles removed */

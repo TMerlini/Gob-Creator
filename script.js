@@ -1045,17 +1045,57 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
 });
 
 // Background loader function
-function loadBackground() {
-    const bgFolder = 'background/';
-    const validExtensions = ['png', 'jpg', 'jpeg', 'gif'];
+async function loadBackground() {
+    // Try multiple background paths in order
+    const backgroundPaths = [
+        '/background/background.gif',
+        '/images/background/background.gif',
+        'background/background.gif',
+        '/images/background/background.png',
+        '/images/background/background.jpg',
+        '/images/background/background.jpeg'
+    ];
     
-    // Try each extension
-    for (const ext of validExtensions) {
+    // Also try to load any uploaded background images
+    try {
+        const response = await fetch('/api/images/background');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.images && data.images.length > 0) {
+                // Add uploaded images to the paths to try
+                data.images.forEach(image => {
+                    backgroundPaths.push(`/images/background/${image}`);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching background images:', error);
+    }
+    
+    let backgroundLoaded = false;
+    
+    for (const path of backgroundPaths) {
+        if (backgroundLoaded) break;
+        
         const img = new Image();
         img.onload = function() {
-            document.body.style.backgroundImage = `url(${bgFolder}background.${ext})`;
+            console.log('Background image loaded successfully from:', path);
+            document.body.style.backgroundImage = `url('${path}')`;
+            backgroundLoaded = true;
         };
-        img.src = `${bgFolder}background.${ext}`;
+        img.onerror = function() {
+            console.log(`Failed to load background from: ${path}`);
+        };
+        img.src = path;
+        
+        // Wait a bit to see if the image loads
+        await delay(100);
+    }
+    
+    // If no background loaded, use a fallback color
+    if (!backgroundLoaded) {
+        console.log('Using fallback background color');
+        document.body.style.backgroundColor = "#000000";
     }
 }
 
@@ -1159,14 +1199,62 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Add this at the end of your script.js file
+// Music player functionality
 document.addEventListener('DOMContentLoaded', function() {
     const audio = document.getElementById('bgMusic');
     const audioToggle = document.getElementById('audioToggle');
     const iconOn = audioToggle.querySelector('.audio-icon-on');
     const iconOff = audioToggle.querySelector('.audio-icon-off');
     let isPlaying = false;
+    let currentTrackIndex = 0;
+    let musicTracks = ['background.mp3']; // Default track
+    let trackSource = document.querySelector('#bgMusic source');
 
+    // Function to load available music tracks
+    async function loadMusicTracks() {
+        try {
+            const response = await fetch('/api/images/music');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.images && data.images.length > 0) {
+                    musicTracks = data.images;
+                    console.log('Available music tracks:', musicTracks);
+                    
+                    // Set initial track
+                    loadTrack(currentTrackIndex);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching music tracks:', error);
+        }
+    }
+    
+    // Load a specific track by index
+    function loadTrack(index) {
+        if (musicTracks.length === 0) return;
+        
+        // Ensure index is within bounds
+        index = ((index % musicTracks.length) + musicTracks.length) % musicTracks.length;
+        currentTrackIndex = index;
+        
+        const wasPlaying = !audio.paused;
+        
+        // Update track source
+        trackSource.src = `/music/${musicTracks[index]}`;
+        audio.load();
+        
+        // Display current track name
+        const trackDisplay = document.querySelector('.track-name');
+        if (trackDisplay) {
+            trackDisplay.textContent = musicTracks[index].replace(/\.[^/.]+$/, ""); // Remove file extension
+        }
+        
+        // Resume playing if it was playing before
+        if (wasPlaying) {
+            audio.play().catch(error => console.log("Audio play failed:", error));
+        }
+    }
+    
     // Function to toggle audio
     function toggleAudio() {
         if (isPlaying) {
@@ -1183,18 +1271,41 @@ document.addEventListener('DOMContentLoaded', function() {
         isPlaying = !isPlaying;
     }
 
-    // Add click event listener
+    // Add click event listener to toggle button
     audioToggle.addEventListener('click', toggleAudio);
+    
+    // Create previous and next track buttons
+    const prevButton = document.getElementById('prevTrack');
+    const nextButton = document.getElementById('nextTrack');
+    
+    if (prevButton) {
+        prevButton.addEventListener('click', function() {
+            loadTrack(currentTrackIndex - 1);
+        });
+    }
+    
+    if (nextButton) {
+        nextButton.addEventListener('click', function() {
+            loadTrack(currentTrackIndex + 1);
+        });
+    }
 
-    // Optional: Add keyboard shortcut (M key)
+    // Optional: Add keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         if (e.key.toLowerCase() === 'm') {
             toggleAudio();
+        } else if (e.key === 'ArrowLeft' && e.altKey) {
+            loadTrack(currentTrackIndex - 1);
+        } else if (e.key === 'ArrowRight' && e.altKey) {
+            loadTrack(currentTrackIndex + 1);
         }
     });
 
     // Set initial volume
     audio.volume = 0.5; // Adjust this value between 0.0 and 1.0
+    
+    // Load available tracks
+    loadMusicTracks();
 });
 
 // Add this to help debug
