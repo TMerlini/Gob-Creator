@@ -41,11 +41,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let backgroundFiles = [];
     let musicFiles = [];
     
-    // Site text settings
+    // Site text and color settings
     let siteTextSettings = {
         title: 'GOBLINARINOS',
         subtitle: 'Merry Christmas Gobos',
-        subtext: 'Put you´r hat on!, Das it & Das all!'
+        subtext: 'Put you´r hat on!, Das it & Das all!',
+        subtitleColor: '#000000',
+        subtextColor: '#000000',
+        buttonColor: '#ffffff',
+        downloadBtnColor: '#1f78cc'
     };
     
     // Check authentication on page load
@@ -542,6 +546,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('siteTitle').value = siteTextSettings.title || '';
                     document.getElementById('siteSubtitle').value = siteTextSettings.subtitle || '';
                     document.getElementById('siteSubtext').value = siteTextSettings.subtext || '';
+                    
+                    // Load color values if they exist
+                    if (siteTextSettings.subtitleColor) {
+                        document.getElementById('subtitleColor').value = siteTextSettings.subtitleColor;
+                    }
+                    if (siteTextSettings.subtextColor) {
+                        document.getElementById('subtextColor').value = siteTextSettings.subtextColor;
+                    }
+                    if (siteTextSettings.buttonColor) {
+                        document.getElementById('buttonColor').value = siteTextSettings.buttonColor;
+                    }
+                    if (siteTextSettings.downloadBtnColor) {
+                        document.getElementById('downloadBtnColor').value = siteTextSettings.downloadBtnColor;
+                    }
                 }
             }
         } catch (error) {
@@ -554,7 +572,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const newSettings = {
             title: document.getElementById('siteTitle').value.trim(),
             subtitle: document.getElementById('siteSubtitle').value.trim(),
-            subtext: document.getElementById('siteSubtext').value.trim()
+            subtext: document.getElementById('siteSubtext').value.trim(),
+            subtitleColor: document.getElementById('subtitleColor').value,
+            subtextColor: document.getElementById('subtextColor').value,
+            buttonColor: document.getElementById('buttonColor').value,
+            downloadBtnColor: document.getElementById('downloadBtnColor').value
         };
         
         // Validate inputs - ensure they're not empty
@@ -577,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             if (response.ok) {
-                alert('Site text settings saved successfully!');
+                alert('All settings saved successfully!');
                 siteTextSettings = newSettings;
             } else {
                 const errorText = await response.text();
@@ -586,7 +608,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error saving site settings:', error);
-            alert('Failed to save site text settings. Please try again.');
+            alert('Failed to save settings. Please try again.');
         }
     });
 });

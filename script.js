@@ -1338,9 +1338,34 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (response.ok) {
             const data = await response.json();
             if (data.settings) {
+                // Update text content
                 document.getElementById('siteTitle').textContent = data.settings.title || 'GOBLINARINOS';
                 document.getElementById('siteSubtitle').textContent = data.settings.subtitle || 'Merry Christmas Gobos';
                 document.getElementById('siteSubtext').textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
+                
+                // Apply color settings
+                if (data.settings.subtitleColor) {
+                    document.getElementById('siteSubtitle').style.color = data.settings.subtitleColor;
+                }
+                
+                if (data.settings.subtextColor) {
+                    document.getElementById('siteSubtext').style.color = data.settings.subtextColor;
+                }
+                
+                if (data.settings.buttonColor) {
+                    // Apply button color to all layer row buttons
+                    document.querySelectorAll('.layer-row, .preview-btn').forEach(el => {
+                        el.style.backgroundColor = data.settings.buttonColor;
+                    });
+                }
+                
+                if (data.settings.downloadBtnColor) {
+                    // Apply color to download button
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    if (downloadBtn) {
+                        downloadBtn.style.backgroundColor = data.settings.downloadBtnColor;
+                    }
+                }
             }
         }
     } catch (error) {

@@ -97,7 +97,7 @@ const upload = multer({
     storage: storage,
     fileFilter: function (req, file, cb) {
         const layer = req.query.layer || 'layer1';
-        
+
         // Validate files based on layer type
         if (layer === 'layer1' || layer === 'layer2') {
             // Accept only PNG files for layer1 and layer2
@@ -115,7 +115,7 @@ const upload = multer({
                 return cb(new Error('Only audio files are allowed for Music!'), false);
             }
         }
-        
+
         cb(null, true);
     },
     limits: {
@@ -180,7 +180,7 @@ app.post('/api/upload', (req, res) => {
         storage: multer.diskStorage({
             destination: function (req, file, cb) {
                 let dir;
-                
+
                 // Determine the correct directory based on layer type
                 if (layer === 'music') {
                     dir = path.join(__dirname, 'music');
@@ -189,7 +189,7 @@ app.post('/api/upload', (req, res) => {
                 } else {
                     dir = path.join(__dirname, 'images', layer);
                 }
-                
+
                 console.log('Uploading to layer:', layer);
                 console.log('Directory:', dir);
 
@@ -228,7 +228,7 @@ app.post('/api/upload', (req, res) => {
         }),
         fileFilter: function (req, file, cb) {
             const layer = req.query.layer || 'layer1';
-            
+
             // Validate files based on layer type
             if (layer === 'layer1' || layer === 'layer2') {
                 // Accept only PNG files for layer1 and layer2
@@ -246,7 +246,7 @@ app.post('/api/upload', (req, res) => {
                     return cb(new Error('Only audio files are allowed for Music!'), false);
                 }
             }
-            
+
             cb(null, true);
         },
         limits: {
@@ -294,7 +294,7 @@ app.get('/api/images/:layer', (req, res) => {
 
         const files = fs.readdirSync(dir);
         let filteredFiles;
-        
+
         if (layer === 'music') {
             filteredFiles = files.filter(file => {
                 const ext = path.extname(file).toLowerCase();
@@ -331,7 +331,7 @@ app.post('/api/delete', (req, res) => {
 
         // Ensure filename is just a basename without path traversal
         const basename = path.basename(filename);
-        
+
         let filePath;
         if (layer === 'music') {
             filePath = path.join(__dirname, 'music', basename);
@@ -377,20 +377,25 @@ app.get('/api/site-settings', (req, res) => {
 
 app.post('/api/site-settings', (req, res) => {
     try {
-        const { settings } = req.body;
-        
+        const settings = req.body.settings;
+
+        // Validate required fields
         if (!settings || !settings.title) {
-            return res.status(400).json({ error: 'Invalid settings data' });
+            return res.status(400).send('Invalid settings data');
         }
-        
+
+        // Ensure all color fields exist
+        if (!settings.subtitleColor) settings.subtitleColor = '#000000';
+        if (!settings.subtextColor) settings.subtextColor = '#000000';
+        if (!settings.buttonColor) settings.buttonColor = '#ffffff';
+        if (!settings.downloadBtnColor) settings.downloadBtnColor = '#1f78cc';
+
         // Save settings to file
-        const settingsPath = path.join(__dirname, 'settings.json');
-        fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
-        
+        fs.writeFileSync('./settings.json', JSON.stringify(settings, null, 2));
         res.json({ success: true });
     } catch (error) {
         console.error('Error saving site settings:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).send('Failed to save settings');
     }
 });
 
