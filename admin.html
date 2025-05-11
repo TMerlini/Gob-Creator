@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goblinarinos Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Goblinarinos Admin Panel</h1>
+            <div class="auth-section">
+                <div id="loginForm" class="auth-form">
+                    <input type="password" id="passwordInput" placeholder="Enter admin password">
+                    <button id="loginBtn">Login</button>
+                </div>
+                <button id="logoutBtn" style="display: none;">Logout</button>
+            </div>
+        </header>
+
+        <main id="adminContent" style="display: none;">
+            <div class="upload-section">
+                <h2>Upload Images</h2>
+                
+                <div class="upload-container">
+                    <div class="upload-box">
+                        <h3>Layer 1 Images (Base)</h3>
+                        <p>Upload base images for the background layer</p>
+                        <div class="dropzone" id="layer1Dropzone">
+                            <p>Drag & drop PNG files here or</p>
+                            <label for="layer1Input" class="upload-btn">Select Files</label>
+                            <input type="file" id="layer1Input" multiple accept="image/png" style="display: none;">
+                        </div>
+                        <div id="layer1Queue" class="upload-queue"></div>
+                    </div>
+                    
+                    <div class="upload-box">
+                        <h3>Layer 2 Images (Overlay)</h3>
+                        <p>Upload overlay images for the movable layer</p>
+                        <div class="dropzone" id="layer2Dropzone">
+                            <p>Drag & drop PNG files here or</p>
+                            <label for="layer2Input" class="upload-btn">Select Files</label>
+                            <input type="file" id="layer2Input" multiple accept="image/png" style="display: none;">
+                        </div>
+                        <div id="layer2Queue" class="upload-queue"></div>
+                    </div>
+                </div>
+                
+                <div class="upload-actions">
+                    <button id="uploadBtn" class="primary-btn">Upload All Files</button>
+                </div>
+                
+                <div id="progressContainer" class="progress-container" style="display: none;">
+                    <div class="progress-bar">
+                        <div id="progressBar" class="progress"></div>
+                    </div>
+                    <p id="progressText">Uploading... 0%</p>
+                </div>
+            </div>
+            
+            <div class="gallery-section">
+                <h2>Manage Existing Images</h2>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-target="layer1Gallery">Layer 1 Images</button>
+                    <button class="tab-btn" data-target="layer2Gallery">Layer 2 Images</button>
+                </div>
+                
+                <div id="layer1Gallery" class="gallery active">
+                    <div class="gallery-loading">Loading images...</div>
+                    <div class="gallery-grid"></div>
+                </div>
+                
+                <div id="layer2Gallery" class="gallery">
+                    <div class="gallery-loading">Loading images...</div>
+                    <div class="gallery-grid"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="admin.js"></script>
+</body>
+</html>
