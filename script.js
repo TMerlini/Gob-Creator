@@ -766,7 +766,15 @@ drawLayers();
 // Navigation buttons functionality
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        const layerId = this.closest('.layer-row').querySelector('.preview-btn').getAttribute('data-layer');
+        // Get layer ID from button's data attribute or from parent row
+        let layerId;
+        if (this.hasAttribute('data-layer')) {
+            layerId = this.getAttribute('data-layer');
+        } else {
+            const layerRow = this.closest('.layer-row');
+            layerId = layerRow.getAttribute('data-layer');
+        }
+        
         const layer = layerId === '1' ? layer1 : layer2;
         
         if (this.classList.contains('prev')) {
@@ -904,60 +912,33 @@ document.addEventListener('click', (e) => {
 function updatePreviews() {
     document.querySelectorAll('.preview-btn').forEach(btn => {
         const layerId = btn.getAttribute('data-layer');
+        let layer;
         
-        // Handle layer 1 navigation preview separately
-        if (layerId === '1-nav-preview') {
-            const previewImg = btn.querySelector('.preview-img');
-            const currentImage = layer1.getCurrentImage();
+        // Determine which layer to use based on the data-layer attribute
+        if (layerId === '1' || layerId === '1-nav-preview') {
+            layer = layer1;
+        } else if (layerId === '2') {
+            layer = layer2;
+        } else {
+            return; // Skip if we can't determine the layer
+        }
+        
+        // Get current image from layer and update preview
+        const previewImg = btn.querySelector('.preview-img');
+        if (previewImg) {
+            const currentImage = layer.getCurrentImage();
             if (currentImage) {
                 previewImg.src = currentImage.src;
             }
-            return;
-        }
-        
-        const layer = layerId === '1' ? layer1 : layer2;
-        const previewImg = btn.querySelector('.preview-img');
-        const currentImage = layer.getCurrentImage();
-        if (currentImage) {
-            previewImg.src = currentImage.src;
         }
     });
 }
 
-// Add navigation button functionality
-document.querySelectorAll('.layer-row').forEach(row => {
-    // Skip if this row doesn't have a preview button
-    if (!row.querySelector('.preview-btn')) {
-        const dataLayer = row.getAttribute('data-layer');
-        if (dataLayer === '1-nav') {
-            // This is the navigation row for layer 1
-            row.querySelector('.nav-btn.prev').addEventListener('click', () => {
-                layer1.previousImage();
-            });
-            
-            row.querySelector('.nav-btn.next').addEventListener('click', () => {
-                layer1.nextImage();
-            });
-        }
-        return;
-    }
-    
-    const layerId = row.querySelector('.preview-btn').getAttribute('data-layer');
-    const layer = layerId === '1' ? layer1 : layer2;
-    
-    // Only attach event listeners if this row has navigation buttons
-    const prevBtn = row.querySelector('.nav-btn.prev');
-    const nextBtn = row.querySelector('.nav-btn.next');
-    
-    if (prevBtn && nextBtn) {
-        prevBtn.addEventListener('click', () => {
-            layer.previousImage();
-        });
-        
-        nextBtn.addEventListener('click', () => {
-            layer.nextImage();
-        });
-    }
+// Call updatePreviews initially to ensure all previews start with the correct images
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        updatePreviews();
+    }, 500); // Short delay to ensure images are loaded
 });
 
 // Update the file input in HTML to accept more formats
