@@ -1053,11 +1053,8 @@ async function loadBackground() {
             const data = await response.json();
             if (data.files && data.files.length > 0) {
                 // Use the first background image from the API
-                const bgFile = data.files[0];
-                
-                // Set the background directly with both possible paths
-                document.body.style.backgroundImage = `url(/background/${bgFile})`;
-                console.log('Background image loaded from API:', bgFile);
+                document.body.style.backgroundImage = `url(/images/background/${data.files[0]})`;
+                console.log('Background image loaded from API:', data.files[0]);
                 return;
             }
         }
@@ -1065,25 +1062,22 @@ async function loadBackground() {
         console.error('Error loading background from API:', error);
     }
     
-    // Explicitly try the known background location
-    const bgImage = new Image();
-    bgImage.onload = function() {
-        document.body.style.backgroundImage = `url(/background/background.gif)`;
-        console.log('Background image loaded successfully from /background/background.gif');
-    };
-    bgImage.onerror = function() {
-        console.error('Failed to load background image from /background/background.gif');
-        
-        // Try alternate location as fallback
-        const altBgImage = new Image();
-        altBgImage.onload = function() {
-            document.body.style.backgroundImage = `url(/images/background/background.gif)`;
-            console.log('Background image loaded from alternate location');
+    // Fallback to static background
+    const bgFolder = 'background/';
+    const validExtensions = ['png', 'jpg', 'jpeg', 'gif'];
+    
+    // Try each extension as fallback
+    for (const ext of validExtensions) {
+        const img = new Image();
+        img.onload = function() {
+            document.body.style.backgroundImage = `url(${bgFolder}background.${ext})`;
+            console.log('Background image loaded from fallback:', `${bgFolder}background.${ext}`);
         };
-        altBgImage.src = '/images/background/background.gif';
-    };
-    bgImage.src = '/background/background.gif';
-}
+        img.onerror = function() {
+            console.log(`Failed to load background.${ext}`);
+        };
+        img.src = `${bgFolder}background.${ext}`;
+    }
 }
 
 // Call the function when page loads
