@@ -35,8 +35,14 @@ const ADMIN_PASSWORD = 'GobAdmin123';
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
+        // Log for debugging
+        console.log('Upload request body:', req.body);
+        
         const layer = req.body.layer || 'layer1';
         const dir = path.join(__dirname, 'images', layer);
+        
+        console.log('Uploading to layer:', layer);
+        console.log('Directory:', dir);
         
         // Create directory if it doesn't exist
         if (!fs.existsSync(dir)) {
@@ -70,6 +76,7 @@ const storage = multer.diskStorage({
     }
 });
 
+// Make sure multer processes the form data before accessing req.body
 const upload = multer({ 
     storage: storage,
     fileFilter: function (req, file, cb) {
