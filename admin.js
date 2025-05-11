@@ -393,6 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load existing images for galleries
     function loadGalleries() {
+        console.log("Loading all galleries...");
         loadGallery('layer1');
         loadGallery('layer2');
         loadGallery('background');
@@ -401,6 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     async function loadGallery(layerType) {
+        console.log(`Loading gallery for ${layerType}...`);
         // Select the correct gallery element based on the layer type
         let galleryElement;
         if (layerType === 'layer1') {
@@ -423,6 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingElement.style.display = 'block';
         
         try {
+            console.log(`Fetching images for ${layerType}...`);
             const response = await fetch(`/api/images/${layerType}`);
             
             if (!response.ok) {
@@ -430,16 +433,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const data = await response.json();
+            console.log(`Received ${layerType} images:`, data);
             
             if (data.images && data.images.length > 0) {
+                console.log(`Found ${data.images.length} images for ${layerType}`);
                 data.images.forEach(image => {
                     addImageToGallery(image, gridElement, layerType);
                 });
             } else {
+                console.log(`No images found for ${layerType}`);
                 gridElement.innerHTML = '<p class="empty-gallery">No images found in this layer.</p>';
             }
         } catch (error) {
-            console.error('Error loading gallery:', error);
+            console.error(`Error loading ${layerType} gallery:`, error);
             gridElement.innerHTML = '<p class="empty-gallery">Failed to load images. Please try again later.</p>';
         } finally {
             loadingElement.style.display = 'none';
@@ -449,6 +455,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function addImageToGallery(image, galleryGrid, layerType) {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item';
+        
+        console.log(`Adding ${layerType} image to gallery:`, image);
         
         // Create proper image or audio preview based on type
         if (layerType === 'music') {
@@ -477,12 +485,20 @@ document.addEventListener('DOMContentLoaded', function() {
             // Set correct path based on layer type
             if (layerType === 'background') {
                 img.src = `/images/background/${image}`;
+                console.log(`Background image path: /images/background/${image}`);
             } else {
                 img.src = `/images/${layerType}/${image}`;
             }
             
             img.alt = image;
             img.loading = 'lazy';
+            
+            // Handle image load errors
+            img.onerror = function() {
+                console.error(`Failed to load image: ${img.src}`);
+                img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" text-anchor="middle" dominant-baseline="middle"%3EImage Error%3C/text%3E%3C/svg%3E';
+            };
+            
             galleryItem.appendChild(img);
         }
         
