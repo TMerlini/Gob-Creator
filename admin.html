@@ -66,6 +66,8 @@
                 <div class="tabs">
                     <button class="tab-btn active" data-target="layer1Gallery">Layer 1 Images</button>
                     <button class="tab-btn" data-target="layer2Gallery">Layer 2 Images</button>
+                    <button class="tab-btn" data-target="backgroundGallery">Background</button>
+                    <button class="tab-btn" data-target="musicGallery">Music</button>
                 </div>
                 
                 <div id="layer1Gallery" class="gallery active">
@@ -76,6 +78,41 @@
                 <div id="layer2Gallery" class="gallery">
                     <div class="gallery-loading">Loading images...</div>
                     <div class="gallery-grid"></div>
+                </div>
+                
+                <div id="backgroundGallery" class="gallery">
+                    <div class="gallery-loading">Loading background images...</div>
+                    <div class="gallery-grid"></div>
+                </div>
+                
+                <div id="musicGallery" class="gallery">
+                    <div class="gallery-loading">Loading music files...</div>
+                    <div class="gallery-grid"></div>
+                </div>
+            </div>
+            
+            <div class="advanced-section">
+                <h2>Advanced Settings</h2>
+                
+                <div class="site-text-settings">
+                    <h3>Site Text</h3>
+                    
+                    <div class="form-group">
+                        <label for="siteTitle">Main Title:</label>
+                        <input type="text" id="siteTitle" placeholder="GOBLINARINOS">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="siteSubtitle">Subtitle:</label>
+                        <input type="text" id="siteSubtitle" placeholder="Merry Christmas Gobos">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="siteSubtext">Subtext:</label>
+                        <input type="text" id="siteSubtext" placeholder="Put you´r hat on!, Das it & Das all!">
+                    </div>
+                    
+                    <button id="saveTextBtn" class="primary-btn">Save Text Settings</button>
                 </div>
             </div>
         </main>

@@ -31,6 +31,13 @@ document.addEventListener('DOMContentLoaded', function() {
     let layer1Files = [];
     let layer2Files = [];
     
+    // Site text settings
+    let siteTextSettings = {
+        title: 'GOBLINARINOS',
+        subtitle: 'Merry Christmas Gobos',
+        subtext: 'Put you´r hat on!, Das it & Das all!'
+    };
+    
     // Check authentication on page load
     checkAuth();
     
@@ -268,6 +275,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadGalleries() {
         loadGallery('layer1');
         loadGallery('layer2');
+        loadGallery('background');
+        loadGallery('music');
+        loadSiteTextSettings();
     }
     
     async function loadGallery(layerType) {
@@ -355,4 +365,58 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Failed to delete the image. Please try again.');
         }
     }
+    
+    // Load site text settings from server
+    async function loadSiteTextSettings() {
+        try {
+            const response = await fetch('/api/site-settings');
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.settings) {
+                    siteTextSettings = data.settings;
+                    document.getElementById('siteTitle').value = siteTextSettings.title || '';
+                    document.getElementById('siteSubtitle').value = siteTextSettings.subtitle || '';
+                    document.getElementById('siteSubtext').value = siteTextSettings.subtext || '';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading site settings:', error);
+        }
+    }
+    
+    // Save site text settings
+    document.getElementById('saveTextBtn').addEventListener('click', async function() {
+        const newSettings = {
+            title: document.getElementById('siteTitle').value.trim(),
+            subtitle: document.getElementById('siteSubtitle').value.trim(),
+            subtext: document.getElementById('siteSubtext').value.trim()
+        };
+        
+        // Validate inputs - ensure they're not empty
+        if (!newSettings.title) {
+            alert('Main title cannot be empty');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/site-settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newSettings)
+            });
+            
+            if (response.ok) {
+                alert('Site text settings saved successfully!');
+                siteTextSettings = newSettings;
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error saving site settings:', error);
+            alert('Failed to save site text settings. Please try again.');
+        }
+    });
 });

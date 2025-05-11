@@ -32,23 +32,39 @@ const COLLECTION_ADDRESS = '0x616f2ac5dd4f760db693c21e9ca7a8aa962cf93b';
 // Admin password (same as in admin.js)
 const ADMIN_PASSWORD = 'GobAdmin123';
 
+// Ensure all necessary directories exist
+const directories = [
+    './images/layer1',
+    './images/layer2',
+    './images/background',
+    './music'
+];
+
+// Create directories if they don't exist
+directories.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log(`Created directory: ${dir}`);
+    }
+});
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // Log for debugging
         console.log('Upload request body:', req.body);
-        
+
         const layer = req.body.layer || 'layer1';
         const dir = path.join(__dirname, 'images', layer);
-        
+
         console.log('Uploading to layer:', layer);
         console.log('Directory:', dir);
-        
+
         // Create directory if it doesn't exist
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
-        
+
         cb(null, dir);
     },
     filename: function (req, file, cb) {
@@ -56,22 +72,22 @@ const storage = multer.diskStorage({
         const layer = req.body.layer || 'layer1';
         const dir = path.join(__dirname, 'images', layer);
         let counter = 1;
-        
+
         if (fs.existsSync(dir)) {
             const files = fs.readdirSync(dir);
             const imageFiles = files.filter(file => file.startsWith('image') && file.endsWith('.png'));
-            
+
             if (imageFiles.length > 0) {
                 // Extract numbers from filenames
                 const numbers = imageFiles.map(file => {
                     const match = file.match(/image(\d+)\.png/);
                     return match ? parseInt(match[1], 10) : 0;
                 });
-                
+
                 counter = Math.max(...numbers) + 1;
             }
         }
-        
+
         cb(null, `image${counter}.png`);
     }
 });
@@ -104,7 +120,7 @@ app.get('/api/nft/:tokenId', async (req, res) => {
 
         const apiUrl = `${API_BASE_URL}/tokens/${COLLECTION_ADDRESS}/${tokenId}`;
         console.log(`Calling API: ${apiUrl}`); // Debug log
-        
+
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
@@ -142,7 +158,7 @@ app.get('/api/nft/:tokenId', async (req, res) => {
 app.post('/api/upload', (req, res) => {
     // Process layer field before multer processes file
     const layer = req.query.layer || 'layer1';
-    
+
     // Create a single-use multer instance with dynamic destination
     const singleUpload = multer({
         storage: multer.diskStorage({
@@ -150,7 +166,7 @@ app.post('/api/upload', (req, res) => {
                 const dir = path.join(__dirname, 'images', layer);
                 console.log('Uploading to layer:', layer);
                 console.log('Directory:', dir);
-                
+
                 // Create directory if it doesn't exist
                 if (!fs.existsSync(dir)) {
                     fs.mkdirSync(dir, { recursive: true });
@@ -161,22 +177,22 @@ app.post('/api/upload', (req, res) => {
                 // Find the next available index for the image
                 const dir = path.join(__dirname, 'images', layer);
                 let counter = 1;
-                
+
                 if (fs.existsSync(dir)) {
                     const files = fs.readdirSync(dir);
                     const imageFiles = files.filter(file => file.startsWith('image') && file.endsWith('.png'));
-                    
+
                     if (imageFiles.length > 0) {
                         // Extract numbers from filenames
                         const numbers = imageFiles.map(file => {
                             const match = file.match(/image(\d+)\.png/);
                             return match ? parseInt(match[1], 10) : 0;
                         });
-                        
+
                         counter = Math.max(...numbers) + 1;
                     }
                 }
-                
+
                 cb(null, `image${counter}.png`);
             }
         }),
@@ -191,17 +207,17 @@ app.post('/api/upload', (req, res) => {
             fileSize: 5 * 1024 * 1024 // 5MB size limit
         }
     }).single('image');
-    
+
     singleUpload(req, res, function(err) {
         if (err) {
             console.error('Upload error:', err);
             return res.status(500).json({ error: err.message });
         }
-        
+
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
-        
+
         res.json({
             success: true,
             filename: req.file.filename,
@@ -218,16 +234,16 @@ app.get('/api/images/:layer', (req, res) => {
         if (!['layer1', 'layer2'].includes(layer)) {
             return res.status(400).json({ error: 'Invalid layer specified' });
         }
-        
+
         const dir = path.join(__dirname, 'images', layer);
-        
+
         if (!fs.existsSync(dir)) {
             return res.json({ images: [] });
         }
-        
+
         const files = fs.readdirSync(dir);
         const imageFiles = files.filter(file => file.endsWith('.png'));
-        
+
         res.json({ images: imageFiles });
     } catch (error) {
         console.error('Error getting images:', error);
@@ -239,23 +255,23 @@ app.get('/api/images/:layer', (req, res) => {
 app.post('/api/delete', (req, res) => {
     try {
         const { layer, filename } = req.body;
-        
+
         if (!layer || !filename) {
             return res.status(400).json({ error: 'Layer and filename are required' });
         }
-        
+
         if (!['layer1', 'layer2'].includes(layer)) {
             return res.status(400).json({ error: 'Invalid layer specified' });
         }
-        
+
         // Ensure filename is just a basename without path traversal
         const basename = path.basename(filename);
         const filePath = path.join(__dirname, 'images', layer, basename);
-        
+
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({ error: 'File not found' });
         }
-        
+
         fs.unlinkSync(filePath);
         res.json({ success: true });
     } catch (error) {

@@ -1207,6 +1207,23 @@ window.addEventListener('load', () => {
 });
 
 // Add delay helper function
+
+// Load site text settings
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const response = await fetch('/api/site-settings');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.settings) {
+                document.getElementById('siteTitle').textContent = data.settings.title || 'GOBLINARINOS';
+                document.getElementById('siteSubtitle').textContent = data.settings.subtitle || 'Merry Christmas Gobos';
+                document.getElementById('siteSubtext').textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading site settings:', error);
+    }
+});n
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const RATE_LIMIT_DELAY = 500;
 
