@@ -928,7 +928,43 @@ document.querySelectorAll('.layer-row').forEach(row => {
 });
 
 // Update the file input in HTML to accept more formats
-document.getElementById('uploadLayer1').setAttribute('accept', 'image/png, image/jpeg, image/jpg, image/gif, image/webp');
+document.getElementById('uploadImage').setAttribute('accept', 'image/png, image/jpeg, image/jpg, image/gif, image/webp');
+
+// Handle file uploads with layer selection
+document.getElementById('uploadImage').addEventListener('change', function(e) {
+    if (this.files && this.files[0]) {
+        const file = this.files[0];
+        const selectedLayer = document.getElementById('uploadLayerSelect').value;
+        
+        // Create a FormData instance
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('layer', selectedLayer);
+        
+        // Show loading indicator
+        alert(`Uploading file to ${selectedLayer}...`);
+        
+        // Upload the file
+        fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Upload successful! File saved as ${data.filename} in ${data.layer}`);
+                // Refresh the page to show the new image
+                window.location.reload();
+            } else {
+                alert('Upload failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Upload error:', error);
+            alert('Upload failed. Please try again.');
+        });
+    }
+});
 
 // Add image optimization before upload
 function optimizeImage(img) {
