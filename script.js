@@ -915,16 +915,38 @@ function updatePreviews() {
 
 // Add navigation button functionality
 document.querySelectorAll('.layer-row').forEach(row => {
+    // Skip if this row doesn't have a preview button
+    if (!row.querySelector('.preview-btn')) {
+        const dataLayer = row.getAttribute('data-layer');
+        if (dataLayer === '1-nav') {
+            // This is the navigation row for layer 1
+            row.querySelector('.nav-btn.prev').addEventListener('click', () => {
+                layer1.previousImage();
+            });
+            
+            row.querySelector('.nav-btn.next').addEventListener('click', () => {
+                layer1.nextImage();
+            });
+        }
+        return;
+    }
+    
     const layerId = row.querySelector('.preview-btn').getAttribute('data-layer');
     const layer = layerId === '1' ? layer1 : layer2;
     
-    row.querySelector('.nav-btn.prev').addEventListener('click', () => {
-        layer.previousImage();
-    });
+    // Only attach event listeners if this row has navigation buttons
+    const prevBtn = row.querySelector('.nav-btn.prev');
+    const nextBtn = row.querySelector('.nav-btn.next');
     
-    row.querySelector('.nav-btn.next').addEventListener('click', () => {
-        layer.nextImage();
-    });
+    if (prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+            layer.previousImage();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            layer.nextImage();
+        });
+    }
 });
 
 // Update the file input in HTML to accept more formats

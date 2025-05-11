@@ -290,9 +290,10 @@ h1 {
     stroke: currentColor;
 }
 
-/* Hide Layer 1 navigation buttons */
-.layer-row[data-layer="1"] .nav-btn {
-    display: none;
+/* Style Layer 1 navigation row */
+.layer-row[data-layer="1-nav"] {
+    margin-top: 5px;
+    justify-content: center;
 }
 
 /* Adjust Layer 1 preview container spacing */

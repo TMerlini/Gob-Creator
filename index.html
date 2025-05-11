@@ -30,9 +30,6 @@
             <!-- Layer Controls moved to left side -->
             <div class="layer-controls">
                 <div class="layer-row" data-layer="1">
-                    <button class="nav-btn prev">←</button>
-                    <span class="select-text">Choose</span>
-                    <button class="nav-btn next">→</button>
                     <button class="preview-btn" data-layer="1">
                         <div class="preview-container">
                             <img class="preview-img" alt="Layer 1 preview">
@@ -50,6 +47,12 @@
                         <input type="file" id="uploadLayer1" accept="image/*" style="display: none;">
                         <a href="admin.html" class="admin-link" title="Admin Panel">👑</a>
                     </div>
+                </div>
+                <!-- Separate navigation for Layer 1 -->
+                <div class="layer-row" data-layer="1-nav">
+                    <button class="nav-btn prev">⇦</button>
+                    <span class="select-text">Choose</span>
+                    <button class="nav-btn next">⇨</button>
                 </div>
                 <div class="layer-row" data-layer="2">
                     <button class="nav-btn prev">⇦</button>
