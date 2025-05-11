@@ -1045,15 +1045,36 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
 });
 
 // Background loader function
-function loadBackground() {
+async function loadBackground() {
+    // First try to load from the background API endpoint
+    try {
+        const response = await fetch('/api/images/background');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.files && data.files.length > 0) {
+                // Use the first background image from the API
+                document.body.style.backgroundImage = `url(/images/background/${data.files[0]})`;
+                console.log('Background image loaded from API:', data.files[0]);
+                return;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading background from API:', error);
+    }
+    
+    // Fallback to static background
     const bgFolder = 'background/';
     const validExtensions = ['png', 'jpg', 'jpeg', 'gif'];
     
-    // Try each extension
+    // Try each extension as fallback
     for (const ext of validExtensions) {
         const img = new Image();
         img.onload = function() {
             document.body.style.backgroundImage = `url(${bgFolder}background.${ext})`;
+            console.log('Background image loaded from fallback:', `${bgFolder}background.${ext}`);
+        };
+        img.onerror = function() {
+            console.log(`Failed to load background.${ext}`);
         };
         img.src = `${bgFolder}background.${ext}`;
     }
