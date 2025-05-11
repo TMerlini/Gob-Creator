@@ -178,6 +178,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Toggle site text settings section
+    const toggleSiteTextBtn = document.getElementById('toggleSiteTextSettings');
+    const siteTextSection = document.getElementById('siteTextSettingsSection');
+    
+    if (toggleSiteTextBtn && siteTextSection) {
+        toggleSiteTextBtn.addEventListener('click', function() {
+            const isHidden = siteTextSection.style.display === 'none';
+            siteTextSection.style.display = isHidden ? 'block' : 'none';
+            this.textContent = isHidden ? '- Hide Site Text & Colors' : '+ Site Text & Colors';
+        });
+    }
+    
     // Tab functionality
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {

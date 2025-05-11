@@ -122,55 +122,57 @@
             <div class="advanced-section">
                 <h2>Advanced Settings</h2>
                 
-                <div class="site-text-settings">
-                    <h3>Site Text</h3>
+                <div class="advanced-dropdown-container">
+                    <button id="toggleSiteTextSettings" class="toggle-settings-btn">+ Site Text & Colors</button>
                     
-                    <div class="form-group">
-                        <label for="siteTitle">Main Title:</label>
-                        <input type="text" id="siteTitle" placeholder="GOBLINARINOS">
+                    <div id="siteTextSettingsSection" class="site-text-settings" style="display: none;">
+                        <div class="form-group">
+                            <label for="siteTitle">Main Title:</label>
+                            <input type="text" id="siteTitle" placeholder="GOBLINARINOS">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="siteSubtitle">Subtitle:</label>
+                            <input type="text" id="siteSubtitle" placeholder="Merry Christmas Gobos">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="siteSubtext">Subtext:</label>
+                            <input type="text" id="siteSubtext" placeholder="Put you´r hat on!, Das it & Das all!">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subtitleColor">Subtitle Color:</label>
+                            <input type="color" id="subtitleColor" value="#000000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subtextColor">Subtext Color:</label>
+                            <input type="color" id="subtextColor" value="#000000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="buttonColor">Button Background Color:</label>
+                            <input type="color" id="buttonColor" value="#ffffff">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="buttonTextColor">Button Text Color:</label>
+                            <input type="color" id="buttonTextColor" value="#000000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="downloadBtnColor">Download Button Color:</label>
+                            <input type="color" id="downloadBtnColor" value="#1f78cc">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="downloadBtnTextColor">Download Button Text Color:</label>
+                            <input type="color" id="downloadBtnTextColor" value="#ffffff">
+                        </div>
+                        
+                        <button id="saveTextBtn" class="primary-btn">Save All Settings</button>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="siteSubtitle">Subtitle:</label>
-                        <input type="text" id="siteSubtitle" placeholder="Merry Christmas Gobos">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="siteSubtext">Subtext:</label>
-                        <input type="text" id="siteSubtext" placeholder="Put you´r hat on!, Das it & Das all!">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="subtitleColor">Subtitle Color:</label>
-                        <input type="color" id="subtitleColor" value="#000000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="subtextColor">Subtext Color:</label>
-                        <input type="color" id="subtextColor" value="#000000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="buttonColor">Button Background Color:</label>
-                        <input type="color" id="buttonColor" value="#ffffff">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="buttonTextColor">Button Text Color:</label>
-                        <input type="color" id="buttonTextColor" value="#000000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="downloadBtnColor">Download Button Color:</label>
-                        <input type="color" id="downloadBtnColor" value="#1f78cc">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="downloadBtnTextColor">Download Button Text Color:</label>
-                        <input type="color" id="downloadBtnTextColor" value="#ffffff">
-                    </div>
-                    
-                    <button id="saveTextBtn" class="primary-btn">Save All Settings</button>
                 </div>
             </div>
         </main>

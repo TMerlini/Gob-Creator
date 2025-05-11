@@ -78,12 +78,12 @@ button:hover {
     flex-wrap: wrap;
 }
 
-.more-uploads-container {
+.more-uploads-container, .advanced-dropdown-container {
     width: 100%;
     margin-top: 20px;
 }
 
-.toggle-more-btn {
+.toggle-more-btn, .toggle-settings-btn {
     width: 100%;
     padding: 12px;
     background-color: #f0f0f0;
@@ -97,7 +97,7 @@ button:hover {
     transition: background-color 0.2s;
 }
 
-.toggle-more-btn:hover {
+.toggle-more-btn:hover, .toggle-settings-btn:hover {
     background-color: #e0e0e0;
 }
 
