@@ -96,14 +96,30 @@ const storage = multer.diskStorage({
 const upload = multer({ 
     storage: storage,
     fileFilter: function (req, file, cb) {
-        // Accept only PNG files
-        if (file.mimetype !== 'image/png') {
-            return cb(new Error('Only PNG images are allowed!'), false);
+        const layer = req.query.layer || 'layer1';
+        
+        // Validate files based on layer type
+        if (layer === 'layer1' || layer === 'layer2') {
+            // Accept only PNG files for layer1 and layer2
+            if (file.mimetype !== 'image/png') {
+                return cb(new Error('Only PNG images are allowed for Layer 1 and Layer 2!'), false);
+            }
+        } else if (layer === 'background') {
+            // Accept image files for background
+            if (!file.mimetype.startsWith('image/')) {
+                return cb(new Error('Only image files are allowed for Background!'), false);
+            }
+        } else if (layer === 'music') {
+            // Accept audio files for music
+            if (!file.mimetype.startsWith('audio/')) {
+                return cb(new Error('Only audio files are allowed for Music!'), false);
+            }
         }
+        
         cb(null, true);
     },
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB size limit
+        fileSize: 10 * 1024 * 1024 // 10MB size limit
     }
 });
 
@@ -163,7 +179,17 @@ app.post('/api/upload', (req, res) => {
     const singleUpload = multer({
         storage: multer.diskStorage({
             destination: function (req, file, cb) {
-                const dir = path.join(__dirname, 'images', layer);
+                let dir;
+                
+                // Determine the correct directory based on layer type
+                if (layer === 'music') {
+                    dir = path.join(__dirname, 'music');
+                } else if (layer === 'background') {
+                    dir = path.join(__dirname, 'images', 'background');
+                } else {
+                    dir = path.join(__dirname, 'images', layer);
+                }
+                
                 console.log('Uploading to layer:', layer);
                 console.log('Directory:', dir);
 
@@ -174,18 +200,22 @@ app.post('/api/upload', (req, res) => {
                 cb(null, dir);
             },
             filename: function (req, file, cb) {
-                // Find the next available index for the image
-                const dir = path.join(__dirname, 'images', layer);
+                const layer = req.query.layer || 'layer1';
+                const dir = layer === 'music' ? path.join(__dirname, 'music') : path.join(__dirname, 'images', layer);
                 let counter = 1;
+                const ext = path.extname(file.originalname).toLowerCase() || 
+                           (layer === 'music' ? '.mp3' : '.png');
+                const filePrefix = layer === 'music' ? 'track' : 'image';
 
                 if (fs.existsSync(dir)) {
                     const files = fs.readdirSync(dir);
-                    const imageFiles = files.filter(file => file.startsWith('image') && file.endsWith('.png'));
+                    const filePattern = new RegExp(`^${filePrefix}(\\d+)\\.[a-z0-9]+$`);
+                    const matchingFiles = files.filter(file => filePattern.test(file));
 
-                    if (imageFiles.length > 0) {
+                    if (matchingFiles.length > 0) {
                         // Extract numbers from filenames
-                        const numbers = imageFiles.map(file => {
-                            const match = file.match(/image(\d+)\.png/);
+                        const numbers = matchingFiles.map(file => {
+                            const match = file.match(filePattern);
                             return match ? parseInt(match[1], 10) : 0;
                         });
 
@@ -193,18 +223,34 @@ app.post('/api/upload', (req, res) => {
                     }
                 }
 
-                cb(null, `image${counter}.png`);
+                cb(null, `${filePrefix}${counter}${ext}`);
             }
         }),
         fileFilter: function (req, file, cb) {
-            // Accept only PNG files
-            if (file.mimetype !== 'image/png') {
-                return cb(new Error('Only PNG images are allowed!'), false);
+            const layer = req.query.layer || 'layer1';
+            
+            // Validate files based on layer type
+            if (layer === 'layer1' || layer === 'layer2') {
+                // Accept only PNG files for layer1 and layer2
+                if (file.mimetype !== 'image/png') {
+                    return cb(new Error('Only PNG images are allowed for Layer 1 and Layer 2!'), false);
+                }
+            } else if (layer === 'background') {
+                // Accept image files for background
+                if (!file.mimetype.startsWith('image/')) {
+                    return cb(new Error('Only image files are allowed for Background!'), false);
+                }
+            } else if (layer === 'music') {
+                // Accept audio files for music
+                if (!file.mimetype.startsWith('audio/')) {
+                    return cb(new Error('Only audio files are allowed for Music!'), false);
+                }
             }
+            
             cb(null, true);
         },
         limits: {
-            fileSize: 5 * 1024 * 1024 // 5MB size limit
+            fileSize: 10 * 1024 * 1024 // 10MB size limit
         }
     }).single('image');
 
@@ -231,20 +277,39 @@ app.post('/api/upload', (req, res) => {
 app.get('/api/images/:layer', (req, res) => {
     try {
         const { layer } = req.params;
-        if (!['layer1', 'layer2'].includes(layer)) {
+        if (!['layer1', 'layer2', 'background', 'music'].includes(layer)) {
             return res.status(400).json({ error: 'Invalid layer specified' });
         }
 
-        const dir = path.join(__dirname, 'images', layer);
+        let dir;
+        if (layer === 'music') {
+            dir = path.join(__dirname, 'music');
+        } else {
+            dir = path.join(__dirname, 'images', layer);
+        }
 
         if (!fs.existsSync(dir)) {
             return res.json({ images: [] });
         }
 
         const files = fs.readdirSync(dir);
-        const imageFiles = files.filter(file => file.endsWith('.png'));
+        let filteredFiles;
+        
+        if (layer === 'music') {
+            filteredFiles = files.filter(file => {
+                const ext = path.extname(file).toLowerCase();
+                return ['.mp3', '.wav', '.ogg', '.m4a'].includes(ext);
+            });
+        } else if (layer === 'background') {
+            filteredFiles = files.filter(file => {
+                const ext = path.extname(file).toLowerCase();
+                return ['.png', '.jpg', '.jpeg', '.gif', '.webp'].includes(ext);
+            });
+        } else {
+            filteredFiles = files.filter(file => file.endsWith('.png'));
+        }
 
-        res.json({ images: imageFiles });
+        res.json({ images: filteredFiles });
     } catch (error) {
         console.error('Error getting images:', error);
         res.status(500).json({ error: error.message });
@@ -260,13 +325,19 @@ app.post('/api/delete', (req, res) => {
             return res.status(400).json({ error: 'Layer and filename are required' });
         }
 
-        if (!['layer1', 'layer2'].includes(layer)) {
+        if (!['layer1', 'layer2', 'background', 'music'].includes(layer)) {
             return res.status(400).json({ error: 'Invalid layer specified' });
         }
 
         // Ensure filename is just a basename without path traversal
         const basename = path.basename(filename);
-        const filePath = path.join(__dirname, 'images', layer, basename);
+        
+        let filePath;
+        if (layer === 'music') {
+            filePath = path.join(__dirname, 'music', basename);
+        } else {
+            filePath = path.join(__dirname, 'images', layer, basename);
+        }
 
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({ error: 'File not found' });

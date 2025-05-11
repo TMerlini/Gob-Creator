@@ -14,10 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const layer1Dropzone = document.getElementById('layer1Dropzone');
     const layer2Dropzone = document.getElementById('layer2Dropzone');
+    const backgroundDropzone = document.getElementById('backgroundDropzone');
+    const musicDropzone = document.getElementById('musicDropzone');
     const layer1Input = document.getElementById('layer1Input');
     const layer2Input = document.getElementById('layer2Input');
+    const backgroundInput = document.getElementById('backgroundInput');
+    const musicInput = document.getElementById('musicInput');
     const layer1Queue = document.getElementById('layer1Queue');
     const layer2Queue = document.getElementById('layer2Queue');
+    const backgroundQueue = document.getElementById('backgroundQueue');
+    const musicQueue = document.getElementById('musicQueue');
     const uploadBtn = document.getElementById('uploadBtn');
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
@@ -25,11 +31,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const layer1Gallery = document.getElementById('layer1Gallery');
     const layer2Gallery = document.getElementById('layer2Gallery');
+    const backgroundGallery = document.getElementById('backgroundGallery');
+    const musicGallery = document.getElementById('musicGallery');
     const tabButtons = document.querySelectorAll('.tab-btn');
     
     // File queues for uploads
     let layer1Files = [];
     let layer2Files = [];
+    let backgroundFiles = [];
+    let musicFiles = [];
     
     // Site text settings
     let siteTextSettings = {
@@ -112,6 +122,44 @@ document.addEventListener('DOMContentLoaded', function() {
         handleFiles(this.files, 'layer2');
     });
     
+    backgroundDropzone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('active');
+    });
+    
+    backgroundDropzone.addEventListener('dragleave', function() {
+        this.classList.remove('active');
+    });
+    
+    backgroundDropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('active');
+        handleFiles(e.dataTransfer.files, 'background');
+    });
+    
+    backgroundInput.addEventListener('change', function() {
+        handleFiles(this.files, 'background');
+    });
+    
+    musicDropzone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('active');
+    });
+    
+    musicDropzone.addEventListener('dragleave', function() {
+        this.classList.remove('active');
+    });
+    
+    musicDropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('active');
+        handleFiles(e.dataTransfer.files, 'music');
+    });
+    
+    musicInput.addEventListener('change', function() {
+        handleFiles(this.files, 'music');
+    });
+    
     // Tab functionality
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -131,15 +179,50 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle file selection
     function handleFiles(files, layerType) {
-        const filesArray = Array.from(files).filter(file => file.type === 'image/png');
+        let filesArray = [];
         
-        if (filesArray.length === 0) {
-            alert('Please select PNG images only.');
-            return;
+        // Filter files based on layer type
+        if (layerType === 'layer1' || layerType === 'layer2') {
+            filesArray = Array.from(files).filter(file => file.type === 'image/png');
+            if (filesArray.length === 0) {
+                alert('Please select PNG images only for Layer 1 and Layer 2.');
+                return;
+            }
+        } else if (layerType === 'background') {
+            filesArray = Array.from(files).filter(file => file.type.startsWith('image/'));
+            if (filesArray.length === 0) {
+                alert('Please select valid image files for Background.');
+                return;
+            }
+        } else if (layerType === 'music') {
+            filesArray = Array.from(files).filter(file => file.type.startsWith('audio/'));
+            if (filesArray.length === 0) {
+                alert('Please select valid audio files for Music.');
+                return;
+            }
         }
         
-        const targetQueue = layerType === 'layer1' ? layer1Queue : layer2Queue;
-        const filesList = layerType === 'layer1' ? layer1Files : layer2Files;
+        // Determine target queue and files list
+        let targetQueue, filesList;
+        
+        switch (layerType) {
+            case 'layer1':
+                targetQueue = layer1Queue;
+                filesList = layer1Files;
+                break;
+            case 'layer2':
+                targetQueue = layer2Queue;
+                filesList = layer2Files;
+                break;
+            case 'background':
+                targetQueue = backgroundQueue;
+                filesList = backgroundFiles;
+                break;
+            case 'music':
+                targetQueue = musicQueue;
+                filesList = musicFiles;
+                break;
+        }
         
         filesArray.forEach(file => {
             // Check if we already have this file
@@ -155,10 +238,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Update references
-        if (layerType === 'layer1') {
-            layer1Files = filesList;
-        } else {
-            layer2Files = filesList;
+        switch (layerType) {
+            case 'layer1':
+                layer1Files = filesList;
+                break;
+            case 'layer2':
+                layer2Files = filesList;
+                break;
+            case 'background':
+                backgroundFiles = filesList;
+                break;
+            case 'music':
+                musicFiles = filesList;
+                break;
         }
     }
     
@@ -190,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle upload process
     uploadBtn.addEventListener('click', async function() {
-        const totalFiles = layer1Files.length + layer2Files.length;
+        const totalFiles = layer1Files.length + layer2Files.length + backgroundFiles.length + musicFiles.length;
         
         if (totalFiles === 0) {
             alert('Please select files to upload first.');
@@ -234,11 +326,39 @@ document.addEventListener('DOMContentLoaded', function() {
             updateProgress();
         }
         
+        // Upload background files
+        for (const file of backgroundFiles) {
+            try {
+                await uploadFile(file, 'background');
+                uploadedCount++;
+            } catch (error) {
+                console.error('Upload error:', error);
+                errorCount++;
+            }
+            updateProgress();
+        }
+        
+        // Upload music files
+        for (const file of musicFiles) {
+            try {
+                await uploadFile(file, 'music');
+                uploadedCount++;
+            } catch (error) {
+                console.error('Upload error:', error);
+                errorCount++;
+            }
+            updateProgress();
+        }
+        
         // Reset the queues
         layer1Queue.innerHTML = '';
         layer2Queue.innerHTML = '';
+        backgroundQueue.innerHTML = '';
+        musicQueue.innerHTML = '';
         layer1Files = [];
         layer2Files = [];
+        backgroundFiles = [];
+        musicFiles = [];
         
         // Complete the progress
         progressText.textContent = `Upload complete! ${uploadedCount} files uploaded successfully, ${errorCount} failed.`;
