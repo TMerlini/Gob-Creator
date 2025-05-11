@@ -166,6 +166,18 @@ document.addEventListener('DOMContentLoaded', function() {
         handleFiles(this.files, 'music');
     });
     
+    // Toggle more uploads section
+    const toggleMoreUploadsBtn = document.getElementById('toggleMoreUploads');
+    const moreUploadsSection = document.getElementById('moreUploadsSection');
+    
+    if (toggleMoreUploadsBtn && moreUploadsSection) {
+        toggleMoreUploadsBtn.addEventListener('click', function() {
+            const isHidden = moreUploadsSection.style.display === 'none';
+            moreUploadsSection.style.display = isHidden ? 'flex' : 'none';
+            this.textContent = isHidden ? '- Less Upload Options' : '+ More Upload Options';
+        });
+    }
+    
     // Tab functionality
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {
