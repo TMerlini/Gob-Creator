@@ -1359,11 +1359,26 @@ document.addEventListener('DOMContentLoaded', async function() {
                     });
                 }
                 
+                if (data.settings.buttonTextColor) {
+                    // Apply text color to all layer row buttons, rotation and flip controls
+                    document.querySelectorAll('.layer-row, .preview-btn, .rotation-control, .flip-btn').forEach(el => {
+                        el.style.color = data.settings.buttonTextColor;
+                    });
+                }
+                
                 if (data.settings.downloadBtnColor) {
                     // Apply color to download button
                     const downloadBtn = document.getElementById('downloadBtn');
                     if (downloadBtn) {
                         downloadBtn.style.backgroundColor = data.settings.downloadBtnColor;
+                    }
+                }
+                
+                if (data.settings.downloadBtnTextColor) {
+                    // Apply text color to download button
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    if (downloadBtn) {
+                        downloadBtn.style.color = data.settings.downloadBtnTextColor;
                     }
                 }
             }

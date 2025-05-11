@@ -388,7 +388,9 @@ app.post('/api/site-settings', (req, res) => {
         if (!settings.subtitleColor) settings.subtitleColor = '#000000';
         if (!settings.subtextColor) settings.subtextColor = '#000000';
         if (!settings.buttonColor) settings.buttonColor = '#ffffff';
+        if (!settings.buttonTextColor) settings.buttonTextColor = '#000000';
         if (!settings.downloadBtnColor) settings.downloadBtnColor = '#1f78cc';
+        if (!settings.downloadBtnTextColor) settings.downloadBtnTextColor = '#ffffff';
 
         // Save settings to file
         fs.writeFileSync('./settings.json', JSON.stringify(settings, null, 2));

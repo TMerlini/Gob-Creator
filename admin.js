@@ -49,7 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
         subtitleColor: '#000000',
         subtextColor: '#000000',
         buttonColor: '#ffffff',
-        downloadBtnColor: '#1f78cc'
+        buttonTextColor: '#000000',
+        downloadBtnColor: '#1f78cc',
+        downloadBtnTextColor: '#ffffff'
     };
     
     // Check authentication on page load
@@ -557,8 +559,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (siteTextSettings.buttonColor) {
                         document.getElementById('buttonColor').value = siteTextSettings.buttonColor;
                     }
+                    if (siteTextSettings.buttonTextColor) {
+                        document.getElementById('buttonTextColor').value = siteTextSettings.buttonTextColor;
+                    }
                     if (siteTextSettings.downloadBtnColor) {
                         document.getElementById('downloadBtnColor').value = siteTextSettings.downloadBtnColor;
+                    }
+                    if (siteTextSettings.downloadBtnTextColor) {
+                        document.getElementById('downloadBtnTextColor').value = siteTextSettings.downloadBtnTextColor;
                     }
                 }
             }
@@ -576,7 +584,9 @@ document.addEventListener('DOMContentLoaded', function() {
             subtitleColor: document.getElementById('subtitleColor').value,
             subtextColor: document.getElementById('subtextColor').value,
             buttonColor: document.getElementById('buttonColor').value,
-            downloadBtnColor: document.getElementById('downloadBtnColor').value
+            buttonTextColor: document.getElementById('buttonTextColor').value,
+            downloadBtnColor: document.getElementById('downloadBtnColor').value,
+            downloadBtnTextColor: document.getElementById('downloadBtnTextColor').value
         };
         
         // Validate inputs - ensure they're not empty
