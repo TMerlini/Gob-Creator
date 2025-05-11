@@ -1393,10 +1393,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                         const style = document.createElement('style');
                         style.textContent = `
                             .rotation-slider::-webkit-slider-thumb {
-                                background: ${data.settings.buttonColor} !important;
+                                background: ${data.settings.buttonTextColor} !important;
                             }
                             .rotation-slider::-moz-range-thumb {
-                                background: ${data.settings.buttonColor} !important;
+                                background: ${data.settings.buttonTextColor} !important;
                             }
                         `;
                         document.head.appendChild(style);
