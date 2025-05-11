@@ -138,18 +138,10 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
         
-        // Log the upload details for debugging
-        console.log('Upload request:', {
-            filename: req.file.filename,
-            path: req.file.path,
-            layer: req.body.layer
-        });
-        
         res.json({
             success: true,
             filename: req.file.filename,
-            path: req.file.path,
-            layer: req.body.layer
+            path: req.file.path
         });
     } catch (error) {
         console.error('Upload error:', error);

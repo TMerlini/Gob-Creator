@@ -928,41 +928,39 @@ document.querySelectorAll('.layer-row').forEach(row => {
 });
 
 // Update the file input in HTML to accept more formats
-document.getElementById('uploadImage').setAttribute('accept', 'image/png, image/jpeg, image/jpg, image/gif, image/webp');
+document.getElementById('uploadLayer1').setAttribute('accept', 'image/png, image/jpeg, image/jpg, image/gif, image/webp');
 
 // Handle file uploads with layer selection
-document.getElementById('uploadImage').addEventListener('change', function(e) {
-    if (this.files && this.files[0]) {
-        const file = this.files[0];
-        const selectedLayer = document.getElementById('uploadLayerSelect').value;
-        
-        // Create a FormData instance
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('layer', selectedLayer);
-        
-        // Show loading indicator
-        alert(`Uploading file to ${selectedLayer}...`);
-        
-        // Upload the file
-        fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(`Upload successful! File saved as ${data.filename} in ${data.layer}`);
-                // Refresh the page to show the new image
-                window.location.reload();
-            } else {
-                alert('Upload failed: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Upload error:', error);
-            alert('Upload failed. Please try again.');
-        });
+document.getElementById('uploadLayer1').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+    
+    if (file && allowedTypes.includes(file.type)) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = function() {
+                // Optimize image before storing
+                const optimizedDataUrl = optimizeImage(img);
+                localStorage.setItem('layer1CustomImage', optimizedDataUrl);
+                
+                // Update layer 1 with optimized image
+                const optimizedImg = new Image();
+                optimizedImg.onload = function() {
+                    layer1.images = [optimizedImg];
+                    layer1.currentImageIndex = 0;
+                    layer1.aspectRatio = optimizedImg.width / optimizedImg.height;
+                    layer1.isCustomImage = true;
+                    
+                    drawLayers();
+                    updatePreviews();
+                };
+                optimizedImg.src = optimizedDataUrl;
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 });
 

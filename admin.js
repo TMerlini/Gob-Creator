@@ -251,8 +251,6 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('image', file);
         formData.append('layer', layerType);
         
-        console.log(`Uploading file to ${layerType}:`, file.name);
-        
         const response = await fetch('/api/upload', {
             method: 'POST',
             body: formData
