@@ -1,17 +1,16 @@
-
 // Admin Panel JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     // Authentication variables
     const ADMIN_PASSWORD = 'GobAdmin123'; // Change this to your desired password
     const AUTH_TOKEN_KEY = 'gobAdmin_auth';
-    
+
     // DOM Elements
     const loginForm = document.getElementById('loginForm');
     const passwordInput = document.getElementById('passwordInput');
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const adminContent = document.getElementById('adminContent');
-    
+
     const layer1Dropzone = document.getElementById('layer1Dropzone');
     const layer2Dropzone = document.getElementById('layer2Dropzone');
     const backgroundDropzone = document.getElementById('backgroundDropzone');
@@ -28,29 +27,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
-    
+
     const layer1Gallery = document.getElementById('layer1Gallery');
     const layer2Gallery = document.getElementById('layer2Gallery');
     const backgroundGallery = document.getElementById('backgroundGallery');
     const musicGallery = document.getElementById('musicGallery');
     const tabButtons = document.querySelectorAll('.tab-btn');
-    
+
     // File queues for uploads
     let layer1Files = [];
     let layer2Files = [];
     let backgroundFiles = [];
     let musicFiles = [];
-    
+
     // Site text settings
     let siteTextSettings = {
         title: 'GOBLINARINOS',
         subtitle: 'Merry Christmas Gobos',
         subtext: 'Put you´r hat on!, Das it & Das all!'
     };
-    
+
     // Check authentication on page load
     checkAuth();
-    
+
     // Authentication functions
     function checkAuth() {
         const token = localStorage.getItem(AUTH_TOKEN_KEY);
@@ -58,14 +57,14 @@ document.addEventListener('DOMContentLoaded', function() {
             showAdminPanel();
         }
     }
-    
+
     function showAdminPanel() {
         loginForm.style.display = 'none';
         logoutBtn.style.display = 'block';
         adminContent.style.display = 'block';
         loadGalleries();
     }
-    
+
     // Event listeners for authentication
     loginBtn.addEventListener('click', function() {
         if (passwordInput.value === ADMIN_PASSWORD) {
@@ -75,100 +74,100 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Incorrect password. Please try again.');
         }
     });
-    
+
     logoutBtn.addEventListener('click', function() {
         localStorage.removeItem(AUTH_TOKEN_KEY);
         loginForm.style.display = 'flex';
         logoutBtn.style.display = 'none';
         adminContent.style.display = 'none';
     });
-    
+
     // File upload event listeners
     layer1Dropzone.addEventListener('dragover', function(e) {
         e.preventDefault();
         this.classList.add('active');
     });
-    
+
     layer1Dropzone.addEventListener('dragleave', function() {
         this.classList.remove('active');
     });
-    
+
     layer1Dropzone.addEventListener('drop', function(e) {
         e.preventDefault();
         this.classList.remove('active');
         handleFiles(e.dataTransfer.files, 'layer1');
     });
-    
+
     layer2Dropzone.addEventListener('dragover', function(e) {
         e.preventDefault();
         this.classList.add('active');
     });
-    
+
     layer2Dropzone.addEventListener('dragleave', function() {
         this.classList.remove('active');
     });
-    
+
     layer2Dropzone.addEventListener('drop', function(e) {
         e.preventDefault();
         this.classList.remove('active');
         handleFiles(e.dataTransfer.files, 'layer2');
     });
-    
+
     layer1Input.addEventListener('change', function() {
         handleFiles(this.files, 'layer1');
     });
-    
+
     layer2Input.addEventListener('change', function() {
         handleFiles(this.files, 'layer2');
     });
-    
+
     backgroundDropzone.addEventListener('dragover', function(e) {
         e.preventDefault();
         this.classList.add('active');
     });
-    
+
     backgroundDropzone.addEventListener('dragleave', function() {
         this.classList.remove('active');
     });
-    
+
     backgroundDropzone.addEventListener('drop', function(e) {
         e.preventDefault();
         this.classList.remove('active');
         handleFiles(e.dataTransfer.files, 'background');
     });
-    
+
     backgroundInput.addEventListener('change', function() {
         handleFiles(this.files, 'background');
     });
-    
+
     musicDropzone.addEventListener('dragover', function(e) {
         e.preventDefault();
         this.classList.add('active');
     });
-    
+
     musicDropzone.addEventListener('dragleave', function() {
         this.classList.remove('active');
     });
-    
+
     musicDropzone.addEventListener('drop', function(e) {
         e.preventDefault();
         this.classList.remove('active');
         handleFiles(e.dataTransfer.files, 'music');
     });
-    
+
     musicInput.addEventListener('change', function() {
         handleFiles(this.files, 'music');
     });
-    
+
     // Tab functionality
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {
             const target = this.dataset.target;
-            
+
             // Update active state for buttons
             tabButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
-            
+
             // Show the target gallery
             document.querySelectorAll('.gallery').forEach(gallery => {
                 gallery.classList.remove('active');
@@ -176,11 +175,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById(target).classList.add('active');
         });
     });
-    
+
     // Handle file selection
     function handleFiles(files, layerType) {
         let filesArray = [];
-        
+
         // Filter files based on layer type
         if (layerType === 'layer1' || layerType === 'layer2') {
             filesArray = Array.from(files).filter(file => file.type === 'image/png');
@@ -201,10 +200,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
         }
-        
+
         // Determine target queue and files list
         let targetQueue, filesList;
-        
+
         switch (layerType) {
             case 'layer1':
                 targetQueue = layer1Queue;
@@ -223,20 +222,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 filesList = musicFiles;
                 break;
         }
-        
+
         filesArray.forEach(file => {
             // Check if we already have this file
             const isDuplicate = filesList.some(existingFile => 
                 existingFile.name === file.name && 
                 existingFile.size === file.size
             );
-            
+
             if (!isDuplicate) {
                 filesList.push(file);
                 addFileToQueue(file, targetQueue, filesList);
             }
         });
-        
+
         // Update references
         switch (layerType) {
             case 'layer1':
@@ -253,16 +252,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
     }
-    
+
     // Add file to the visual queue
     function addFileToQueue(file, queueElement, filesList) {
         const fileItem = document.createElement('div');
         fileItem.className = 'file-item';
-        
+
         const fileName = document.createElement('div');
         fileName.className = 'file-name';
         fileName.textContent = file.name;
-        
+
         const removeBtn = document.createElement('button');
         removeBtn.className = 'file-remove';
         removeBtn.textContent = '×';
@@ -274,34 +273,34 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             fileItem.remove();
         });
-        
+
         fileItem.appendChild(fileName);
         fileItem.appendChild(removeBtn);
         queueElement.appendChild(fileItem);
     }
-    
+
     // Handle upload process
     uploadBtn.addEventListener('click', async function() {
         const totalFiles = layer1Files.length + layer2Files.length + backgroundFiles.length + musicFiles.length;
-        
+
         if (totalFiles === 0) {
             alert('Please select files to upload first.');
             return;
         }
-        
+
         this.disabled = true;
         progressContainer.style.display = 'block';
-        
+
         let uploadedCount = 0;
         let errorCount = 0;
-        
+
         // Helper function to update progress
         const updateProgress = () => {
             const progress = Math.round(((uploadedCount + errorCount) / totalFiles) * 100);
             progressBar.style.width = `${progress}%`;
             progressText.textContent = `Uploading... ${progress}% (${uploadedCount} successful, ${errorCount} failed)`;
         };
-        
+
         // Upload layer1 files
         for (const file of layer1Files) {
             try {
@@ -313,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             updateProgress();
         }
-        
+
         // Upload layer2 files
         for (const file of layer2Files) {
             try {
@@ -325,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             updateProgress();
         }
-        
+
         // Upload background files
         for (const file of backgroundFiles) {
             try {
@@ -337,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             updateProgress();
         }
-        
+
         // Upload music files
         for (const file of musicFiles) {
             try {
@@ -349,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             updateProgress();
         }
-        
+
         // Reset the queues
         layer1Queue.innerHTML = '';
         layer2Queue.innerHTML = '';
@@ -359,10 +358,10 @@ document.addEventListener('DOMContentLoaded', function() {
         layer2Files = [];
         backgroundFiles = [];
         musicFiles = [];
-        
+
         // Complete the progress
         progressText.textContent = `Upload complete! ${uploadedCount} files uploaded successfully, ${errorCount} failed.`;
-        
+
         // Re-enable the upload button after a delay
         setTimeout(() => {
             uploadBtn.disabled = false;
@@ -371,26 +370,26 @@ document.addEventListener('DOMContentLoaded', function() {
             loadGalleries();
         }, 2000);
     });
-    
+
     // Upload a single file to the server
     async function uploadFile(file, layerType) {
         const formData = new FormData();
         formData.append('image', file);
-        
+
         console.log(`Uploading file to ${layerType}:`, file.name);
-        
+
         const response = await fetch(`/api/upload?layer=${layerType}`, {
             method: 'POST',
             body: formData
         });
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         return await response.json();
     }
-    
+
     // Load existing images for galleries
     function loadGalleries() {
         console.log("Loading all galleries...");
@@ -400,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadGallery('music');
         loadSiteTextSettings();
     }
-    
+
     async function loadGallery(layerType) {
         console.log(`Loading gallery for ${layerType}...`);
         // Select the correct gallery element based on the layer type
@@ -417,27 +416,30 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Unknown layer type:', layerType);
             return;
         }
-        
+
         const gridElement = galleryElement.querySelector('.gallery-grid');
         const loadingElement = galleryElement.querySelector('.gallery-loading');
-        
+
         gridElement.innerHTML = '';
         loadingElement.style.display = 'block';
-        
+
         try {
             console.log(`Fetching images for ${layerType}...`);
             const response = await fetch(`/api/images/${layerType}`);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const data = await response.json();
             console.log(`Received ${layerType} images:`, data);
-            
-            if (data.images && data.images.length > 0) {
-                console.log(`Found ${data.images.length} images for ${layerType}`);
-                data.images.forEach(image => {
+
+            // Check if we're using the right property for the files
+            const files = data.images || data.files || [];
+
+            if (files && files.length > 0) {
+                console.log(`Found ${files.length} images for ${layerType}`);
+                files.forEach(image => {
                     addImageToGallery(image, gridElement, layerType);
                 });
             } else {
@@ -451,27 +453,27 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingElement.style.display = 'none';
         }
     }
-    
+
     function addImageToGallery(image, galleryGrid, layerType) {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item';
-        
+
         console.log(`Adding ${layerType} image to gallery:`, image);
-        
+
         // Create proper image or audio preview based on type
         if (layerType === 'music') {
             // For music files, show an audio player
             const audio = document.createElement('audio');
             audio.controls = true;
             audio.className = 'gallery-audio';
-            
+
             const source = document.createElement('source');
             source.src = `/music/${image}`;
             source.type = 'audio/' + image.split('.').pop(); // Get file extension
-            
+
             audio.appendChild(source);
             galleryItem.appendChild(audio);
-            
+
             // Add file name
             const fileName = document.createElement('p');
             fileName.className = 'gallery-filename';
@@ -481,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // For images, show an image preview
             const img = document.createElement('img');
             img.className = 'gallery-img';
-            
+
             // Set correct path based on layer type
             if (layerType === 'background') {
                 img.src = `/images/background/${image}`;
@@ -489,23 +491,23 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 img.src = `/images/${layerType}/${image}`;
             }
-            
+
             img.alt = image;
             img.loading = 'lazy';
-            
+
             // Handle image load errors
             img.onerror = function() {
                 console.error(`Failed to load image: ${img.src}`);
                 img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" text-anchor="middle" dominant-baseline="middle"%3EImage Error%3C/text%3E%3C/svg%3E';
             };
-            
+
             galleryItem.appendChild(img);
         }
-        
+
         // Add action buttons
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'gallery-item-actions';
-        
+
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
         deleteBtn.innerHTML = '×';
@@ -515,12 +517,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteImage(image, layerType, galleryItem);
             }
         });
-        
+
         actionsDiv.appendChild(deleteBtn);
         galleryItem.appendChild(actionsDiv);
         galleryGrid.appendChild(galleryItem);
     }
-    
+
     async function deleteImage(image, layerType, galleryItem) {
         try {
             const response = await fetch('/api/delete', {
@@ -533,11 +535,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     filename: image
                 })
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             // Remove from gallery if successful
             galleryItem.remove();
         } catch (error) {
@@ -545,12 +547,12 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Failed to delete the image. Please try again.');
         }
     }
-    
+
     // Load site text settings from server
     async function loadSiteTextSettings() {
         try {
             const response = await fetch('/api/site-settings');
-            
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.settings) {
@@ -564,7 +566,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error loading site settings:', error);
         }
     }
-    
+
     // Save site text settings
     document.getElementById('saveTextBtn').addEventListener('click', async function() {
         const newSettings = {
@@ -572,16 +574,16 @@ document.addEventListener('DOMContentLoaded', function() {
             subtitle: document.getElementById('siteSubtitle').value.trim(),
             subtext: document.getElementById('siteSubtext').value.trim()
         };
-        
+
         // Validate inputs - ensure they're not empty
         if (!newSettings.title) {
             alert('Main title cannot be empty');
             return;
         }
-        
+
         try {
             console.log('Saving settings:', newSettings);
-            
+
             const response = await fetch('/api/site-settings', {
                 method: 'POST',
                 headers: {
@@ -591,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     settings: newSettings
                 })
             });
-            
+
             if (response.ok) {
                 alert('Site text settings saved successfully!');
                 siteTextSettings = newSettings;
