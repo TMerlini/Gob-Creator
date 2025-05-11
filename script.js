@@ -1045,19 +1045,38 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
 
 // Background loader function
 async function loadBackground() {
-    // Directly set the background image to the known path
-    document.body.style.backgroundImage = "url('/background/background.gif')";
-    console.log('Background image set to /background/background.gif');
-
-    // Optional: Fallback if the direct path fails
-    const bgImage = new Image();
-    bgImage.onerror = function() {
-        console.error('Failed to load background image from /background/background.gif');
-        // Try alternate location
-        document.body.style.backgroundImage = "url('/images/background/background.gif')";
-        console.log('Trying alternate background path');
-    };
-    bgImage.src = '/background/background.gif';
+    // Try multiple background paths in order
+    const backgroundPaths = [
+        '/background/background.gif',
+        '/images/background/background.gif',
+        'background/background.gif'
+    ];
+    
+    for (const path of backgroundPaths) {
+        const img = new Image();
+        img.onload = function() {
+            console.log('Background image loaded successfully from:', path);
+            document.body.style.backgroundImage = `url('${path}')`;
+            return true;
+        };
+        img.onerror = function() {
+            console.log(`Failed to load background from: ${path}`);
+        };
+        img.src = path;
+        
+        // Wait a bit to see if the image loads
+        await delay(100);
+        
+        if (document.body.style.backgroundImage) {
+            break;
+        }
+    }
+    
+    // Fallback if all paths fail
+    if (!document.body.style.backgroundImage) {
+        console.log('Using fallback background');
+        document.body.style.backgroundImage = "url('background/background.gif')";
+    }
 }
 
 // Call the function when page loads
@@ -1224,7 +1243,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (error) {
         console.error('Error loading site settings:', error);
     }
-});n
+});
+
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const RATE_LIMIT_DELAY = 500;
 

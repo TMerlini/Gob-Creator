@@ -23,7 +23,7 @@ body {
     background-attachment: fixed;
     display: flex;
     flex-direction: column;
-    background-image: url('/background/background.gif');
+    /* Background image will be set by JavaScript */
 }
 
 .subtext {
@@ -203,12 +203,13 @@ h1 {
     position: absolute;
     left: 320px;
     right: 0;
-    bottom: 2; /* Align to bottom */
+    top: 100px; /* Position from top */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1;
     max-width: calc(85% - 340px);
+    height: calc(100vh - 200px); /* Set explicit height */
 }
 
 #mainCanvas {
