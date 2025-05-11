@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goblinarinos Cooker</title>
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="images/favicon/site.webmanifest">
+    <link rel="mask-icon" href="images/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="https://magiceden.io/collections/ethereum/0x616f2ac5dd4f760db693c21e9ca7a8aa962cf93b" target="_blank" rel="noopener noreferrer">
+                <img src="images/logo/image1.png" alt="Goblinarinos Logo" class="logo">
+            </a>
+            <h1>GOBLINARINOS</h1>
+            <h2 class="subtitle">Merry Christmas Gobos</h2>
+            <p class="subtext">Put you´r hat on!, Das it & Das all!</p>
+        </div>
+        <div class="content-wrapper">
+            <!-- Layer Controls moved to left side -->
+            <div class="layer-controls">
+                <div class="layer-row" data-layer="1">
+                    <button class="nav-btn prev">←</button>
+                    <button class="nav-btn next">→</button>
+                    <button class="preview-btn" data-layer="1">PREVIEW LAYER 1</button>
+                    <div class="upload-wrapper">
+                        <span class="upload-text">Upload-PFP</span>
+                        <label for="uploadLayer1" class="upload-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </label>
+                        <input type="file" id="uploadLayer1" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                <div class="layer-row" data-layer="2">
+                    <button class="nav-btn prev">⇦</button>
+                    <span class="select-text">Choose</span>
+                    <button class="nav-btn next">⇨</button>
+                    <button class="preview-btn" data-layer="2">
+                        <div class="preview-container">
+                            <img class="preview-img" alt="Layer 2 preview">
+                        </div>
+                    </button>
+                </div>
+                <div class="layer2-controls">
+                    <div class="rotation-control">
+                        <span class="rotation-label">Rotate:</span>
+                        <input type="range" id="rotationSlider" min="0" max="360" value="0" class="rotation-slider">
+                        <span class="rotation-value">0°</span>
+                    </div>
+                    <button class="flip-btn" title="Flip Horizontally">◭</button>
+                </div>
+                <div class="download-container">
+                    <button id="downloadBtn" class="download-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        |      Press to Gib      | 
+                    </button>
+                        </div>
+                    <div class="instructions">
+                        <p>How to use:</p>
+                        <ol>
+                            <li>Upload your PFP - Max 10MB / 4096x4096</li>
+                            <li>Select layer from the "Choose"</li>
+                            <li>Adjust rotation / size / flip as needed </li>
+                            <li>Press to Gib to download!</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add this after your existing layer controls but before the canvas -->
+            <div class="nft-selector">
+                <div class="nft-input-box">
+                    <h4>Load NFT by ID</h4>
+                    <div class="nft-input-wrapper">
+                        <input type="number" id="nftIdInput" placeholder="Enter NFT #" min="1" max="10000">
+                        <button id="loadNftBtn">Load</button>
+                        <button id="clearNftBtn" class="clear-btn">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="canvas-container">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+
+            <!-- Add the contributors section -->
+            <div class="contributors-section">
+                <h3></h3>
+                <div class="contributors-list">
+                    <div class="contributor">
+                        <a href="https://twitter.com/ordinarino35380" target="_blank" rel="noopener noreferrer">
+                            <img src="images/contributors/image3.png" alt="Contributor 1" class="contributor-image">
+                        </a>
+                        <span class="contributor-name">@ordinarino35380</span>
+                        <span class="contributor-role">Developer</span>
+                    </div>
+                    <div class="contributor">
+                        <a href="https://twitter.com/MerloOfficial" target="_blank" rel="noopener noreferrer">
+                            <img src="images/contributors/image2.png" alt="Contributor 2" class="contributor-image">
+                        </a>
+                        <span class="contributor-name">@MerloOfficial</span>
+                        <span class="contributor-role">Artist/Developer</span>
+                    </div>
+                    <div class="contributor">
+                        <a href="https://twitter.com/Franku271" target="_blank" rel="noopener noreferrer">
+                            <img src="images/contributors/image1.png" alt="Contributor 3" class="contributor-image">
+                        </a>
+                        <span class="contributor-name">@Franku271</span>
+                        <span class="contributor-role">Artist/Developer</span>
+                    </div>
+                    <div class="contributor">
+                        <a href="https://twitter.com/BetterBen33" target="_blank" rel="noopener noreferrer">
+                            <img src="images/contributors/image4.png" alt="Contributor 4" class="contributor-image">
+                        </a>
+                        <span class="contributor-name">@BetterBen33</span>
+                        <span class="contributor-role">Artist/Developer</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing footer -->
+            <footer class="footer">
+                <a href="https://x.com/goblinarinos" target="_blank" rel="noopener noreferrer" class="social-link">
+                    <svg viewBox="0 0 24 24" width="24" height="24" class="x-icon">
+                        <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <span>@goblinarinos</span>
+                </a>
+            </footer>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <audio id="bgMusic" loop>
+        <source src="music/background.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="audio-control">
+        <button id="audioToggle" class="audio-toggle">
+            <svg class="audio-icon-on" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>
+            </svg>
+            <svg class="audio-icon-off" viewBox="0 0 24 24" style="display:none;">
+                <path fill="currentColor" d="M12,4L9.91,6.09L12,8.18V4M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z"/>
+            </svg>
+        </button>
+    </div>
+</body>
+</html>
