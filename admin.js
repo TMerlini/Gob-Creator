@@ -249,11 +249,10 @@ document.addEventListener('DOMContentLoaded', function() {
     async function uploadFile(file, layerType) {
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('layer', layerType);
         
         console.log(`Uploading file to ${layerType}:`, file.name);
         
-        const response = await fetch('/api/upload', {
+        const response = await fetch(`/api/upload?layer=${layerType}`, {
             method: 'POST',
             body: formData
         });

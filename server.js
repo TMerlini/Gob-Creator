@@ -139,8 +139,65 @@ app.get('/api/nft/:tokenId', async (req, res) => {
 
 // Admin API endpoints
 // Upload image endpoint
-app.post('/api/upload', upload.single('image'), (req, res) => {
-    try {
+app.post('/api/upload', (req, res) => {
+    // Process layer field before multer processes file
+    const layer = req.query.layer || 'layer1';
+    
+    // Create a single-use multer instance with dynamic destination
+    const singleUpload = multer({
+        storage: multer.diskStorage({
+            destination: function (req, file, cb) {
+                const dir = path.join(__dirname, 'images', layer);
+                console.log('Uploading to layer:', layer);
+                console.log('Directory:', dir);
+                
+                // Create directory if it doesn't exist
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir, { recursive: true });
+                }
+                cb(null, dir);
+            },
+            filename: function (req, file, cb) {
+                // Find the next available index for the image
+                const dir = path.join(__dirname, 'images', layer);
+                let counter = 1;
+                
+                if (fs.existsSync(dir)) {
+                    const files = fs.readdirSync(dir);
+                    const imageFiles = files.filter(file => file.startsWith('image') && file.endsWith('.png'));
+                    
+                    if (imageFiles.length > 0) {
+                        // Extract numbers from filenames
+                        const numbers = imageFiles.map(file => {
+                            const match = file.match(/image(\d+)\.png/);
+                            return match ? parseInt(match[1], 10) : 0;
+                        });
+                        
+                        counter = Math.max(...numbers) + 1;
+                    }
+                }
+                
+                cb(null, `image${counter}.png`);
+            }
+        }),
+        fileFilter: function (req, file, cb) {
+            // Accept only PNG files
+            if (file.mimetype !== 'image/png') {
+                return cb(new Error('Only PNG images are allowed!'), false);
+            }
+            cb(null, true);
+        },
+        limits: {
+            fileSize: 5 * 1024 * 1024 // 5MB size limit
+        }
+    }).single('image');
+    
+    singleUpload(req, res, function(err) {
+        if (err) {
+            console.error('Upload error:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
@@ -148,12 +205,10 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
         res.json({
             success: true,
             filename: req.file.filename,
-            path: req.file.path
+            path: req.file.path,
+            layer: layer
         });
-    } catch (error) {
-        console.error('Upload error:', error);
-        res.status(500).json({ error: error.message });
-    }
+    });
 });
 
 // Get images for a layer
