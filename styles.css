@@ -323,17 +323,7 @@ h1 {
     color: #666;
 }
 
-.admin-link {
-    margin-left: 8px;
-    font-size: 16px;
-    text-decoration: none;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.admin-link:hover {
-    opacity: 1;
-}
+/* Admin link styles removed */
 
 .select-text {
     font-size: 12px;
