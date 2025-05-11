@@ -1364,6 +1364,43 @@ document.addEventListener('DOMContentLoaded', async function() {
                     document.querySelectorAll('.layer-row, .preview-btn, .rotation-control, .flip-btn').forEach(el => {
                         el.style.color = data.settings.buttonTextColor;
                     });
+                    
+                    // Additional elements that need the text color
+                    document.querySelectorAll('.nav-btn, .upload-text, .select-text, .rotation-label, .rotation-value').forEach(el => {
+                        el.style.color = data.settings.buttonTextColor;
+                    });
+                    
+                    // Style the upload input label
+                    const uploadLabels = document.querySelectorAll('input[type="file"] + label');
+                    uploadLabels.forEach(label => {
+                        label.style.color = data.settings.buttonTextColor;
+                    });
+                }
+                
+                if (data.settings.buttonColor) {
+                    // Apply button color to input elements and their labels
+                    document.querySelectorAll('input[type="file"]').forEach(input => {
+                        const label = input.nextElementSibling;
+                        if (label && label.tagName === 'LABEL') {
+                            label.style.backgroundColor = data.settings.buttonColor;
+                        }
+                    });
+                    
+                    // Apply to rotation slider
+                    const rotationSliders = document.querySelectorAll('.rotation-slider');
+                    rotationSliders.forEach(slider => {
+                        // For WebKit browsers
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            .rotation-slider::-webkit-slider-thumb {
+                                background: ${data.settings.buttonColor} !important;
+                            }
+                            .rotation-slider::-moz-range-thumb {
+                                background: ${data.settings.buttonColor} !important;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    });
                 }
                 
                 if (data.settings.downloadBtnColor) {

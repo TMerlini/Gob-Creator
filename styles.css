@@ -641,6 +641,17 @@ h1 {
     background: #8b20e2;
 }
 
+/* Ensure upload element styling */
+.upload-text, .upload-icon {
+    transition: color 0.3s ease;
+}
+
+label[for="uploadLayer1"] {
+    cursor: pointer;
+    display: inline-block;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 .layer2-controls {
     display: flex;
     flex-direction: column;
