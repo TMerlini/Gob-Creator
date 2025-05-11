@@ -1052,28 +1052,12 @@ async function loadBackground() {
         if (response.ok) {
             const data = await response.json();
             if (data.files && data.files.length > 0) {
-                // Try both possible locations for background images
+                // Use the first background image from the API
                 const bgFile = data.files[0];
                 
-                // Check if the file exists in images/background
-                const imgBg = new Image();
-                imgBg.onload = function() {
-                    document.body.style.backgroundImage = `url(/images/background/${bgFile})`;
-                    console.log('Background image loaded from images/background:', bgFile);
-                };
-                imgBg.onerror = function() {
-                    // If not in images/background, try in /background
-                    const rootBg = new Image();
-                    rootBg.onload = function() {
-                        document.body.style.backgroundImage = `url(/background/${bgFile})`;
-                        console.log('Background image loaded from background folder:', bgFile);
-                    };
-                    rootBg.onerror = function() {
-                        console.error('Could not load background image from either location');
-                    };
-                    rootBg.src = `/background/${bgFile}`;
-                };
-                imgBg.src = `/images/background/${bgFile}`;
+                // Set the background directly with both possible paths
+                document.body.style.backgroundImage = `url(/background/${bgFile})`;
+                console.log('Background image loaded from API:', bgFile);
                 return;
             }
         }
@@ -1081,26 +1065,24 @@ async function loadBackground() {
         console.error('Error loading background from API:', error);
     }
     
-    // Fallback to static background
-    const bgFolders = ['background/', 'images/background/'];
-    const validExtensions = ['png', 'jpg', 'jpeg', 'gif'];
-    
-    // Try each folder and extension combination
-    for (const folder of bgFolders) {
-        for (const ext of validExtensions) {
-            const img = new Image();
-            img.onload = function() {
-                document.body.style.backgroundImage = `url(${folder}background.${ext})`;
-                console.log('Background image loaded from fallback:', `${folder}background.${ext}`);
-                // Break out of the loop by returning
-                return true;
-            };
-            img.onerror = function() {
-                console.log(`Failed to load ${folder}background.${ext}`);
-            };
-            img.src = `${folder}background.${ext}`;
-        }
-    }
+    // Explicitly try the known background location
+    const bgImage = new Image();
+    bgImage.onload = function() {
+        document.body.style.backgroundImage = `url(/background/background.gif)`;
+        console.log('Background image loaded successfully from /background/background.gif');
+    };
+    bgImage.onerror = function() {
+        console.error('Failed to load background image from /background/background.gif');
+        
+        // Try alternate location as fallback
+        const altBgImage = new Image();
+        altBgImage.onload = function() {
+            document.body.style.backgroundImage = `url(/images/background/background.gif)`;
+            console.log('Background image loaded from alternate location');
+        };
+        altBgImage.src = '/images/background/background.gif';
+    };
+    bgImage.src = '/background/background.gif';
 }
 }
 

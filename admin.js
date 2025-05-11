@@ -608,3 +608,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Create gallery item
+    function createGalleryItem(image, layerType, galleryGrid) {
+        const galleryItem = document.createElement('div');
+        galleryItem.className = 'gallery-item';
+
+        // Add image
+        if (layerType === 'music') {
+            // For music files, show an audio player
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = `/music/${image}`;
+            galleryItem.appendChild(audio);
+
+            // Add filename below audio player
+            const filenameElement = document.createElement('div');
+            filenameElement.className = 'filename';
+            filenameElement.textContent = image;
+            galleryItem.appendChild(filenameElement);
+        } else {
+            // For image files
+            const img = document.createElement('img');
+
+            if (layerType === 'background') {
+                // Try both potential background locations
+                img.onerror = function() {
+                    img.src = `/background/${image}`;
+                    console.log(`Trying alternate path for background: /background/${image}`);
+                };
+                img.src = `/images/background/${image}`;
+            } else {
+                img.src = `/images/${layerType}/${image}`;
+            }
