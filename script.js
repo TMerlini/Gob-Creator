@@ -1353,8 +1353,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }
                 
                 if (data.settings.buttonColor) {
-                    // Apply button color to all layer row buttons
-                    document.querySelectorAll('.layer-row, .preview-btn').forEach(el => {
+                    // Apply button color to all layer row buttons, rotation and flip controls
+                    document.querySelectorAll('.layer-row, .preview-btn, .rotation-control, .flip-btn').forEach(el => {
                         el.style.backgroundColor = data.settings.buttonColor;
                     });
                 }
