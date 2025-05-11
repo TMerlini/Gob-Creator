@@ -904,6 +904,17 @@ document.addEventListener('click', (e) => {
 function updatePreviews() {
     document.querySelectorAll('.preview-btn').forEach(btn => {
         const layerId = btn.getAttribute('data-layer');
+        
+        // Handle layer 1 navigation preview separately
+        if (layerId === '1-nav-preview') {
+            const previewImg = btn.querySelector('.preview-img');
+            const currentImage = layer1.getCurrentImage();
+            if (currentImage) {
+                previewImg.src = currentImage.src;
+            }
+            return;
+        }
+        
         const layer = layerId === '1' ? layer1 : layer2;
         const previewImg = btn.querySelector('.preview-img');
         const currentImage = layer.getCurrentImage();
@@ -1217,123 +1228,4 @@ window.addEventListener('load', () => {
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const RATE_LIMIT_DELAY = 500;
 
-// Add your Cloudflare Worker URL
-const WORKER_URL = 'https://your-worker.your-subdomain.workers.dev'; // Replace with your actual worker URL
-
-async function fetchGoblinarino(tokenId) {
-    try {
-        console.log('Fetching NFT:', tokenId);
-        await delay(RATE_LIMIT_DELAY);
-
-        // Use the Cloudflare Worker endpoint
-        const response = await fetch(`${WORKER_URL}/api/nft/${tokenId}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-
-        console.log('Response status:', response.status);
-
-        if (!response.ok) {
-            const responseText = await response.text();
-            console.error('Error Response Content:', responseText);
-            throw new Error('Failed to fetch NFT data');
-        }
-
-        const data = await response.json();
-        console.log('NFT Data:', data);
-
-        if (!data || !data.image) {
-            throw new Error('Invalid NFT data received');
-        }
-
-        return data;
-    } catch (error) {
-        console.error('Error fetching NFT:', error);
-        throw error;
-    }
-}
-
-// Update the click handler with better error handling
-document.getElementById('loadNftBtn').addEventListener('click', async () => {
-    const input = document.getElementById('nftIdInput');
-    const tokenId = input.value.trim();
-    
-    if (!tokenId) {
-        alert('Please enter an NFT ID');
-        return;
-    }
-
-    const loadBtn = document.getElementById('loadNftBtn');
-    loadBtn.textContent = 'Loading...';
-    loadBtn.disabled = true;
-
-    try {
-        const nftData = await fetchGoblinarino(tokenId);
-        
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        
-        img.onload = () => {
-            layer1.apiImage = img;
-            drawLayers();
-            
-            // Update NFT preview
-            const nftPreview = document.querySelector('.preview-btn[data-layer="nft"] .preview-img');
-            if (nftPreview) {
-                nftPreview.src = img.src;
-            }
-        };
-
-        img.onerror = () => {
-            throw new Error('Failed to load NFT image');
-        };
-
-        img.src = nftData.image;
-
-    } catch (error) {
-        console.error('Error:', error);
-        alert(error.message || 'Failed to load NFT. Please try again.');
-    } finally {
-        loadBtn.textContent = 'Load NFT';
-        loadBtn.disabled = false;
-    }
-});
-
-// Add clear button functionality for NFT preview
-document.getElementById('clearNftBtn').addEventListener('click', () => {
-    // Clear the API image
-    layer1.apiImage = null;
-    
-    // Clear the input field
-    document.getElementById('nftIdInput').value = '';
-    
-    // Clear the preview image
-    const nftPreview = document.querySelector('.preview-btn[data-layer="nft"] .preview-img');
-    if (nftPreview) {
-        nftPreview.src = '';
-    }
-    
-    // Redraw the canvas
-    drawLayers();
-});
-
-// Add keyboard support for the input
-document.getElementById('nftIdInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        document.getElementById('loadNftBtn').click();
-    }
-});
-
-// Add clear button functionality
-document.getElementById('clearNftBtn').addEventListener('click', () => {
-    // Clear the API image
-    layer1.apiImage = null;
-    
-    // Clear the input field
-    document.getElementById('nftIdInput').value = '';
-    
-    // Redraw the canvas
-    drawLayers();
-});
+// NFT selector functionality removed
