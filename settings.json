@@ -5,5 +5,7 @@
   "subtitleColor": "#ffffff",
   "subtextColor": "#ffffff",
   "buttonColor": "#d829db",
-  "downloadBtnColor": "#000000"
+  "buttonTextColor": "#db3939",
+  "downloadBtnColor": "#000000",
+  "downloadBtnTextColor": "#ffffff"
 }
