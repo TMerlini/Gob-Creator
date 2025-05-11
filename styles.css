@@ -23,7 +23,6 @@ body {
     background-attachment: fixed;
     display: flex;
     flex-direction: column;
-    /* Background image will be set by JavaScript */
 }
 
 .subtext {
@@ -203,13 +202,12 @@ h1 {
     position: absolute;
     left: 320px;
     right: 0;
-    top: 100px; /* Position from top */
+    bottom: 2; /* Align to bottom */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1;
     max-width: calc(85% - 340px);
-    height: calc(100vh - 200px); /* Set explicit height */
 }
 
 #mainCanvas {
@@ -411,7 +409,7 @@ h1 {
         width: 40px;  /* Bigger on mobile */
         height: 40px;
     }
-
+    
     .resize-handle::before {
         font-size: 24px;
     }
@@ -1054,7 +1052,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px,
+    padding: 4px;
     margin-left: auto;
     overflow: hidden;
 }
@@ -1547,7 +1545,7 @@ h1 {
     .subtitle {
         font-size: 1.6em;
     }
-
+    
     .subtext {
         font-size: 1em;
     }

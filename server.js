@@ -305,6 +305,29 @@ app.get('/api/images/:layer', (req, res) => {
         let dir;
         if (layer === 'music') {
             dir = path.join(__dirname, 'music');
+        } else if (layer === 'background') {
+            // Check both locations for background images
+            const bgDir1 = path.join(__dirname, 'images', 'background');
+            const bgDir2 = path.join(__dirname, 'background');
+            
+            // First check the background directory at root (this is where it actually exists)
+            if (fs.existsSync(bgDir2) && fs.readdirSync(bgDir2).length > 0) {
+                console.log('Using background directory at root');
+                dir = bgDir2;
+            }
+            // Then check the images/background directory
+            else if (fs.existsSync(bgDir1) && fs.readdirSync(bgDir1).length > 0) {
+                console.log('Using images/background directory');
+                dir = bgDir1;
+            }
+            // Default to background at root
+            else {
+                dir = bgDir2;
+                if (!fs.existsSync(dir)) {
+                    console.log('Creating missing background directory');
+                    fs.mkdirSync(dir, { recursive: true });
+                }
+            }
         } else {
             dir = path.join(__dirname, 'images', layer);
         }
@@ -314,7 +337,7 @@ app.get('/api/images/:layer', (req, res) => {
         if (!fs.existsSync(dir)) {
             console.log(`Directory ${dir} does not exist, creating it`);
             fs.mkdirSync(dir, { recursive: true });
-            return res.json({ images: [] });
+            return res.json({ files: [] });
         }
 
         const files = fs.readdirSync(dir);
@@ -335,7 +358,7 @@ app.get('/api/images/:layer', (req, res) => {
             filteredFiles = files.filter(file => file.endsWith('.png'));
         }
 
-        res.json({ images: filteredFiles });
+        res.json({ files: filteredFiles });
     } catch (error) {
         console.error('Error getting images:', error);
         res.status(500).json({ error: error.message });
