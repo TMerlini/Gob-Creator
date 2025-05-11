@@ -1,5 +1,9 @@
 {
   "title": "Ordinarinos",
   "subtitle": "Cutomize gobs",
-  "subtext": "Put you´r hat on!, Das it & Das all!"
+  "subtext": "Put you´r hat on!, Das it & Das all!",
+  "subtitleColor": "#ffffff",
+  "subtextColor": "#ffffff",
+  "buttonColor": "#3ea1a3",
+  "downloadBtnColor": "#000000"
 }
