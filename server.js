@@ -351,6 +351,49 @@ app.post('/api/delete', (req, res) => {
     }
 });
 
+// Site settings API endpoints
+app.get('/api/site-settings', (req, res) => {
+    try {
+        // Check if settings file exists
+        const settingsPath = path.join(__dirname, 'settings.json');
+        if (fs.existsSync(settingsPath)) {
+            const settingsData = fs.readFileSync(settingsPath, 'utf8');
+            const settings = JSON.parse(settingsData);
+            res.json({ settings });
+        } else {
+            // Return default settings if file doesn't exist
+            const defaultSettings = {
+                title: 'GOBLINARINOS',
+                subtitle: 'Merry Christmas Gobos',
+                subtext: 'Put you´r hat on!, Das it & Das all!'
+            };
+            res.json({ settings: defaultSettings });
+        }
+    } catch (error) {
+        console.error('Error getting site settings:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/site-settings', (req, res) => {
+    try {
+        const { settings } = req.body;
+        
+        if (!settings || !settings.title) {
+            return res.status(400).json({ error: 'Invalid settings data' });
+        }
+        
+        // Save settings to file
+        const settingsPath = path.join(__dirname, 'settings.json');
+        fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error saving site settings:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`API endpoint: /api/nft/:tokenId`);

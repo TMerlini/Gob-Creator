@@ -401,7 +401,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     async function loadGallery(layerType) {
-        const galleryElement = layerType === 'layer1' ? layer1Gallery : layer2Gallery;
+        // Select the correct gallery element based on the layer type
+        let galleryElement;
+        if (layerType === 'layer1') {
+            galleryElement = layer1Gallery;
+        } else if (layerType === 'layer2') {
+            galleryElement = layer2Gallery;
+        } else if (layerType === 'background') {
+            galleryElement = backgroundGallery;
+        } else if (layerType === 'music') {
+            galleryElement = musicGallery;
+        } else {
+            console.error('Unknown layer type:', layerType);
+            return;
+        }
+        
         const gridElement = galleryElement.querySelector('.gallery-grid');
         const loadingElement = galleryElement.querySelector('.gallery-loading');
         
@@ -436,12 +450,43 @@ document.addEventListener('DOMContentLoaded', function() {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item';
         
-        const img = document.createElement('img');
-        img.className = 'gallery-img';
-        img.src = `/images/${layerType}/${image}`;
-        img.alt = image;
-        img.loading = 'lazy';
+        // Create proper image or audio preview based on type
+        if (layerType === 'music') {
+            // For music files, show an audio player
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.className = 'gallery-audio';
+            
+            const source = document.createElement('source');
+            source.src = `/music/${image}`;
+            source.type = 'audio/' + image.split('.').pop(); // Get file extension
+            
+            audio.appendChild(source);
+            galleryItem.appendChild(audio);
+            
+            // Add file name
+            const fileName = document.createElement('p');
+            fileName.className = 'gallery-filename';
+            fileName.textContent = image;
+            galleryItem.appendChild(fileName);
+        } else {
+            // For images, show an image preview
+            const img = document.createElement('img');
+            img.className = 'gallery-img';
+            
+            // Set correct path based on layer type
+            if (layerType === 'background') {
+                img.src = `/images/background/${image}`;
+            } else {
+                img.src = `/images/${layerType}/${image}`;
+            }
+            
+            img.alt = image;
+            img.loading = 'lazy';
+            galleryItem.appendChild(img);
+        }
         
+        // Add action buttons
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'gallery-item-actions';
         
@@ -456,7 +501,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         actionsDiv.appendChild(deleteBtn);
-        galleryItem.appendChild(img);
         galleryItem.appendChild(actionsDiv);
         galleryGrid.appendChild(galleryItem);
     }
@@ -520,18 +564,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         try {
+            console.log('Saving settings:', newSettings);
+            
             const response = await fetch('/api/site-settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newSettings)
+                body: JSON.stringify({
+                    settings: newSettings
+                })
             });
             
             if (response.ok) {
                 alert('Site text settings saved successfully!');
                 siteTextSettings = newSettings;
             } else {
+                const errorText = await response.text();
+                console.error('Server error:', errorText);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
         } catch (error) {
