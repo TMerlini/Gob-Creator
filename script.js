@@ -189,10 +189,13 @@ class Layer {
         // Clear any cached image for Layer 1 on page load
         if (id === 1) {
             localStorage.removeItem('layer1CustomImage');
-            this.imageCount = 3; // Layer 1 keeps fixed count
         }
         
-        this.loadImages();
+        // Load images with a small delay to ensure DOM is ready
+        setTimeout(() => {
+            this.loadImages();
+            console.log(`Started loading Layer ${this.id} images`);
+        }, 100);
     }
 
     loadCachedImage(cachedData) {
@@ -243,70 +246,69 @@ class Layer {
     }
 
     loadImages() {
-        if (this.id === 1) {
-            // Layer 1 keeps its original fixed loading
-            for (let i = 1; i <= this.imageCount; i++) {
-                this.loadSingleImage(i);
+        // Use the improved loading method for both layers
+        const maxImages = 50; // Adjust based on expected maximum number of images
+        let loadedCount = 0;
+        let errors = 0;
+
+        const preloadImage = (index) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                
+                img.onload = () => {
+                    console.log(`Successfully loaded layer${this.id}/image${index}.png`);
+                    this.images[index - 1] = img;
+                    this.originalImages[index - 1] = img;
+                    loadedCount++;
+                    resolve(true);
+                };
+                
+                img.onerror = () => {
+                    console.log(`Failed to load layer${this.id}/image${index}.png`);
+                    errors++;
+                    resolve(false);
+                };
+
+                const imagePath = `images/layer${this.id}/image${index}.png`;
+                img.src = imagePath;
+            });
+        };
+
+        // Load all images concurrently
+        const loadAllImages = async () => {
+            const loadPromises = [];
+            for (let i = 1; i <= maxImages; i++) {
+                loadPromises.push(preloadImage(i));
             }
-        } else {
-            // New improved loading for Layer 2
-            const maxImages = 200; // Increase this number to match your total images
-            let loadedCount = 0;
-            let errors = 0;
 
-            const preloadImage = (index) => {
-                return new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.crossOrigin = "Anonymous";
-                    
-                    img.onload = () => {
-                        console.log(`Successfully loaded image${index}.png`);
-                        this.images[index - 1] = img;
-                        this.originalImages[index - 1] = img;
-                        loadedCount++;
-                        resolve(true);
-                    };
-                    
-                    img.onerror = () => {
-                        console.log(`Failed to load image${index}.png`);
-                        errors++;
-                        resolve(false);
-                    };
-
-                    const imagePath = `images/layer${this.id}/image${index}.png`;
-                    img.src = imagePath;
-                });
-            };
-
-            // Load all images concurrently
-            const loadAllImages = async () => {
-                const loadPromises = [];
-                for (let i = 1; i <= maxImages; i++) {
-                    loadPromises.push(preloadImage(i));
+            await Promise.all(loadPromises);
+            
+            // Clean up array by removing undefined entries
+            this.images = this.images.filter(img => img);
+            this.originalImages = this.originalImages.filter(img => img);
+            
+            console.log(`Layer ${this.id} loading complete:`);
+            console.log(`Successfully loaded: ${loadedCount} images`);
+            console.log(`Failed to load: ${errors} images`);
+            console.log(`Total images in array: ${this.images.length}`);
+            
+            // Update display after loading
+            if (this.images.length > 0) {
+                this.currentImageIndex = 0;
+                this.aspectRatio = this.images[0].width / this.images[0].height;
+                
+                // Center Layer 2 if needed
+                if (this.id === 2) {
+                    centerLayer2();
                 }
+                
+                drawLayers();
+                updatePreviews();
+            }
+        };
 
-                await Promise.all(loadPromises);
-                
-                // Clean up array by removing undefined entries
-                this.images = this.images.filter(img => img);
-                this.originalImages = this.originalImages.filter(img => img);
-                
-                console.log(`Layer ${this.id} loading complete:`);
-                console.log(`Successfully loaded: ${loadedCount} images`);
-                console.log(`Failed to load: ${errors} images`);
-                console.log(`Total images in array: ${this.images.length}`);
-                
-                // Update display after loading
-                if (this.images.length > 0) {
-                    this.currentImageIndex = 0;
-                    this.aspectRatio = this.images[0].width / this.images[0].height;
-                    drawLayers();
-                    updatePreviews();
-                }
-            };
-
-            loadAllImages();
-        }
+        loadAllImages();
     }
 
     loadSingleImage(index) {
@@ -1323,7 +1325,13 @@ document.addEventListener('DOMContentLoaded', function() {
 // Add this to help debug
 window.addEventListener('load', () => {
     setTimeout(() => {
+        // Debug both layers
+        if (layer1) {
+            console.log('Layer 1 images:');
+            layer1.debugImages();
+        }
         if (layer2) {
+            console.log('Layer 2 images:');
             layer2.debugImages();
         }
     }, 2000); // Wait 2 seconds after load to check images
