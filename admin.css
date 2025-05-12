@@ -89,6 +89,7 @@ button:hover {
     justify-content: center;
     gap: 20px;
     margin-bottom: 30px;
+    margin-top: 20px;
     width: 100%;
 }
 
@@ -229,6 +230,7 @@ button:hover {
     text-align: center;
     cursor: pointer;
     transition: background-color 0.2s;
+    margin-bottom: 25px;
 }
 
 .toggle-more-btn:hover, .toggle-settings-btn:hover {
