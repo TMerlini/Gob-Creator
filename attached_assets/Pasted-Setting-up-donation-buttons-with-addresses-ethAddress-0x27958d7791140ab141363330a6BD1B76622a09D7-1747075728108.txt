@@ -1,0 +1,59 @@
+Setting up donation buttons with addresses: {ethAddress: '0x27958d7791140ab141363330a6BD1B76622a09D7', btcAddress: '3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM', solAddress: '67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda'}
+script.js:1655 Donation buttons initialized with default addresses
+script.js:1372 Setting up donation buttons with addresses: {ethAddress: '0x27958d7791140ab141363330a6BD1B76622a09D7', btcAddress: '3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM', solAddress: '67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda'}
+script.js:1666 Donation buttons updated with server settings
+script.js:1333 Layer 1 images:
+script.js:337 Layer 1 images:
+script.js:339 Image 1: http://192.168.1.92:3000/images/layer1/image2.png
+script.js:339 Image 2: http://192.168.1.92:3000/images/layer1/image3.png
+script.js:339 Image 3: http://192.168.1.92:3000/images/layer1/image4.png
+script.js:339 Image 4: http://192.168.1.92:3000/images/layer1/image5.png
+script.js:1337 Layer 2 images:
+script.js:337 Layer 2 images:
+script.js:339 Image 1: http://192.168.1.92:3000/images/layer2/image2.png
+script.js:339 Image 2: http://192.168.1.92:3000/images/layer2/image3.png
+script.js:339 Image 3: http://192.168.1.92:3000/images/layer2/image4.png
+script.js:339 Image 4: http://192.168.1.92:3000/images/layer2/image5.png
+script.js:339 Image 5: http://192.168.1.92:3000/images/layer2/image6.png
+script.js:339 Image 6: http://192.168.1.92:3000/images/layer2/image7.png
+script.js:339 Image 7: http://192.168.1.92:3000/images/layer2/image8.png
+script.js:339 Image 8: http://192.168.1.92:3000/images/layer2/image9.png
+script.js:339 Image 9: http://192.168.1.92:3000/images/layer2/image10.png
+script.js:339 Image 10: http://192.168.1.92:3000/images/layer2/image11.png
+script.js:339 Image 11: http://192.168.1.92:3000/images/layer2/image12.png
+script.js:339 Image 12: http://192.168.1.92:3000/images/layer2/image13.png
+script.js:339 Image 13: http://192.168.1.92:3000/images/layer2/image14.png
+script.js:339 Image 14: http://192.168.1.92:3000/images/layer2/image15.png
+script.js:339 Image 15: http://192.168.1.92:3000/images/layer2/image16.png
+script.js:339 Image 16: http://192.168.1.92:3000/images/layer2/image17.png
+script.js:339 Image 17: http://192.168.1.92:3000/images/layer2/image18.png
+script.js:339 Image 18: http://192.168.1.92:3000/images/layer2/image19.png
+script.js:339 Image 19: http://192.168.1.92:3000/images/layer2/image20.png
+script.js:339 Image 20: http://192.168.1.92:3000/images/layer2/image21.png
+script.js:339 Image 21: http://192.168.1.92:3000/images/layer2/image22.png
+script.js:339 Image 22: http://192.168.1.92:3000/images/layer2/image23.png
+script.js:339 Image 23: http://192.168.1.92:3000/images/layer2/image24.png
+script.js:1384 ETH button clicked
+script.js:1385 Uncaught TypeError: Cannot read properties of undefined (reading 'writeText')
+    at HTMLButtonElement.<anonymous> (script.js:1385:33)
+(anonymous) @ script.js:1385Understand this error
+script.js:1384 ETH button clicked
+script.js:1385 Uncaught TypeError: Cannot read properties of undefined (reading 'writeText')
+    at HTMLButtonElement.<anonymous> (script.js:1385:33)
+(anonymous) @ script.js:1385Understand this error
+script.js:1384 ETH button clicked
+script.js:1385 Uncaught TypeError: Cannot read properties of undefined (reading 'writeText')
+    at HTMLButtonElement.<anonymous> (script.js:1385:33)
+(anonymous) @ script.js:1385Understand this error
+script.js:1384 ETH button clicked
+script.js:1385 Uncaught TypeError: Cannot read properties of undefined (reading 'writeText')
+    at HTMLButtonElement.<anonymous> (script.js:1385:33)
+(anonymous) @ script.js:1385Understand this error
+script.js:1384 ETH button clicked
+script.js:1385 Uncaught TypeError: Cannot read properties of undefined (reading 'writeText')
+    at HTMLButtonElement.<anonymous> (script.js:1385:33)
+(anonymous) @ script.js:1385Understand this error
+script.js:1384 ETH button clicked
+script.js:1385 Uncaught TypeError: Cannot read properties of undefined (reading 'writeText')
+    at HTMLButtonElement.<anonymous> (script.js:1385:33)
+(anonymous) @ script.js:1385Understand this error
