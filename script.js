@@ -1613,4 +1613,15 @@ function displayContributors(data) {
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const RATE_LIMIT_DELAY = 500;
 
-// NFT selector functionality removed
+//NFT selector functionality removed
+
+// Call fetchSiteSettings, fetchContributors, and fetchDonationSettings on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup donation buttons
+    setupCryptoDonationButtons();
+
+    // Setup background music if it exists
+    if (typeof setupBackgroundMusic === 'function') {
+        setupBackgroundMusic();
+    }
+});
