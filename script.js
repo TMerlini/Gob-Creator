@@ -21,16 +21,16 @@ document.body.addEventListener('touchmove', function(e) {
 // Simplified touch handlers
 function handleTouchStart(e) {
     const rect = canvas.getBoundingClientRect();
-    
+
     // Handle pinch gesture (2 fingers)
     if (e.touches.length === 2) {
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
-        
+
         // Convert touch positions to canvas coordinates
         const touch1X = (touch1.clientX - rect.left) * (canvas.width / rect.width);
         const touch1Y = (touch1.clientY - rect.top) * (canvas.height / rect.height);
-        
+
         // Check if at least one touch is on layer2
         const img2 = layer2.getCurrentImage();
         if (img2) {
@@ -38,7 +38,7 @@ function handleTouchStart(e) {
             const baseSize = canvas.width * layer2.scale;
             const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
             const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
-            
+
             if (touch1X >= layer2.x && 
                 touch1X <= layer2.x + scaledWidth && 
                 touch1Y >= layer2.y && 
@@ -52,20 +52,20 @@ function handleTouchStart(e) {
             }
         }
     }
-    
+
     // Handle single touch (moving)
     if (e.touches.length === 1) {
         const touch = e.touches[0];
         const canvasX = (touch.clientX - rect.left) * (canvas.width / rect.width);
         const canvasY = (touch.clientY - rect.top) * (canvas.height / rect.height);
-        
+
         const img2 = layer2.getCurrentImage();
         if (img2) {
             const originalAspectRatio = img2.width / img2.height;
             const baseSize = canvas.width * layer2.scale;
             const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
             const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
-            
+
             if (canvasX >= layer2.x && 
                 canvasX <= layer2.x + scaledWidth && 
                 canvasY >= layer2.y && 
@@ -94,39 +94,39 @@ function handleTouchMove(e) {
     if (isPinching && e.touches.length === 2) {
         const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
         const scaleFactor = currentDistance / initialTouchDistance;
-        
+
         // Calculate new scale based on the initial scale and pinch gesture
         let newScale = initialScale * scaleFactor;
-        
+
         // Constrain scale between 0.1 and 1.0
         newScale = Math.max(0.1, Math.min(1.0, newScale));
-        
+
         layer2.scale = newScale;
         drawLayers();
         e.preventDefault();
         return;
     }
-    
+
     // Handle dragging
     if (isDragging && selectedLayer && e.touches.length === 1) {
         const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
         const currentX = (touch.clientX - rect.left) * (canvas.width / rect.width);
         const currentY = (touch.clientY - rect.top) * (canvas.height / rect.height);
-        
+
         const img2 = layer2.getCurrentImage();
         if (img2) {
             const originalAspectRatio = img2.width / img2.height;
             const baseSize = canvas.width * layer2.scale;
             const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
             const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
-            
+
             let newX = currentX - dragStartX;
             let newY = currentY - dragStartY;
-            
+
             newX = Math.max(0, Math.min(newX, canvas.width - scaledWidth));
             newY = Math.max(0, Math.min(newY, canvas.height - scaledHeight));
-            
+
             selectedLayer.x = newX;
             selectedLayer.y = newY;
             drawLayers();
@@ -154,12 +154,12 @@ function resizeCanvas() {
     const container = canvas.parentElement;
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
-    
+
     // Set canvas size to match container while maintaining 1:1 aspect ratio
     const size = Math.min(containerWidth, containerHeight);
     canvas.style.width = `${size}px`;
     canvas.style.height = `${size}px`;
-    
+
     // Set actual canvas dimensions (for rendering)
     canvas.width = 1500;  // Fixed internal size
     canvas.height = 1500;
@@ -185,12 +185,12 @@ class Layer {
         this.isCustomImage = false;
         this.isFlipped = false;
         this.rotation = 0;
-        
+
         // Clear any cached image for Layer 1 on page load
         if (id === 1) {
             localStorage.removeItem('layer1CustomImage');
         }
-        
+
         // Load images with a small delay to ensure DOM is ready
         setTimeout(() => {
             this.loadImages();
@@ -255,7 +255,7 @@ class Layer {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.crossOrigin = "Anonymous";
-                
+
                 img.onload = () => {
                     console.log(`Successfully loaded layer${this.id}/image${index}.png`);
                     this.images[index - 1] = img;
@@ -263,7 +263,7 @@ class Layer {
                     loadedCount++;
                     resolve(true);
                 };
-                
+
                 img.onerror = () => {
                     console.log(`Failed to load layer${this.id}/image${index}.png`);
                     errors++;
@@ -283,26 +283,26 @@ class Layer {
             }
 
             await Promise.all(loadPromises);
-            
+
             // Clean up array by removing undefined entries
             this.images = this.images.filter(img => img);
             this.originalImages = this.originalImages.filter(img => img);
-            
+
             console.log(`Layer ${this.id} loading complete:`);
             console.log(`Successfully loaded: ${loadedCount} images`);
             console.log(`Failed to load: ${errors} images`);
             console.log(`Total images in array: ${this.images.length}`);
-            
+
             // Update display after loading
             if (this.images.length > 0) {
                 this.currentImageIndex = 0;
                 this.aspectRatio = this.images[0].width / this.images[0].height;
-                
+
                 // Center Layer 2 if needed
                 if (this.id === 2) {
                     centerLayer2();
                 }
-                
+
                 drawLayers();
                 updatePreviews();
             }
@@ -360,7 +360,7 @@ canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    
+
     const mouseX = (e.clientX - rect.left) * scaleX;
     const mouseY = (e.clientY - rect.top) * scaleY;
 
@@ -377,7 +377,7 @@ canvas.addEventListener('mousedown', (e) => {
         const originalAspectRatio = img2.width / img2.height;
         const baseSize = canvas.width * layer2.scale;
         let scaledWidth, scaledHeight;
-        
+
         if (originalAspectRatio > 1) {
             scaledWidth = baseSize;
             scaledHeight = baseSize / originalAspectRatio;
@@ -411,7 +411,7 @@ canvas.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    
+
     const mouseX = (e.clientX - rect.left) * scaleX;
     const mouseY = (e.clientY - rect.top) * scaleY;
 
@@ -419,13 +419,13 @@ canvas.addEventListener('mousemove', (e) => {
         const dx = mouseX - resizeStartX;
         const dy = mouseY - resizeStartY;
         const maxDelta = Math.max(dx, dy);
-        
+
         const newScale = layer2.scale + (maxDelta / canvas.width);
         layer2.scale = Math.max(0.1, Math.min(1.0, newScale));
-        
+
         resizeStartX = mouseX;
         resizeStartY = mouseY;
-        
+
         drawLayers();
     } else if (isDragging && selectedLayer) {
         const img2 = layer2.getCurrentImage();
@@ -433,7 +433,7 @@ canvas.addEventListener('mousemove', (e) => {
             const originalAspectRatio = img2.width / img2.height;
             const baseSize = canvas.width * layer2.scale;
             let scaledWidth, scaledHeight;
-            
+
             if (originalAspectRatio > 1) {
                 scaledWidth = baseSize;
                 scaledHeight = baseSize / originalAspectRatio;
@@ -444,7 +444,7 @@ canvas.addEventListener('mousemove', (e) => {
 
             let newX = mouseX - dragStartX;
             let newY = mouseY - dragStartY;
-            
+
             newX = Math.max(0, Math.min(newX, canvas.width - scaledWidth));
             newY = Math.max(0, Math.min(newY, canvas.height - scaledHeight));
 
@@ -492,7 +492,7 @@ window.addEventListener('keydown', (e) => {
     // Ensure layer stays within canvas bounds after resizing
     const scaledWidth = canvas.width * layer2.scale;
     const scaledHeight = canvas.height * layer2.scale;
-    
+
     layer2.x = Math.min(layer2.x, canvas.width - scaledWidth);
     layer2.y = Math.min(layer2.y, canvas.height - scaledHeight);
 
@@ -503,7 +503,7 @@ window.addEventListener('keydown', (e) => {
 function drawLayersClean(ctx, width, height) {
     // Clear the canvas completely first
     ctx.clearRect(0, 0, width, height);
-    
+
     // Draw layer 1 (static background)
     const img1 = layer1.getCurrentImage();
     if (img1) {
@@ -517,22 +517,22 @@ function drawLayersClean(ctx, width, height) {
         const baseSize = width * layer2.scale;
         const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
         const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
-        
+
         ctx.save();
-        
+
         // Move to the center of the image's position
         ctx.translate(layer2.x + scaledWidth/2, layer2.y + scaledHeight/2);
-        
+
         // Apply rotation
         ctx.rotate(layer2.rotation * Math.PI / 180);
-        
+
         if (layer2.isFlipped) {
             ctx.scale(-1, 1);
         }
-        
+
         // Draw the image centered at the origin
         ctx.drawImage(img2, -scaledWidth/2, -scaledHeight/2, scaledWidth, scaledHeight);
-        
+
         ctx.restore();
     }
 }
@@ -549,14 +549,14 @@ function createExportCanvas() {
         // Create a new canvas for export
         const exportCanvas = document.createElement('canvas');
         const exportCtx = exportCanvas.getContext('2d');
-        
+
         // Set dimensions
         exportCanvas.width = mainCanvas.width;
         exportCanvas.height = mainCanvas.height;
-        
+
         // Copy the main canvas content
         exportCtx.drawImage(mainCanvas, 0, 0);
-        
+
         return exportCanvas;
     } catch (error) {
         console.error('Error in createExportCanvas:', error);
@@ -567,16 +567,16 @@ function createExportCanvas() {
 // Helper function to draw layers without UI elements
 function drawLayersForExport(canvas) {
     const ctx = canvas.getContext('2d');
-    
+
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Draw layer 1 (background)
     const img1 = layer1.getCurrentImage();
     if (img1) {
         ctx.drawImage(img1, 0, 0, canvas.width, canvas.height);
     }
-    
+
     // Draw layer 2 (overlay) - only the image, no UI elements
     const img2 = layer2.getCurrentImage();
     if (img2) {
@@ -584,7 +584,7 @@ function drawLayersForExport(canvas) {
         const baseSize = canvas.width * layer2.scale;
         const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
         const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
-        
+
         ctx.drawImage(img2, 
             layer2.x, layer2.y, 
             scaledWidth, scaledHeight);
@@ -604,7 +604,7 @@ document.getElementById('downloadBtn').addEventListener('click', function() {
         const exportCanvas = document.createElement('canvas');
         exportCanvas.width = canvas.width;
         exportCanvas.height = canvas.height;
-        
+
         // Draw layers without UI elements
         drawLayersForExport(exportCanvas);
 
@@ -687,10 +687,10 @@ function generateGobName() {
         'supreme', 'ultra', 'maximus', 'prime', 'deluxe',
         'wizard', 'chief', 'lord', 'king', 'boss'
     ];
-    
+
     const randomNum = Math.floor(Math.random() * 1000);
     const randomSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-    
+
     return `Gob${randomSuffix}_${randomNum}`;
 }
 
@@ -698,7 +698,7 @@ function generateGobName() {
 function drawLayers() {
     // First draw the images without UI
     drawLayersClean(ctx, canvas.width, canvas.height);
-    
+
     // Then add UI elements only if needed
     if (selectedLayer === layer2) {
         const img2 = layer2.getCurrentImage();
@@ -707,10 +707,10 @@ function drawLayers() {
             const baseSize = canvas.width * layer2.scale;
             const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
             const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
-            
+
             // Draw resize handle
             const handleSize = window.innerWidth <= 768 ? 40 : 30;
-            
+
             ctx.save();
             ctx.beginPath();
             ctx.arc(layer2.x + scaledWidth, layer2.y + scaledHeight, 
@@ -720,7 +720,7 @@ function drawLayers() {
             ctx.strokeStyle = '#666';
             ctx.lineWidth = 2;
             ctx.stroke();
-            
+
             // Draw resize arrows
             ctx.beginPath();
             ctx.moveTo(layer2.x + scaledWidth - 10, layer2.y + scaledHeight);
@@ -776,15 +776,15 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
             const layerRow = this.closest('.layer-row');
             layerId = layerRow.getAttribute('data-layer');
         }
-        
+
         const layer = layerId === '1' ? layer1 : layer2;
-        
+
         if (this.classList.contains('prev')) {
             layer.previousImage();
         } else {
             layer.nextImage();
         }
-        
+
         drawLayers();
     });
 });
@@ -792,21 +792,21 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 // Initialize preview boxes within the buttons
 document.querySelectorAll('.preview-btn').forEach(btn => {
     const layerId = btn.getAttribute('data-layer');
-    
+
     // Create preview container inside the button
     const previewContainer = document.createElement('div');
     previewContainer.className = 'preview-container';
-    
+
     // Create preview image
     const previewImg = document.createElement('img');
     previewImg.className = 'preview-img';
     previewImg.alt = `Layer ${layerId} preview`;
-    
+
     // Add them to the button
     previewContainer.appendChild(previewImg);
     btn.innerHTML = ''; // Clear the "PREVIEW LAYER X" text
     btn.appendChild(previewContainer);
-    
+
     // Update preview image when layer image changes
     const layer = layerId === '1' ? layer1 : layer2;
     const updatePreview = () => {
@@ -815,10 +815,10 @@ document.querySelectorAll('.preview-btn').forEach(btn => {
             previewImg.src = currentImage.src;
         }
     };
-    
+
     // Initial preview update
     updatePreview();
-    
+
     // Update preview when navigating images
     btn.closest('.layer-row').querySelectorAll('.nav-btn').forEach(navBtn => {
         navBtn.addEventListener('click', updatePreview);
@@ -829,10 +829,10 @@ document.querySelectorAll('.preview-btn').forEach(btn => {
 function isInResizeHandle(x, y) {
     const img2 = layer2.getCurrentImage();
     if (!img2 || !selectedLayer || selectedLayer.id !== 2) return false;
-    
+
     const originalAspectRatio = img2.width / img2.height;
     const baseSize = canvas.width * layer2.scale;
-    
+
     let scaledWidth, scaledHeight;
     if (originalAspectRatio > 1) {
         scaledWidth = baseSize;
@@ -841,11 +841,11 @@ function isInResizeHandle(x, y) {
         scaledHeight = baseSize;
         scaledWidth = baseSize * originalAspectRatio;
     }
-    
+
     const handleX = layer2.x + scaledWidth;
     const handleY = layer2.y + scaledHeight;
     const handleRadius = window.innerWidth <= 768 ? 20 : 15; // Increased touch area
-    
+
     const dx = x - handleX;
     const dy = y - handleY;
     return Math.sqrt(dx * dx + dy * dy) <= handleRadius;
@@ -865,14 +865,14 @@ function createPreviewBox(layerId) {
         display: none;
         overflow: hidden;
     `;
-    
+
     const img = document.createElement('img');
     img.style.cssText = `
         width: 100%;
         height: 100%;
         object-fit: contain;
     `;
-    
+
     previewBox.appendChild(img);
     document.body.appendChild(previewBox);
     return previewBox;
@@ -888,11 +888,11 @@ document.querySelectorAll('.preview-btn').forEach(btn => {
         const layerId = this.getAttribute('data-layer');
         const layer = layerId === '1' ? layer1 : layer2;
         const previewBox = layerId === '1' ? previewBox1 : previewBox2;
-        
+
         // Position preview box next to the button
         const btnRect = this.getBoundingClientRect();
         previewBox.style.top = btnRect.top + 'px';
-        
+
         // Get current image from layer
         const currentImage = layer.getCurrentImage();
         if (currentImage) {
@@ -915,7 +915,7 @@ function updatePreviews() {
     document.querySelectorAll('.preview-btn').forEach(btn => {
         const layerId = btn.getAttribute('data-layer');
         let layer;
-        
+
         // Determine which layer to use based on the data-layer attribute
         if (layerId === '1' || layerId === '1-nav-preview') {
             layer = layer1;
@@ -924,7 +924,7 @@ function updatePreviews() {
         } else {
             return; // Skip if we can't determine the layer
         }
-        
+
         // Get current image from layer and update preview
         const previewImg = btn.querySelector('.preview-img');
         if (previewImg) {
@@ -951,7 +951,7 @@ document.getElementById('uploadLayer1').setAttribute('accept', 'image/png, image
 document.getElementById('uploadLayer1').addEventListener('change', function(e) {
     const file = e.target.files[0];
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
-    
+
     if (file && allowedTypes.includes(file.type)) {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -961,7 +961,7 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
                 // Optimize image before storing
                 const optimizedDataUrl = optimizeImage(img);
                 localStorage.setItem('layer1CustomImage', optimizedDataUrl);
-                
+
                 // Update layer 1 with optimized image
                 const optimizedImg = new Image();
                 optimizedImg.onload = function() {
@@ -969,7 +969,7 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
                     layer1.currentImageIndex = 0;
                     layer1.aspectRatio = optimizedImg.width / optimizedImg.height;
                     layer1.isCustomImage = true;
-                    
+
                     drawLayers();
                     updatePreviews();
                 };
@@ -985,13 +985,13 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
 function optimizeImage(img) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     // Set maximum dimensions while maintaining aspect ratio
     const MAX_WIDTH = 1500;
     const MAX_HEIGHT = 1500;
     let width = img.width;
     let height = img.height;
-    
+
     if (width > height) {
         if (width > MAX_WIDTH) {
             height *= MAX_WIDTH / width;
@@ -1003,10 +1003,10 @@ function optimizeImage(img) {
             height = MAX_HEIGHT;
         }
     }
-    
+
     canvas.width = width;
     canvas.height = height;
-    
+
     // Draw and compress image
     ctx.drawImage(img, 0, 0, width, height);
     return canvas.toDataURL('image/png', 0.8); // Adjust quality as needed
@@ -1016,7 +1016,7 @@ function optimizeImage(img) {
 document.getElementById('uploadLayer1').addEventListener('change', function(e) {
     const file = e.target.files[0];
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
-    
+
     if (file && allowedTypes.includes(file.type)) {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -1026,7 +1026,7 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
                 // Optimize image before storing
                 const optimizedDataUrl = optimizeImage(img);
                 localStorage.setItem('layer1CustomImage', optimizedDataUrl);
-                
+
                 // Update layer 1 with optimized image
                 const optimizedImg = new Image();
                 optimizedImg.onload = function() {
@@ -1034,7 +1034,7 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
                     layer1.currentImageIndex = 0;
                     layer1.aspectRatio = optimizedImg.width / optimizedImg.height;
                     layer1.isCustomImage = true;
-                    
+
                     drawLayers();
                     updatePreviews();
                 };
@@ -1050,7 +1050,7 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
 async function loadBackground() {
     // Start with an empty array of paths to try
     let backgroundPaths = [];
-    
+
     // First try to load uploaded background images from the server
     try {
         const response = await fetch('/api/images/background');
@@ -1067,7 +1067,7 @@ async function loadBackground() {
     } catch (error) {
         console.error('Error fetching background images:', error);
     }
-    
+
     // Then add fallback paths if no uploaded backgrounds worked
     backgroundPaths = backgroundPaths.concat([
         '/images/background/image1.png',
@@ -1078,9 +1078,9 @@ async function loadBackground() {
         '/images/background/background.jpg',
         '/images/background/background.jpeg'
     ]);
-    
+
     console.log('Trying to load background from these paths:', backgroundPaths);
-    
+
     // Try each path and set the first one that works
     for (const path of backgroundPaths) {
         try {
@@ -1104,37 +1104,25 @@ function setupCryptoDonationButtons(settings) {
     const btcBtn = document.getElementById('btcBtn');
     const solBtn = document.getElementById('solBtn');
     const cryptoCopied = document.getElementById('cryptoCopied');
-    
+
     if (!ethBtn || !btcBtn || !solBtn || !cryptoCopied) {
         console.error("Donation buttons not found in the DOM");
         return;
     }
-    
-    // Set default addresses if settings not available
-    const defaultSettings = {
-        ethAddress: "0xYourDefaultEthAddress",
-        btcAddress: "YourDefaultBtcAddress",
-        solAddress: "YourDefaultSolAddress"
+
+    // Set hardcoded addresses from settings.json
+    const addresses = {
+        ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
+        btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
+        solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
     };
-    
-    // Use settings if available, otherwise use defaults
-    const addresses = settings || defaultSettings;
-    
+
+    if (settings && settings.ethAddress) addresses.ethAddress = settings.ethAddress;
+    if (settings && settings.btcAddress) addresses.btcAddress = settings.btcAddress;
+    if (settings && settings.solAddress) addresses.solAddress = settings.solAddress;
+
     console.log("Setting up donation buttons with addresses:", addresses);
-    
-    // Hide buttons if no address is set
-    if (!addresses.ethAddress) {
-        ethBtn.style.display = 'none';
-    }
-    
-    if (!addresses.btcAddress) {
-        btcBtn.style.display = 'none';
-    }
-    
-    if (!addresses.solAddress) {
-        solBtn.style.display = 'none';
-    }
-    
+
     // Function to show the copied notification
     function showCopiedNotification() {
         cryptoCopied.classList.add('show');
@@ -1142,103 +1130,50 @@ function setupCryptoDonationButtons(settings) {
             cryptoCopied.classList.remove('show');
         }, 2000);
     }
-    
+
     // Setup click handlers
     ethBtn.addEventListener('click', function() {
-        if (addresses.ethAddress) {
-            console.log("Copying ETH address:", addresses.ethAddress);
-            navigator.clipboard.writeText(addresses.ethAddress)
-                .then(() => {
-                    showCopiedNotification();
-                })
-                .catch(err => {
-                    console.error("Failed to copy ETH address:", err);
-                    alert("Address copied: " + addresses.ethAddress);
-                });
-        }
+        console.log("ETH button clicked");
+        navigator.clipboard.writeText(addresses.ethAddress)
+            .then(() => {
+                showCopiedNotification();
+                console.log("ETH address copied to clipboard");
+            })
+            .catch(err => {
+                console.error("Failed to copy ETH address:", err);
+                alert("Address copied: " + addresses.ethAddress);
+            });
     });
-    
-    btcBtn.addEventListener('click', function() {
-        if (addresses.btcAddress) {
-            console.log("Copying BTC address:", addresses.btcAddress);
-            navigator.clipboard.writeText(addresses.btcAddress)
-                .then(() => {
-                    showCopiedNotification();
-                })
-                .catch(err => {
-                    console.error("Failed to copy BTC address:", err);
-                    alert("Address copied: " + addresses.btcAddress);
-                });
-        }
-    });
-    
-    solBtn.addEventListener('click', function() {
-        if (addresses.solAddress) {
-            console.log("Copying SOL address:", addresses.solAddress);
-            navigator.clipboard.writeText(addresses.solAddress)
-                .then(() => {
-                    showCopiedNotification();
-                })
-                .catch(err => {
-                    console.error("Failed to copy SOL address:", err);
-                    alert("Address copied: " + addresses.solAddress);
-                });
-        }
-    });
-    
-    // Apply button styling from settings
-    if (settings && settings.buttonColor) {
-        const buttons = document.querySelectorAll('.crypto-btn');
-        buttons.forEach(btn => {
-            // Only apply to buttons that don't have specific crypto classes
-            if (!btn.classList.contains('eth') && 
-                !btn.classList.contains('btc') && 
-                !btn.classList.contains('sol')) {
-                btn.style.backgroundColor = settings.buttonColor;
-            }
-        });
-    }
-    
-    if (settings && settings.buttonTextColor) {
-        const buttons = document.querySelectorAll('.crypto-btn');
-        buttons.forEach(btn => {
-            // Only apply to buttons that don't have specific crypto classes
-            if (!btn.classList.contains('eth') && 
-                !btn.classList.contains('btc') && 
-                !btn.classList.contains('sol')) {
-                btn.style.color = settings.buttonTextColor;
-            }
-        });
-    }
-}
 
-// Function to fetch site settings and setup donation buttons
-async function setupDonationButtons() {
-    try {
-        console.log("Fetching site settings for donation buttons...");
-        const response = await fetch('/api/site-settings');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data && data.settings) {
-            console.log("Site settings loaded successfully, setting up donation buttons");
-            setupCryptoDonationButtons(data.settings);
-        } else {
-            console.log("No settings found in response");
-            setupCryptoDonationButtons(null);
-        }
-    } catch (error) {
-        console.error("Error setting up donation buttons:", error);
-        setupCryptoDonationButtons(null);
-    }
+    btcBtn.addEventListener('click', function() {
+        console.log("BTC button clicked");
+        navigator.clipboard.writeText(addresses.btcAddress)
+            .then(() => {
+                showCopiedNotification();
+                console.log("BTC address copied to clipboard");
+            })
+            .catch(err => {
+                console.error("Failed to copy BTC address:", err);
+                alert("Address copied: " + addresses.btcAddress);
+            });
+    });
+
+    solBtn.addEventListener('click', function() {
+        console.log("SOL button clicked");
+        navigator.clipboard.writeText(addresses.solAddress)
+            .then(() => {
+                showCopiedNotification();
+                console.log("SOL address copied to clipboard");
+            })
+            .catch(err => {
+                console.error("Failed to copy SOL address:", err);
+                alert("Address copied: " + addresses.solAddress);
+            });
+    });
 }
 
             });
-            
+
             if (loaded) {
                 console.log('Using background image:', path);
                 return; // Exit after successfully loading an image
@@ -1247,7 +1182,7 @@ async function setupDonationButtons() {
             console.error('Error loading background from:', path, error);
         }
     }
-    
+
     // Only fall back to the default if all other options failed
     console.log('All background images failed to load, using fallback');
     document.body.style.backgroundImage = "url('background/background.gif')";
@@ -1262,7 +1197,7 @@ function centerLayer2() {
         const originalAspectRatio = img2.width / img2.height;
         const baseSize = canvas.width * layer2.scale;
         let scaledWidth, scaledHeight;
-        
+
         if (originalAspectRatio > 1) {
             scaledWidth = baseSize;
             scaledHeight = baseSize / originalAspectRatio;
@@ -1274,7 +1209,7 @@ function centerLayer2() {
         // Center the image
         layer2.x = (canvas.width - scaledWidth) / 2;
         layer2.y = (canvas.height - scaledHeight) / 2;
-        
+
         drawLayers();
     }
 }
@@ -1297,7 +1232,7 @@ function initCanvas() {
     const baseSize = 800; // Reduced from 1500
     canvas.width = baseSize;
     canvas.height = baseSize;
-    
+
     // Initial draw
     drawLayers();
 }
@@ -1306,11 +1241,11 @@ function initCanvas() {
 function createExportCanvas() {
     const exportCanvas = document.createElement('canvas');
     const exportCtx = exportCanvas.getContext('2d');
-    
+
     // Match the new base size
     exportCanvas.width = 800;  // Reduced from 1500
     exportCanvas.height = 800;
-    
+
     // Rest of your export code...
 }
 
@@ -1326,16 +1261,16 @@ document.querySelector('.flip-btn').addEventListener('click', () => {
 function isInFlipHandle(x, y) {
     const img2 = layer2.getCurrentImage();
     if (!img2 || !selectedLayer || selectedLayer.id !== 2) return false;
-    
+
     const originalAspectRatio = img2.width / img2.height;
     const baseSize = canvas.width * layer2.scale;
     const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
     const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
-    
+
     const handleX = layer2.x;  // Left side of the image
     const handleY = layer2.y + scaledHeight;  // Bottom of the image
     const handleRadius = window.innerWidth <= 768 ? 20 : 15;
-    
+
     const dx = x - handleX;
     const dy = y - handleY;
     return Math.sqrt(dx * dx + dy * dy) <= handleRadius;
@@ -1345,7 +1280,7 @@ function isInFlipHandle(x, y) {
 document.addEventListener('DOMContentLoaded', function() {
     const rotationSlider = document.getElementById('rotationSlider');
     const rotationValue = document.querySelector('.rotation-value');
-    
+
     rotationSlider.addEventListener('input', function() {
         layer2.rotation = parseInt(this.value);
         rotationValue.textContent = `${this.value}°`;
@@ -1373,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.images && data.images.length > 0) {
                     musicTracks = data.images;
                     console.log('Available music tracks:', musicTracks);
-                    
+
                     // Set initial track
                     loadTrack(currentTrackIndex);
                 }
@@ -1382,33 +1317,33 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error fetching music tracks:', error);
         }
     }
-    
+
     // Load a specific track by index
     function loadTrack(index) {
         if (musicTracks.length === 0) return;
-        
+
         // Ensure index is within bounds
         index = ((index % musicTracks.length) + musicTracks.length) % musicTracks.length;
         currentTrackIndex = index;
-        
+
         const wasPlaying = !audio.paused;
-        
+
         // Update track source
         trackSource.src = `/music/${musicTracks[index]}`;
         audio.load();
-        
+
         // Display current track name
         const trackDisplay = document.querySelector('.track-name');
         if (trackDisplay) {
             trackDisplay.textContent = musicTracks[index].replace(/\.[^/.]+$/, ""); // Remove file extension
         }
-        
+
         // Resume playing if it was playing before
         if (wasPlaying) {
             audio.play().catch(error => console.log("Audio play failed:", error));
         }
     }
-    
+
     // Function to toggle audio
     function toggleAudio() {
         if (isPlaying) {
@@ -1427,17 +1362,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add click event listener to toggle button
     audioToggle.addEventListener('click', toggleAudio);
-    
+
     // Create previous and next track buttons
     const prevButton = document.getElementById('prevTrack');
     const nextButton = document.getElementById('nextTrack');
-    
+
     if (prevButton) {
         prevButton.addEventListener('click', function() {
             loadTrack(currentTrackIndex - 1);
         });
     }
-    
+
     if (nextButton) {
         nextButton.addEventListener('click', function() {
             loadTrack(currentTrackIndex + 1);
@@ -1457,7 +1392,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Set initial volume
     audio.volume = 0.5; // Adjust this value between 0.0 and 1.0
-    
+
     // Load available tracks
     loadMusicTracks();
 });
@@ -1491,41 +1426,41 @@ document.addEventListener('DOMContentLoaded', async function() {
                 document.getElementById('siteTitle').textContent = data.settings.title || 'GOBLINARINOS';
                 document.getElementById('siteSubtitle').textContent = data.settings.subtitle || 'Merry Christmas Gobos';
                 document.getElementById('siteSubtext').textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
-                
+
                 // Apply color settings
                 if (data.settings.subtitleColor) {
                     document.getElementById('siteSubtitle').style.color = data.settings.subtitleColor;
                 }
-                
+
                 if (data.settings.subtextColor) {
                     document.getElementById('siteSubtext').style.color = data.settings.subtextColor;
                 }
-                
+
                 if (data.settings.buttonColor) {
                     // Apply button color to all layer row buttons, rotation and flip controls
                     document.querySelectorAll('.layer-row, .preview-btn, .rotation-control, .flip-btn').forEach(el => {
                         el.style.backgroundColor = data.settings.buttonColor;
                     });
                 }
-                
+
                 if (data.settings.buttonTextColor) {
                     // Apply text color to all layer row buttons, rotation and flip controls
                     document.querySelectorAll('.layer-row, .preview-btn, .rotation-control, .flip-btn').forEach(el => {
                         el.style.color = data.settings.buttonTextColor;
                     });
-                    
+
                     // Additional elements that need the text color
                     document.querySelectorAll('.nav-btn, .upload-text, .select-text, .rotation-label, .rotation-value').forEach(el => {
                         el.style.color = data.settings.buttonTextColor;
                     });
-                    
+
                     // Style the upload input label
                     const uploadLabels = document.querySelectorAll('input[type="file"] + label');
                     uploadLabels.forEach(label => {
                         label.style.color = data.settings.buttonTextColor;
                     });
                 }
-                
+
                 if (data.settings.buttonColor) {
                     // Apply button color to input elements and their labels
                     document.querySelectorAll('input[type="file"]').forEach(input => {
@@ -1534,7 +1469,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                             label.style.backgroundColor = data.settings.buttonColor;
                         }
                     });
-                    
+
                     // Apply to rotation slider
                     const rotationSliders = document.querySelectorAll('.rotation-slider');
                     rotationSliders.forEach(slider => {
@@ -1551,7 +1486,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                         document.head.appendChild(style);
                     });
                 }
-                
+
                 if (data.settings.downloadBtnColor) {
                     // Apply color to download button
                     const downloadBtn = document.getElementById('downloadBtn');
@@ -1559,7 +1494,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                         downloadBtn.style.backgroundColor = data.settings.downloadBtnColor;
                     }
                 }
-                
+
                 if (data.settings.downloadBtnTextColor) {
                     // Apply text color to download button
                     const downloadBtn = document.getElementById('downloadBtn');
@@ -1567,12 +1502,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                         downloadBtn.style.color = data.settings.downloadBtnTextColor;
                     }
                 }
-                
+
                 // Setup crypto donation buttons with the loaded settings
                 setupCryptoDonationButtons(data.settings);
             }
         }
-        
+
         // Load contributors
         const contributorsResponse = await fetch('/api/contributors');
         if (contributorsResponse.ok) {
@@ -1591,9 +1526,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 function displayContributors(data) {
     const developersSection = document.querySelector('.contributors-section .contributors-list .contributors-category:nth-of-type(1)');
     const contributorsSection = document.querySelector('.contributors-section .contributors-list .contributors-category:nth-of-type(2)');
-    
+
     if (!developersSection || !contributorsSection) return;
-    
+
     // Clear existing contributors
     let nextElement = developersSection.nextElementSibling;
     while (nextElement && !nextElement.classList.contains('contributors-category')) {
@@ -1601,76 +1536,76 @@ function displayContributors(data) {
         nextElement.remove();
         nextElement = nextAfter;
     }
-    
+
     nextElement = contributorsSection.nextElementSibling;
     while (nextElement) {
         const nextAfter = nextElement.nextElementSibling;
         nextElement.remove();
         nextElement = nextAfter;
     }
-    
+
     // Add developers
     if (data.developers && data.developers.length > 0) {
         data.developers.forEach(dev => {
             const contributorDiv = document.createElement('div');
             contributorDiv.className = 'contributor';
-            
+
             const link = document.createElement('a');
             link.href = `https://twitter.com/${dev.xAccount.replace('@', '')}`;
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
-            
+
             const img = document.createElement('img');
             img.src = dev.image || 'images/contributors/image3.png'; // Default image if none provided
             img.alt = dev.name;
             img.className = 'contributor-image';
             link.appendChild(img);
-            
+
             const nameSpan = document.createElement('span');
             nameSpan.className = 'contributor-name';
             nameSpan.textContent = dev.xAccount;
-            
+
             const roleSpan = document.createElement('span');
             roleSpan.className = 'contributor-role';
             roleSpan.textContent = dev.role || 'Developer';
-            
+
             contributorDiv.appendChild(link);
             contributorDiv.appendChild(nameSpan);
             contributorDiv.appendChild(roleSpan);
-            
+
             developersSection.parentNode.insertBefore(contributorDiv, contributorsSection);
         });
     }
-    
+
     // Add contributors
     if (data.contributors && data.contributors.length > 0) {
         data.contributors.forEach(contrib => {
             const contributorDiv = document.createElement('div');
             contributorDiv.className = 'contributor';
-            
+
             const link = document.createElement('a');
             link.href = `https://twitter.com/${contrib.xAccount.replace('@', '')}`;
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
-            
+
             const img = document.createElement('img');
             img.src = contrib.image || 'images/contributors/image1.png'; // Default image if none provided
             img.alt = contrib.name;
             img.className = 'contributor-image';
             link.appendChild(img);
-            
+
             const nameSpan = document.createElement('span');
             nameSpan.className = 'contributor-name';
             nameSpan.textContent = contrib.xAccount;
-            
+
             const roleSpan = document.createElement('span');
             roleSpan.className = 'contributor-role';
             roleSpan.textContent = contrib.role || 'Contributor';
-            
+
             contributorDiv.appendChild(link);
             contributorDiv.appendChild(nameSpan);
             contributorDiv.appendChild(roleSpan);
-            
+
             contributorsSection.parentNode.appendChild(contributorDiv);
         });
     }
