@@ -1111,7 +1111,7 @@ function setupCryptoDonationButtons(settings) {
     }
 
     try {
-        // Fetch settings from server or use provided settings parameter
+        // Default addresses
         let addresses = {
             ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
             btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
@@ -1633,32 +1633,38 @@ const RATE_LIMIT_DELAY = 500;
 
 //NFT selector functionality removed
 
-// Call the setup function directly on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', async function() {
-    try {
-        // First try to fetch settings from the server
-        const response = await fetch('/api/site-settings');
-        if (response.ok) {
-            const data = await response.json();
-            if (data.settings) {
-                // Set up crypto donation buttons with fetched settings
-                setupCryptoDonationButtons(data.settings);
-            } else {
-                // If no settings object in response, use defaults
-                setupCryptoDonationButtons();
-            }
-        } else {
-            // If fetch fails, use defaults
-            setupCryptoDonationButtons();
+// Add direct initialization at the end of the file to ensure it runs
+window.addEventListener('DOMContentLoaded', function() {
+    // Add a small delay to make sure the DOM is fully loaded
+    setTimeout(function() {
+        try {
+            // Use the default settings as a fallback
+            setupCryptoDonationButtons({
+                ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
+                btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
+                solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
+            });
+
+            console.log("Donation buttons initialized with default addresses");
+            
+            // Try to fetch updated settings from server (non-blocking)
+            fetch('/api/site-settings')
+                .then(response => {
+                    if (response.ok) return response.json();
+                    throw new Error('Failed to fetch settings');
+                })
+                .then(data => {
+                    if (data && data.settings) {
+                        setupCryptoDonationButtons(data.settings);
+                        console.log("Donation buttons updated with server settings");
+                    }
+                })
+                .catch(err => {
+                    console.log("Using default donation addresses:", err);
+                });
+            
+        } catch (error) {
+            console.error("Error initializing donation buttons:", error);
         }
-        
-        // Setup background music if it exists
-        if (typeof setupBackgroundMusic === 'function') {
-            setupBackgroundMusic();
-        }
-    } catch (error) {
-        console.error("Error in DOMContentLoaded handler:", error);
-        // Fallback to defaults in case of any error
-        setupCryptoDonationButtons();
-    }
+    }, 500);
 });
