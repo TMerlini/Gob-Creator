@@ -664,6 +664,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (siteTextSettings.downloadBtnTextColor) {
                         document.getElementById('downloadBtnTextColor').value = siteTextSettings.downloadBtnTextColor;
                     }
+                    
+                    // Load donation addresses if they exist
+                    if (siteTextSettings.donationAddresses) {
+                        if (siteTextSettings.donationAddresses.btc) {
+                            document.getElementById('btcAddress').value = siteTextSettings.donationAddresses.btc;
+                        }
+                        if (siteTextSettings.donationAddresses.eth) {
+                            document.getElementById('ethAddress').value = siteTextSettings.donationAddresses.eth;
+                        }
+                        if (siteTextSettings.donationAddresses.sol) {
+                            document.getElementById('solAddress').value = siteTextSettings.donationAddresses.sol;
+                        }
+                    }
                 }
             }
         } catch (error) {
@@ -795,7 +808,12 @@ document.addEventListener('DOMContentLoaded', function() {
             buttonColor: document.getElementById('buttonColor').value,
             buttonTextColor: document.getElementById('buttonTextColor').value,
             downloadBtnColor: document.getElementById('downloadBtnColor').value,
-            downloadBtnTextColor: document.getElementById('downloadBtnTextColor').value
+            downloadBtnTextColor: document.getElementById('downloadBtnTextColor').value,
+            donationAddresses: {
+                btc: document.getElementById('btcAddress').value.trim(),
+                eth: document.getElementById('ethAddress').value.trim(),
+                sol: document.getElementById('solAddress').value.trim()
+            }
         };
 
         // Validate inputs - ensure they're not empty

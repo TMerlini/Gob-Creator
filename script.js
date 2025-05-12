@@ -1413,6 +1413,19 @@ document.addEventListener('DOMContentLoaded', async function() {
                     });
                 }
 
+                // Update donation addresses if available in settings
+                if (data.settings.donationAddresses) {
+                    if (data.settings.donationAddresses.btc) {
+                        DONATION_ADDRESSES.btc = data.settings.donationAddresses.btc;
+                    }
+                    if (data.settings.donationAddresses.eth) {
+                        DONATION_ADDRESSES.eth = data.settings.donationAddresses.eth;
+                    }
+                    if (data.settings.donationAddresses.sol) {
+                        DONATION_ADDRESSES.sol = data.settings.donationAddresses.sol;
+                    }
+                }
+
                 if (data.settings.downloadBtnColor) {
                     // Apply color to download button
                     const downloadBtn = document.getElementById('downloadBtn');
@@ -1710,3 +1723,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Trigger initial draw
     requestAnimationFrame(draw);
 });
+
+// Define DONATION_ADDRESSES at the top scope, so can be accessible and updatable
+const DONATION_ADDRESSES = {
+    btc: '',
+    eth: '',
+    sol: ''
+};
