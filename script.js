@@ -1,767 +1,1170 @@
-// Global variables for shapes
-let layer1 = { images: [], currentImageIndex: 0, aspectRatio: 1, isCustomImage: false };
-let layer2 = { images: [], currentImageIndex: 0, aspectRatio: 1, x: 0, y: 0, scale: 0.2, angle: 0, isFlipped: false, isDragging: false };
-let isResizing = false;
-let isRotating = false;
-let startX, startY;
-let lastX, lastY;
-let startAngle = 0;
-let startDistance = 0;
-let startScale = 0.2;
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
 
-// Set up global variables
-let downloadBtn;
-let canvas;
-let ctx;
-let flipBtn;
+// Set fixed dimensions
+canvas.width = 1500;
+canvas.height = 1500;
 
-// Global settings
-let DISPLAY_GRID = false;
-let SNAP_TO_GRID = false;
-let GRID_SIZE = 10;
-
-// Initialize the canvas when the page loads
-function initCanvas() {
-    canvas = document.getElementById('canvas');
-    if (!canvas) return;
-
-    ctx = canvas.getContext('2d');
-
-    // Responsive canvas sizing based on viewport
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // Set up event listeners for canvas interactions
-    setupCanvasListeners();
-
-    // Set up event listeners for UI controls
-    setupUIControls();
-
-    // Load images
-    loadImages();
-
-    // Setup main loop
-    setInterval(drawLayers, 1000 / 60); // 60 FPS
-}
-
-// Resize canvas based on window size
-function resizeCanvas() {
-    if (!canvas) return;
-
-    // Get current transform to restore after resize
-    let currentTransform = ctx ? ctx.getTransform() : null;
-
-    // Set canvas dimensions
-    const size = Math.min(window.innerWidth * 0.8, window.innerHeight * 0.7);
-    canvas.width = size;
-    canvas.height = size;
-
-    // Restore transform if it existed
-    if (currentTransform) {
-        ctx.setTransform(currentTransform);
-    }
-
-    // Draw layers after resize
-    if (ctx) {
-        drawLayers();
-    }
-}
-
-// Setup canvas interaction listeners
-function setupCanvasListeners() {
-    // Mouse down event
-    canvas.addEventListener('mousedown', function(e) {
-        handleMouseDown(e);
-    });
-
-    // Touch start event
-    canvas.addEventListener('touchstart', function(e) {
+// Prevent default touch behaviors
+document.body.addEventListener('touchstart', function(e) {
+    if (e.target === canvas) {
         e.preventDefault();
-        const touch = e.touches[0];
-        const mouseEvent = new MouseEvent('mousedown', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        handleMouseDown(mouseEvent);
-    });
-
-    // Mouse move event
-    window.addEventListener('mousemove', function(e) {
-        handleMouseMove(e);
-    });
-
-    // Touch move event
-    window.addEventListener('touchmove', function(e) {
-        if (e.touches.length === 1) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent('mousemove', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            handleMouseMove(mouseEvent);
-        } else if (e.touches.length === 2) {
-            // Pinch to resize/rotate
-            handleTouchPinch(e);
-        }
-    });
-
-    // Mouse up event
-    window.addEventListener('mouseup', function() {
-        handleMouseUp();
-    });
-
-    // Touch end event
-    window.addEventListener('touchend', function() {
-        handleMouseUp();
-    });
-}
-
-// Setup UI control listeners
-function setupUIControls() {
-    // Previous and Next buttons for Layer 1
-    document.getElementById('prevLayer1').addEventListener('click', () => {
-        prevImage(1);
-    });
-
-    document.getElementById('nextLayer1').addEventListener('click', () => {
-        nextImage(1);
-    });
-
-    // Previous and Next buttons for Layer 2
-    document.getElementById('prevLayer2').addEventListener('click', () => {
-        prevImage(2);
-    });
-
-    document.getElementById('nextLayer2').addEventListener('click', () => {
-        nextImage(2);
-    });
-
-    // Download button
-    downloadBtn = document.getElementById('downloadBtn');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => {
-            downloadImage();
-        });
     }
+}, { passive: false });
 
-    // Flip button
-    flipBtn = document.querySelector('.flip-btn');
-    if (flipBtn) {
-        flipBtn.addEventListener('click', () => {
-            if (layer2) {
-                layer2.isFlipped = !layer2.isFlipped;
-                drawLayers();
-            }
-        });
+document.body.addEventListener('touchmove', function(e) {
+    if (e.target === canvas) {
+        e.preventDefault();
     }
+}, { passive: false });
 
-    // Center hat button
-    const centerHatBtn = document.getElementById('centerHatBtn');
-    if (centerHatBtn) {
-        centerHatBtn.addEventListener('click', centerLayer2);
-    }
-
-    // Grid toggle
-    const gridToggle = document.getElementById('gridToggle');
-    if (gridToggle) {
-        gridToggle.addEventListener('change', function() {
-            DISPLAY_GRID = this.checked;
-            drawLayers();
-        });
-    }
-
-    // Snap to grid toggle
-    const snapToggle = document.getElementById('snapToggle');
-    if (snapToggle) {
-        snapToggle.addEventListener('change', function() {
-            SNAP_TO_GRID = this.checked;
-            drawLayers();
-        });
-    }
-
-    // Play music button
-    const playMusicBtn = document.getElementById('playMusicBtn');
-    if (playMusicBtn) {
-        playMusicBtn.addEventListener('click', function() {
-            const bgMusic = document.getElementById('bgMusic');
-            if (bgMusic.paused) {
-                bgMusic.play();
-                this.textContent = 'Pause Music';
-            } else {
-                bgMusic.pause();
-                this.textContent = 'Play Music';
-            }
-        });
-    }
-}
-
-// Mouse down handler
-function handleMouseDown(e) {
+// Simplified touch handlers
+function handleTouchStart(e) {
     const rect = canvas.getBoundingClientRect();
-    const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-    lastX = mouseX;
-    lastY = mouseY;
+    // Handle pinch gesture (2 fingers)
+    if (e.touches.length === 2) {
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
 
-    // Check if we're in the resize handle
-    if (isInResizeHandle(mouseX, mouseY)) {
-        isResizing = true;
-        startDistance = Math.sqrt(Math.pow(mouseX - (layer2.x + layer2.images[layer2.currentImageIndex].width * layer2.scale / 2), 2) + 
-                                 Math.pow(mouseY - (layer2.y + layer2.images[layer2.currentImageIndex].height * layer2.scale / 2), 2));
-        startScale = layer2.scale;
+        // Convert touch positions to canvas coordinates
+        const touch1X = (touch1.clientX - rect.left) * (canvas.width / rect.width);
+        const touch1Y = (touch1.clientY - rect.top) * (canvas.height / rect.height);
+
+        // Check if at least one touch is on layer2
+        const img2 = layer2.getCurrentImage();
+        if (img2) {
+            const originalAspectRatio = img2.width / img2.height;
+            const baseSize = canvas.width * layer2.scale;
+            const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
+            const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
+
+            if (touch1X >= layer2.x && 
+                touch1X <= layer2.x + scaledWidth && 
+                touch1Y >= layer2.y && 
+                touch1Y <= layer2.y + scaledHeight) {
+                isPinching = true;
+                selectedLayer = layer2;
+                initialTouchDistance = getTouchDistance(touch1, touch2);
+                initialScale = layer2.scale;
+                e.preventDefault();
+                return;
+            }
+        }
+    }
+
+    // Handle single touch (moving)
+    if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const canvasX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        const canvasY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+
+        const img2 = layer2.getCurrentImage();
+        if (img2) {
+            const originalAspectRatio = img2.width / img2.height;
+            const baseSize = canvas.width * layer2.scale;
+            const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
+            const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
+
+            if (canvasX >= layer2.x && 
+                canvasX <= layer2.x + scaledWidth && 
+                canvasY >= layer2.y && 
+                canvasY <= layer2.y + scaledHeight) {
+                isDragging = true;
+                selectedLayer = layer2;
+                dragStartX = canvasX - layer2.x;
+                dragStartY = canvasY - layer2.y;
+            }
+        }
+    }
+
+    // Check for flip handle
+    if (selectedLayer === layer2 && isInFlipHandle(canvasX, canvasY)) {
+        layer2.isFlipped = !layer2.isFlipped;
+        drawLayers();
+        e.preventDefault();
         return;
     }
 
-    // Check if we're in the rotate handle
-    if (isInRotateHandle(mouseX, mouseY)) {
-        isRotating = true;
-        const centerX = layer2.x + layer2.images[layer2.currentImageIndex].width * layer2.scale / 2;
-        const centerY = layer2.y + layer2.images[layer2.currentImageIndex].height * layer2.scale / 2;
-        startAngle = Math.atan2(mouseY - centerY, mouseX - centerX) - layer2.angle;
+    e.preventDefault();
+}
+
+function handleTouchMove(e) {
+    // Handle pinch gesture
+    if (isPinching && e.touches.length === 2) {
+        const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        const scaleFactor = currentDistance / initialTouchDistance;
+
+        // Calculate new scale based on the initial scale and pinch gesture
+        let newScale = initialScale * scaleFactor;
+
+        // Constrain scale between 0.1 and 1.0
+        newScale = Math.max(0.1, Math.min(1.0, newScale));
+
+        layer2.scale = newScale;
+        drawLayers();
+        e.preventDefault();
         return;
     }
 
-    // Check if we're in the flip handle
-    if (isInFlipHandle(mouseX, mouseY)) {
+    // Handle dragging
+    if (isDragging && selectedLayer && e.touches.length === 1) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const currentX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        const currentY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+
+        const img2 = layer2.getCurrentImage();
+        if (img2) {
+            const originalAspectRatio = img2.width / img2.height;
+            const baseSize = canvas.width * layer2.scale;
+            const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
+            const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
+
+            let newX = currentX - dragStartX;
+            let newY = currentY - dragStartY;
+
+            newX = Math.max(0, Math.min(newX, canvas.width - scaledWidth));
+            newY = Math.max(0, Math.min(newY, canvas.height - scaledHeight));
+
+            selectedLayer.x = newX;
+            selectedLayer.y = newY;
+            drawLayers();
+        }
+    }
+    e.preventDefault();
+}
+
+function handleTouchEnd(e) {
+    isDragging = false;
+    isPinching = false;
+    if (e.touches.length === 0) {
+        selectedLayer = null;
+    }
+    e.preventDefault();
+}
+
+// Update event listeners
+canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+// Set canvas size with proper scaling
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    const containerWidth = container.offsetWidth;
+    const containerHeight = container.offsetHeight;
+
+    // Set canvas size to match container while maintaining 1:1 aspect ratio
+    const size = Math.min(containerWidth, containerHeight);
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+
+    // Set actual canvas dimensions (for rendering)
+    canvas.width = 1500;  // Fixed internal size
+    canvas.height = 1500;
+}
+
+// Initial resize
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Layer class with proportional scaling
+class Layer {
+    constructor(id) {
+        this.id = id;
+        this.images = [];
+        this.originalImages = [];
+        this.currentImageIndex = 0;
+        this.x = 0;
+        this.y = 0;
+        this.width = 800;  // Updated to match new canvas size
+        this.height = 800;
+        this.scale = id === 2 ? 0.4 : 1;
+        this.aspectRatio = 1;
+        this.isCustomImage = false;
+        this.isFlipped = false;
+        this.rotation = 0;
+
+        // Clear any cached image for Layer 1 on page load
+        if (id === 1) {
+            localStorage.removeItem('layer1CustomImage');
+        }
+
+        // Load images with a small delay to ensure DOM is ready
+        setTimeout(() => {
+            this.loadImages();
+            console.log(`Started loading Layer ${this.id} images`);
+        }, 100);
+    }
+
+    loadCachedImage(cachedData) {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = () => {
+            this.images = [img];
+            this.currentImageIndex = 0;
+            this.aspectRatio = img.width / img.height;
+            this.isCustomImage = true;
+            drawLayers();
+            updatePreviews();
+        };
+        img.src = cachedData;
+    }
+
+    resetToOriginal() {
+        this.images = [...this.originalImages];
+        this.isCustomImage = false;
+        this.currentImageIndex = 0;
+        localStorage.removeItem('layer1CustomImage');
+        drawLayers();
+        updatePreviews();
+    }
+
+    nextImage() {
+        if (this.id === 1 && this.isCustomImage) {
+            this.resetToOriginal();
+            return;
+        }
+        if (this.images.length > 0) {
+            this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
+            drawLayers();
+            updatePreviews();
+        }
+    }
+
+    previousImage() {
+        if (this.id === 1 && this.isCustomImage) {
+            this.resetToOriginal();
+            return;
+        }
+        if (this.images.length > 0) {
+            this.currentImageIndex = (this.currentImageIndex - 1 + this.images.length) % this.images.length;
+            drawLayers();
+            updatePreviews();
+        }
+    }
+
+    loadImages() {
+        // Use the improved loading method for both layers
+        const maxImages = 50; // Adjust based on expected maximum number of images
+        let loadedCount = 0;
+        let errors = 0;
+
+        const preloadImage = (index) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+
+                img.onload = () => {
+                    console.log(`Successfully loaded layer${this.id}/image${index}.png`);
+                    this.images[index - 1] = img;
+                    this.originalImages[index - 1] = img;
+                    loadedCount++;
+                    resolve(true);
+                };
+
+                img.onerror = () => {
+                    console.log(`Failed to load layer${this.id}/image${index}.png`);
+                    errors++;
+                    resolve(false);
+                };
+
+                const imagePath = `images/layer${this.id}/image${index}.png`;
+                img.src = imagePath;
+            });
+        };
+
+        // Load all images concurrently
+        const loadAllImages = async () => {
+            const loadPromises = [];
+            for (let i = 1; i <= maxImages; i++) {
+                loadPromises.push(preloadImage(i));
+            }
+
+            await Promise.all(loadPromises);
+
+            // Clean up array by removing undefined entries
+            this.images = this.images.filter(img => img);
+            this.originalImages = this.originalImages.filter(img => img);
+
+            console.log(`Layer ${this.id} loading complete:`);
+            console.log(`Successfully loaded: ${loadedCount} images`);
+            console.log(`Failed to load: ${errors} images`);
+            console.log(`Total images in array: ${this.images.length}`);
+
+            // Update display after loading
+            if (this.images.length > 0) {
+                this.currentImageIndex = 0;
+                this.aspectRatio = this.images[0].width / this.images[0].height;
+
+                // Center Layer 2 if needed
+                if (this.id === 2) {
+                    centerLayer2();
+                }
+
+                drawLayers();
+                updatePreviews();
+            }
+        };
+
+        loadAllImages();
+    }
+
+    loadSingleImage(index) {
+        const img = new Image();
+        img.onload = () => {
+            if (index === 1) {
+                this.aspectRatio = img.width / img.height;
+            }
+            this.images.push(img);
+            this.originalImages.push(img);
+            drawLayers();
+            updatePreviews();
+        };
+        img.onerror = (err) => {
+            console.error(`Failed to load image${index} for layer ${this.id}:`, err);
+        };
+        img.src = `images/layer${this.id}/image${index}.png`;
+    }
+
+    getCurrentImage() {
+        return this.images[this.currentImageIndex];
+    }
+
+    // Add this helper method to check loaded images
+    debugImages() {
+        console.log(`Layer ${this.id} images:`);
+        this.images.forEach((img, index) => {
+            console.log(`Image ${index + 1}: ${img.src}`);
+        });
+    }
+}
+
+// Create layers
+const layer1 = new Layer(1); // Static layer
+const layer2 = new Layer(2); // Movable layer
+
+// Variables for drag functionality
+let isDragging = false;
+let dragStartX, dragStartY;
+let selectedLayer = null;
+
+// Add these variables for resize handling
+let isResizing = false;
+let resizeStartX, resizeStartY;
+const HANDLE_RADIUS = 8;
+
+// Event listeners for layer 2 movement
+canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+
+    // Check for flip handle first
+    if (selectedLayer === layer2 && isInFlipHandle(mouseX, mouseY)) {
         layer2.isFlipped = !layer2.isFlipped;
         drawLayers();
         return;
     }
 
-    // Check if we're clicking on layer2
-    if (isPointInLayer2(mouseX, mouseY)) {
-        layer2.isDragging = true;
-        startX = mouseX - layer2.x;
-        startY = mouseY - layer2.y;
-    }
-}
+    // Get current Layer 2 dimensions
+    const img2 = layer2.getCurrentImage();
+    if (img2) {
+        const originalAspectRatio = img2.width / img2.height;
+        const baseSize = canvas.width * layer2.scale;
+        let scaledWidth, scaledHeight;
 
-// Mouse move handler
-function handleMouseMove(e) {
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-    // Update cursor based on what's under it
-    updateCursor(mouseX, mouseY);
-
-    // Handle resizing
-    if (isResizing && layer2.images.length > 0) {
-        const centerX = layer2.x + layer2.images[layer2.currentImageIndex].width * layer2.scale / 2;
-        const centerY = layer2.y + layer2.images[layer2.currentImageIndex].height * layer2.scale / 2;
-        const currentDistance = Math.sqrt(Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2));
-        const scaleFactor = currentDistance / startDistance;
-        layer2.scale = startScale * scaleFactor;
-
-        // Constrain scale
-        if (layer2.scale < 0.05) layer2.scale = 0.05;
-        if (layer2.scale > 2) layer2.scale = 2;
-
-        drawLayers();
-        return;
-    }
-
-    // Handle rotating
-    if (isRotating && layer2.images.length > 0) {
-        const centerX = layer2.x + layer2.images[layer2.currentImageIndex].width * layer2.scale / 2;
-        const centerY = layer2.y + layer2.images[layer2.currentImageIndex].height * layer2.scale / 2;
-        const angle = Math.atan2(mouseY - centerY, mouseX - centerX);
-        layer2.angle = angle - startAngle;
-        drawLayers();
-        return;
-    }
-
-    // Handle dragging
-    if (layer2.isDragging) {
-        let newX = mouseX - startX;
-        let newY = mouseY - startY;
-
-        // Apply snap to grid if enabled
-        if (SNAP_TO_GRID) {
-            newX = Math.round(newX / GRID_SIZE) * GRID_SIZE;
-            newY = Math.round(newY / GRID_SIZE) * GRID_SIZE;
+        if (originalAspectRatio > 1) {
+            scaledWidth = baseSize;
+            scaledHeight = baseSize / originalAspectRatio;
+        } else {
+            scaledHeight = baseSize;
+            scaledWidth = baseSize * originalAspectRatio;
         }
 
-        layer2.x = newX;
-        layer2.y = newY;
+        // Check for resize handle first
+        if (selectedLayer === layer2 && isInResizeHandle(mouseX, mouseY)) {
+            isResizing = true;
+            resizeStartX = mouseX;
+            resizeStartY = mouseY;
+            initialScale = layer2.scale;
+            return;
+        }
 
-        drawLayers();
+        // Check for regular dragging
+        if (mouseX >= layer2.x && mouseX <= layer2.x + scaledWidth &&
+            mouseY >= layer2.y && mouseY <= layer2.y + scaledHeight) {
+            isDragging = true;
+            selectedLayer = layer2;
+            dragStartX = mouseX - layer2.x;
+            dragStartY = mouseY - layer2.y;
+        }
     }
-
-    lastX = mouseX;
-    lastY = mouseY;
-}
-
-// Mouse up handler
-function handleMouseUp() {
-    layer2.isDragging = false;
-    isResizing = false;
-    isRotating = false;
-}
-
-// Handle touch pinch (two-finger) gesture
-function handleTouchPinch(e) {
-    if (e.touches.length !== 2) return;
-
-    const touch1 = e.touches[0];
-    const touch2 = e.touches[1];
-
-    const rect = canvas.getBoundingClientRect();
-    const x1 = (touch1.clientX - rect.left) * (canvas.width / rect.width);
-    const y1 = (touch1.clientY - rect.top) * (canvas.height / rect.height);
-    const x2 = (touch2.clientX - rect.left) * (canvas.width / rect.width);
-    const y2 = (touch2.clientY - rect.top) * (canvas.height / rect.height);
-
-    // Calculate distance between touches
-    const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-
-    // If we haven't started resizing yet
-    if (!isResizing) {
-        isResizing = true;
-        startDistance = distance;
-        startScale = layer2.scale;
-    } else {
-        // Adjust scale based on pinch
-        const scaleFactor = distance / startDistance;
-        layer2.scale = startScale * scaleFactor;
-
-        // Constrain scale
-        if (layer2.scale < 0.05) layer2.scale = 0.05;
-        if (layer2.scale > 2) layer2.scale = 2;
-    }
-
-    // Calculate angle for rotation
-    const angle = Math.atan2(y2 - y1, x2 - x1);
-
-    // If we haven't started rotating yet
-    if (!isRotating) {
-        isRotating = true;
-        startAngle = angle - layer2.angle;
-    } else {
-        // Adjust rotation
-        layer2.angle = angle - startAngle;
-    }
-
     drawLayers();
-}
+});
 
-// Update cursor based on what's under the mouse
-function updateCursor(mouseX, mouseY) {
-    if (isInResizeHandle(mouseX, mouseY)) {
-        canvas.style.cursor = 'nwse-resize';
-    } else if (isInRotateHandle(mouseX, mouseY)) {
-        canvas.style.cursor = 'grab';
-    } else if (isInFlipHandle(mouseX, mouseY)) {
-        canvas.style.cursor = 'pointer';
-    } else if (isPointInLayer2(mouseX, mouseY)) {
-        canvas.style.cursor = 'move';
-    } else {
-        canvas.style.cursor = 'default';
-    }
-}
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-// Check if point is in resize handle
-function isInResizeHandle(x, y) {
-    if (!layer2.images.length) return false;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
 
-    const img = layer2.images[layer2.currentImageIndex];
-    const handleSize = 20;
-    const handleX = layer2.x + img.width * layer2.scale - handleSize / 2;
-    const handleY = layer2.y + img.height * layer2.scale - handleSize / 2;
+    if (isResizing && selectedLayer === layer2) {
+        const dx = mouseX - resizeStartX;
+        const dy = mouseY - resizeStartY;
+        const maxDelta = Math.max(dx, dy);
 
-    return x >= handleX && x <= handleX + handleSize && y >= handleY && y <= handleY + handleSize;
-}
+        const newScale = layer2.scale + (maxDelta / canvas.width);
+        layer2.scale = Math.max(0.1, Math.min(1.0, newScale));
 
-// Check if point is in rotate handle
-function isInRotateHandle(x, y) {
-    if (!layer2.images.length) return false;
+        resizeStartX = mouseX;
+        resizeStartY = mouseY;
 
-    const img = layer2.images[layer2.currentImageIndex];
-    const handleSize = 20;
-    const handleX = layer2.x + img.width * layer2.scale / 2;
-    const handleY = layer2.y - handleSize / 2;
+        drawLayers();
+    } else if (isDragging && selectedLayer) {
+        const img2 = layer2.getCurrentImage();
+        if (img2) {
+            const originalAspectRatio = img2.width / img2.height;
+            const baseSize = canvas.width * layer2.scale;
+            let scaledWidth, scaledHeight;
 
-    return x >= handleX - handleSize / 2 && x <= handleX + handleSize / 2 && y >= handleY && y <= handleY + handleSize;
-}
-
-// Check if point is in flip handle
-function isInFlipHandle(x, y) {
-    if (!layer2.images.length) return false;
-
-    const img = layer2.images[layer2.currentImageIndex];
-    const handleSize = 20;
-    const handleX = layer2.x - handleSize / 2;
-    const handleY = layer2.y + img.height * layer2.scale / 2;
-
-    return x >= handleX && x <= handleX + handleSize && y >= handleY - handleSize / 2 && y <= handleY + handleSize / 2;
-}
-
-// Check if point is in layer2
-function isPointInLayer2(x, y) {
-    if (!layer2.images.length) return false;
-
-    // Transform the point to account for rotation
-    const img = layer2.images[layer2.currentImageIndex];
-    const centerX = layer2.x + img.width * layer2.scale / 2;
-    const centerY = layer2.y + img.height * layer2.scale / 2;
-
-    // Translate point to origin
-    const translatedX = x - centerX;
-    const translatedY = y - centerY;
-
-    // Rotate point
-    const rotatedX = translatedX * Math.cos(-layer2.angle) - translatedY * Math.sin(-layer2.angle);
-    const rotatedY = translatedX * Math.sin(-layer2.angle) + translatedY * Math.cos(-layer2.angle);
-
-    // Translate back
-    const finalX = rotatedX + centerX;
-    const finalY = rotatedY + centerY;
-
-    // Check if point is in bounding box
-    return finalX >= layer2.x && finalX <= layer2.x + img.width * layer2.scale && 
-           finalY >= layer2.y && finalY <= layer2.y + img.height * layer2.scale;
-}
-
-// Load images for both layers
-function loadImages() {
-    // For demo purposes, hard-coded number of images to try loading
-    const numImagesToTry = 50;
-
-    // Load Layer 1 images
-    loadLayerImages(1, numImagesToTry).then(() => {
-        console.log("Layer 1 loading complete:");
-        console.log("Successfully loaded: " + layer1.images.length + " images");
-        console.log("Failed to load: " + (numImagesToTry - layer1.images.length) + " images");
-        console.log("Total images in array: " + layer1.images.length);
-
-        // If we have images, use the first one initially
-        if (layer1.images.length > 0) {
-            layer1.currentImageIndex = 0;
-
-            // Update preview for layer 1
-            updatePreviewForLayer(1);
-        }
-    });
-
-    // Load Layer 2 images
-    loadLayerImages(2, numImagesToTry).then(() => {
-        console.log("Layer 2 loading complete:");
-        console.log("Successfully loaded: " + layer2.images.length + " images");
-        console.log("Failed to load: " + (numImagesToTry - layer2.images.length) + " images");
-        console.log("Total images in array: " + layer2.images.length);
-
-        // If we have images, use the first one initially
-        if (layer2.images.length > 0) {
-            layer2.currentImageIndex = 0;
-
-            // Center layer2 initially
-            centerLayer2();
-
-            // Update preview for layer 2
-            updatePreviewForLayer(2);
-        }
-    });
-
-    // Load background images and set background
-    loadBackground();
-}
-
-// Load images for a specific layer
-function loadLayerImages(layerId, numImagesToTry) {
-    const layerObj = layerId === 1 ? layer1 : layer2;
-    const promises = [];
-
-    for (let i = 1; i <= numImagesToTry; i++) {
-        const image = new Image();
-        image.crossOrigin = "Anonymous";
-        const imageUrl = `images/layer${layerId}/image${i}.png`;
-
-        const promise = new Promise((resolve) => {
-            image.onload = function() {
-                console.log(`Successfully loaded layer${layerId}/image${i}.png`);
-                layerObj.images.push(image);
-                resolve();
-            };
-
-            image.onerror = function() {
-                console.log(`Failed to load layer${layerId}/image${i}.png`);
-                resolve();
-            };
-        });
-
-        image.src = imageUrl;
-        promises.push(promise);
-    }
-
-    return Promise.all(promises);
-}
-
-// Load background images and set body background
-async function loadBackground() {
-    try {
-        // Try to fetch uploaded backgrounds
-        const response = await fetch('/api/images/background');
-        if (response.ok) {
-            const data = await response.json();
-            console.log("Found uploaded backgrounds:", data);
-
-            if (data.images && data.images.length > 0) {
-                // Try multiple paths that might work for backgrounds
-                const possiblePaths = [
-                    `/images/background/${data.images[0]}`,
-                    `/images/background/${data.images[0].replace('.gif', '.png')}`,
-                    `/images/background/background.gif`,
-                    `/background/background.gif`,
-                    `background/background.gif`,
-                    `/images/background/background.png`,
-                    `/images/background/background.jpg`,
-                    `/images/background/background.jpeg`
-                ];
-
-                console.log("Trying to load background from these paths:", possiblePaths);
-
-                // Try each path
-                for (const path of possiblePaths) {
-                    try {
-                        const img = new Image();
-                        img.src = path;
-                        await new Promise((resolve, reject) => {
-                            img.onload = resolve;
-                            img.onerror = reject;
-                        });
-
-                        // If we made it here, the image loaded
-                        document.body.style.backgroundImage = `url('${path}')`;
-                        return;
-                    } catch (err) {
-                        // Image failed to load, try the next one
-                        continue;
-                    }
-                }
+            if (originalAspectRatio > 1) {
+                scaledWidth = baseSize;
+                scaledHeight = baseSize / originalAspectRatio;
+            } else {
+                scaledHeight = baseSize;
+                scaledWidth = baseSize * originalAspectRatio;
             }
+
+            let newX = mouseX - dragStartX;
+            let newY = mouseY - dragStartY;
+
+            newX = Math.max(0, Math.min(newX, canvas.width - scaledWidth));
+            newY = Math.max(0, Math.min(newY, canvas.height - scaledHeight));
+
+            selectedLayer.x = newX;
+            selectedLayer.y = newY;
+
+            drawLayers();
         }
-    } catch (error) {
-        console.error("Error loading background:", error);
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+    isDragging = false;
+    isResizing = false;
+});
+
+// Add these variables after your existing declarations
+let currentScale = 0.2; // Starting scale for layer 2
+const MIN_SCALE = 0.1;
+const MAX_SCALE = 1.0;
+const SCALE_STEP = 0.02;
+
+// Add keyboard controls for resizing Layer 2
+window.addEventListener('keydown', (e) => {
+    if (!selectedLayer || selectedLayer.id !== 2) return;
+
+    switch(e.key) {
+        case 'ArrowUp':
+            // Increase size
+            currentScale = Math.min(currentScale + SCALE_STEP, MAX_SCALE);
+            layer2.scale = currentScale;
+            break;
+        case 'ArrowDown':
+            // Decrease size
+            currentScale = Math.max(currentScale - SCALE_STEP, MIN_SCALE);
+            layer2.scale = currentScale;
+            break;
+        case 'f':
+        case 'F':
+            // Toggle flip
+            layer2.isFlipped = !layer2.isFlipped;
+            break;
     }
 
-    // Use default if all other options failed
-    console.log('All background images failed to load, using fallback');
-    document.body.style.backgroundImage = "url('background/background.gif')";
-}
+    // Ensure layer stays within canvas bounds after resizing
+    const scaledWidth = canvas.width * layer2.scale;
+    const scaledHeight = canvas.height * layer2.scale;
 
-function centerLayer2() {
-    if (!layer2.images.length || !layer1.images.length) return;
-
-    const img1 = layer1.images[layer1.currentImageIndex];
-    const img2 = layer2.images[layer2.currentImageIndex];
-
-    // Center layer2 on layer1
-    layer2.x = (canvas.width - img2.width * layer2.scale) / 2;
-    layer2.y = (canvas.height - img2.height * layer2.scale) / 3;
-
-    // Reset angle and scale
-    layer2.angle = 0;
-    layer2.scale = 0.2;
+    layer2.x = Math.min(layer2.x, canvas.width - scaledWidth);
+    layer2.y = Math.min(layer2.y, canvas.height - scaledHeight);
 
     drawLayers();
-}
+});
 
-// Previous image for specified layer
-function prevImage(layerId) {
-    const layer = layerId === 1 ? layer1 : layer2;
+// Helper function to draw layers without UI elements
+function drawLayersClean(ctx, width, height) {
+    // Clear the canvas completely first
+    ctx.clearRect(0, 0, width, height);
 
-    if (layer.images.length <= 1) return;
-
-    layer.currentImageIndex--;
-    if (layer.currentImageIndex < 0) {
-        layer.currentImageIndex = layer.images.length - 1;
+    // Draw layer 1 (static background)
+    const img1 = layer1.getCurrentImage();
+    if (img1) {
+        ctx.drawImage(img1, 0, 0, width, height);
     }
 
-    updatePreviewForLayer(layerId);
-
-    // Reset angle if switching layer2 image
-    if (layerId === 2) {
-        layer2.angle = 0;
-    }
-
-    drawLayers();
-}
-
-// Next image for specified layer
-function nextImage(layerId) {
-    const layer = layerId === 1 ? layer1 : layer2;
-
-    if (layer.images.length <= 1) return;
-
-    layer.currentImageIndex++;
-    if (layer.currentImageIndex >= layer.images.length) {
-        layer.currentImageIndex = 0;
-    }
-
-    updatePreviewForLayer(layerId);
-
-    // Reset angle if switching layer2 image
-    if (layerId === 2) {
-        layer2.angle = 0;
-    }
-
-    drawLayers();
-}
-
-// Update preview image for the specified layer
-function updatePreviewForLayer(layerId) {
-    const layer = layerId === 1 ? layer1 : layer2;
-    const previewId = `layer${layerId}Preview`;
-
-    if (!layer.images.length) return;
-
-    const previewContainer = document.getElementById(previewId);
-    if (!previewContainer) return;
-
-    // Clear existing content
-    previewContainer.innerHTML = '';
-
-    // Create new preview image
-    const previewImg = document.createElement('img');
-    previewImg.classList.add('preview-image');
-    previewImg.alt = `Layer ${layerId} Preview`;
-
-    const currentImage = layer.images[layer.currentImageIndex];
-    previewImg.src = currentImage.src;
-
-    previewContainer.appendChild(previewImg);
-
-    console.log(`Updated preview for layer ${layerId} with image: ${currentImage.src}`);
-}
-
-// Draw all layers to the canvas
-function drawLayers() {
-    if (!canvas || !ctx) return;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw grid if enabled
-    if (DISPLAY_GRID) {
-        drawGrid();
-    }
-
-    // Draw layer 1 (always centered and fixed)
-    if (layer1.images.length > 0) {
-        const img = layer1.images[layer1.currentImageIndex];
-        const scale = 0.8;
-        const x = (canvas.width - img.width * scale) / 2;
-        const y = (canvas.height - img.height * scale) / 2;
-
-        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-    }
-
-    // Draw layer 2 (movable, resizable)
-    if (layer2.images.length > 0) {
-        const img = layer2.images[layer2.currentImageIndex];
+    // Draw layer 2 (movable) with rotation support
+    const img2 = layer2.getCurrentImage();
+    if (img2) {
+        const originalAspectRatio = img2.width / img2.height;
+        const baseSize = width * layer2.scale;
+        const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
+        const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
 
         ctx.save();
 
-        // Set up transform for rotation around center
-        const centerX = layer2.x + img.width * layer2.scale / 2;
-        const centerY = layer2.y + img.height * layer2.scale / 2;
+        // Move to the center of the image's position
+        ctx.translate(layer2.x + scaledWidth/2, layer2.y + scaledHeight/2);
 
-        ctx.translate(centerX, centerY);
-        ctx.rotate(layer2.angle);
+        // Apply rotation
+        ctx.rotate(layer2.rotation * Math.PI / 180);
 
-        // Apply flip if needed
         if (layer2.isFlipped) {
             ctx.scale(-1, 1);
         }
 
-        // Draw the image with translation and scaling
-        ctx.drawImage(
-            img, 
-            -img.width * layer2.scale / 2, 
-            -img.height * layer2.scale / 2,
-            img.width * layer2.scale,
-            img.height * layer2.scale
-        );
-
-        // Draw handles
-        drawHandles();
+        // Draw the image centered at the origin
+        ctx.drawImage(img2, -scaledWidth/2, -scaledHeight/2, scaledWidth, scaledHeight);
 
         ctx.restore();
     }
 }
 
-// Draw control handles for layer 2
-function drawHandles() {
-    if (!layer2.images.length) return;
+// Helper function to create export canvas
+function createExportCanvas() {
+    try {
+        // Get the main canvas
+        const mainCanvas = document.getElementById('mainCanvas');
+        if (!mainCanvas) {
+            throw new Error('Main canvas not found');
+        }
 
-    const img = layer2.images[layer2.currentImageIndex];
-    const handleSize = 10;
+        // Create a new canvas for export
+        const exportCanvas = document.createElement('canvas');
+        const exportCtx = exportCanvas.getContext('2d');
 
-    // Draw resize handle (bottom-right corner)
-    ctx.fillStyle = '#3498db';
-    ctx.fillRect(
-        img.width * layer2.scale / 2 - handleSize / 2,
-        img.height * layer2.scale / 2 - handleSize / 2,
-        handleSize,
-        handleSize
-    );
+        // Set dimensions
+        exportCanvas.width = mainCanvas.width;
+        exportCanvas.height = mainCanvas.height;
 
-    // Draw rotate handle (top center)
-    ctx.fillStyle = '#e74c3c';
-    ctx.beginPath();
-    ctx.arc(
-        0,
-        -img.height * layer2.scale / 2,
-        handleSize / 2,
-        0,
-        Math.PI * 2
-    );
-    ctx.fill();
+        // Copy the main canvas content
+        exportCtx.drawImage(mainCanvas, 0, 0);
 
-    // Draw flip handle (left center)
-    ctx.fillStyle = '#2ecc71';
-    ctx.beginPath();
-    ctx.arc(
-        -img.width * layer2.scale / 2,
-        0,
-        handleSize / 2,
-        0,
-        Math.PI * 2
-    );
-    ctx.fill();
+        return exportCanvas;
+    } catch (error) {
+        console.error('Error in createExportCanvas:', error);
+        throw error;
+    }
 }
 
-// Draw grid on canvas
-function drawGrid() {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(200, 200, 200, 0.3)';
-    ctx.lineWidth = 1;
+// Helper function to draw layers without UI elements
+function drawLayersForExport(canvas) {
+    const ctx = canvas.getContext('2d');
 
-    // Draw vertical lines
-    for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw layer 1 (background)
+    const img1 = layer1.getCurrentImage();
+    if (img1) {
+        ctx.drawImage(img1, 0, 0, canvas.width, canvas.height);
     }
 
-    // Draw horizontal lines
-    for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
+    // Draw layer 2 (overlay) - only the image, no UI elements
+    const img2 = layer2.getCurrentImage();
+    if (img2) {
+        const originalAspectRatio = img2.width / img2.height;
+        const baseSize = canvas.width * layer2.scale;
+        const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
+        const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
 
-    ctx.restore();
+        ctx.drawImage(img2, 
+            layer2.x, layer2.y, 
+            scaledWidth, scaledHeight);
+    }
 }
 
-// Download the current canvas as an image
-function downloadImage() {
+// Update the download button click handler
+document.getElementById('downloadBtn').addEventListener('click', function() {
+    try {
+        // Get the main canvas
+        const canvas = document.getElementById('mainCanvas');
+        if (!canvas) {
+            throw new Error('Canvas element not found');
+        }
+
+        // Create a temporary canvas for export
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = canvas.width;
+        exportCanvas.height = canvas.height;
+
+        // Draw layers without UI elements
+        drawLayersForExport(exportCanvas);
+
+        // Generate filename
+        const fileName = generateGobName();
+
+        // Check if it's iOS/iPadOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 0);
+
+        if (isIOS) {
+            // For iOS: Open in new window
+            const dataURL = exportCanvas.toDataURL('image/png');
+            const windowContent = `
+                <html>
+                    <head>
+                        <title>${fileName}</title>
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <style>
+                            body {
+                                margin: 0;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                min-height: 100vh;
+                                background: #f0f0f0;
+                            }
+                            img {
+                                max-width: 100%;
+                                max-height: 100vh;
+                                object-fit: contain;
+                            }
+                            .instructions {
+                                position: fixed;
+                                top: 10px;
+                                left: 0;
+                                right: 0;
+                                text-align: center;
+                                background: rgba(255,255,255,0.9);
+                                padding: 10px;
+                                font-family: sans-serif;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="instructions">
+                            Tap and hold image to save as "${fileName}.png"
+                        </div>
+                        <img src="${dataURL}" alt="Gob Creation">
+                    </body>
+                </html>
+            `;
+
+            const win = window.open();
+            if (win) {
+                win.document.write(windowContent);
+            } else {
+                alert('Please allow pop-ups to download the image');
+            }
+        } else {
+            // For other devices: Direct download
+            const dataURL = exportCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `${fileName}.png`;
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    } catch (error) {
+        console.error('Download failed:', error);
+        alert(`Failed to download image: ${error.message}`);
+    }
+});
+
+// Random name generator function
+function generateGobName() {
+    const suffixes = [
+        'inator', 'arino', 'enstein', 'ology', 'master', 
+        'supreme', 'ultra', 'maximus', 'prime', 'deluxe',
+        'wizard', 'chief', 'lord', 'king', 'boss'
+    ];
+
+    const randomNum = Math.floor(Math.random() * 1000);
+    const randomSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+
+    return `Gob${randomSuffix}_${randomNum}`;
+}
+
+// Update the original drawLayers function to include UI elements
+function drawLayers() {
+    // First draw the images without UI
+    drawLayersClean(ctx, canvas.width, canvas.height);
+
+    // Then add UI elements only if needed
+    if (selectedLayer === layer2) {
+        const img2 = layer2.getCurrentImage();
+        if (img2) {
+            const originalAspectRatio = img2.width / img2.height;
+            const baseSize = canvas.width * layer2.scale;
+            const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
+            const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
+
+            // Draw resize handle
+            const handleSize = window.innerWidth <= 768 ? 40 : 30;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(layer2.x + scaledWidth, layer2.y + scaledHeight, 
+                   handleSize/2, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw resize arrows
+            ctx.beginPath();
+            ctx.moveTo(layer2.x + scaledWidth - 10, layer2.y + scaledHeight);
+            ctx.lineTo(layer2.x + scaledWidth + 10, layer2.y + scaledHeight);
+            ctx.moveTo(layer2.x + scaledWidth, layer2.y + scaledHeight - 10);
+            ctx.lineTo(layer2.x + scaledWidth, layer2.y + scaledHeight + 10);
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw flip handle (bottom-left)
+            ctx.beginPath();
+            ctx.arc(layer2.x, layer2.y + scaledHeight, 
+                   handleSize/1.69, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw flip arrows
+            ctx.beginPath();
+            // Left arrow
+            ctx.moveTo(layer2.x - 8, layer2.y + scaledHeight);
+            ctx.lineTo(layer2.x - 3, layer2.y + scaledHeight - 5);
+            ctx.moveTo(layer2.x - 8, layer2.y + scaledHeight);
+            ctx.lineTo(layer2.x - 3, layer2.y + scaledHeight + 5);
+            // Right arrow
+            ctx.moveTo(layer2.x + 8, layer2.y + scaledHeight);
+            ctx.lineTo(layer2.x + 3, layer2.y + scaledHeight - 5);
+            ctx.moveTo(layer2.x + 8, layer2.y + scaledHeight);
+            ctx.lineTo(layer2.x + 3, layer2.y + scaledHeight + 5);
+
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+}
+
+// Initial draw
+drawLayers();
+
+// Navigation buttons functionality
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Get layer ID from button's data attribute or from parent row
+        let layerId;
+        if (this.hasAttribute('data-layer')) {
+            layerId = this.getAttribute('data-layer');
+        } else {
+            const layerRow = this.closest('.layer-row');
+            layerId = layerRow.getAttribute('data-layer');
+        }
+
+        const layer = layerId === '1' ? layer1 : layer2;
+
+        if (this.classList.contains('prev')) {
+            layer.previousImage();
+        } else {
+            layer.nextImage();
+        }
+
+        drawLayers();
+    });
+});
+
+// Initialize preview boxes within the buttons
+document.querySelectorAll('.preview-btn').forEach(btn => {
+    const layerId = btn.getAttribute('data-layer');
+
+    // Create preview container inside the button
+    const previewContainer = document.createElement('div');
+    previewContainer.className = 'preview-container';
+
+    // Create preview image
+    const previewImg = document.createElement('img');
+    previewImg.className = 'preview-img';
+    previewImg.alt = `Layer ${layerId} preview`;
+
+    // Add them to the button
+    previewContainer.appendChild(previewImg);
+    btn.innerHTML = ''; // Clear the "PREVIEW LAYER X" text
+    btn.appendChild(previewContainer);
+
+    // Update preview image when layer image changes
+    const layer = layerId === '1' ? layer1 : layer2;
+    const updatePreview = () => {
+        const currentImage = layer.getCurrentImage();
+        if (currentImage) {
+            previewImg.src = currentImage.src;
+        }
+    };
+
+    // Initial preview update
+    updatePreview();
+
+    // Update preview when navigating images
+    btn.closest('.layer-row').querySelectorAll('.nav-btn').forEach(navBtn => {
+        navBtn.addEventListener('click', updatePreview);
+    });
+});
+
+// Helper function to check if a point is inside the resize handle
+function isInResizeHandle(x, y) {
+    const img2 = layer2.getCurrentImage();
+    if (!img2 || !selectedLayer || selectedLayer.id !== 2) return false;
+
+    const originalAspectRatio = img2.width / img2.height;
+    const baseSize = canvas.width * layer2.scale;
+
+    let scaledWidth, scaledHeight;
+    if (originalAspectRatio > 1) {
+        scaledWidth = baseSize;
+        scaledHeight = baseSize / originalAspectRatio;
+    } else {
+        scaledHeight = baseSize;
+        scaledWidth = baseSize * originalAspectRatio;
+    }
+
+    const handleX = layer2.x + scaledWidth;
+    const handleY = layer2.y + scaledHeight;
+    const handleRadius = window.innerWidth <= 768 ? 20 : 15; // Increased touch area
+
+    const dx = x - handleX;
+    const dy = y - handleY;
+    return Math.sqrt(dx * dx + dy * dy) <= handleRadius;
+}
+
+// Add preview functionality
+function createPreviewBox(layerId) {
+    const previewBox = document.createElement('div');
+    previewBox.className = 'preview-box';
+    previewBox.style.cssText = `
+        width: 100px;
+        height: 100px;
+        background: #fff;
+        border: 2px solid #ccc;
+        position: absolute;
+        right: 10px;
+        display: none;
+        overflow: hidden;
+    `;
+
+    const img = document.createElement('img');
+    img.style.cssText = `
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    `;
+
+    previewBox.appendChild(img);
+    document.body.appendChild(previewBox);
+    return previewBox;
+}
+
+// Create preview boxes for both layers
+const previewBox1 = createPreviewBox(1);
+const previewBox2 = createPreviewBox(2);
+
+// Update preview buttons functionality
+document.querySelectorAll('.preview-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const layerId = this.getAttribute('data-layer');
+        const layer = layerId === '1' ? layer1 : layer2;
+        const previewBox = layerId === '1' ? previewBox1 : previewBox2;
+
+        // Position preview box next to the button
+        const btnRect = this.getBoundingClientRect();
+        previewBox.style.top = btnRect.top + 'px';
+
+        // Get current image from layer
+        const currentImage = layer.getCurrentImage();
+        if (currentImage) {
+            const img = previewBox.querySelector('img');
+            img.src = currentImage.src;
+            previewBox.style.display = 'block';
+        }
+    });
+});
+
+// Hide preview boxes when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('preview-btn')) {
+        previewBox1.style.display = 'none';
+        previewBox2.style.display = 'none';
+    }
+});
+
+function updatePreviews() {
+    document.querySelectorAll('.preview-btn').forEach(btn => {
+        const layerId = btn.getAttribute('data-layer');
+        let layer;
+
+        // Determine which layer to use based on the data-layer attribute
+        if (layerId === '1' || layerId === '1-nav-preview') {
+            layer = layer1;
+        } else if (layerId === '2') {
+            layer = layer2;
+        } else {
+            return; // Skip if we can't determine the layer
+        }
+
+        // Get current image from layer and update preview
+        const previewImg = btn.querySelector('.preview-img');
+        if (previewImg) {
+            const currentImage = layer.getCurrentImage();
+            if (currentImage) {
+                previewImg.src = currentImage.src;
+                console.log(`Updated preview for layer ${layerId} with image: ${currentImage.src}`);
+            }
+        }```text
+        }
+    });
+}
+
+// Call updatePreviews initially to ensure all previews start with the correct images
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        updatePreviews();
+    }, 500); // Short delay to ensure images are loaded
+});
+
+// Update the file input in HTML to accept more formats
+document.getElementById('uploadLayer1').setAttribute('accept', 'image/png, image/jpeg, image/jpg, image/gif, image/webp');
+
+// Handle file uploads with layer selection
+document.getElementById('uploadLayer1').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+
+    if (file && allowedTypes.includes(file.type)) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = function() {
+                // Optimize image before storing
+                const optimizedDataUrl = optimizeImage(img);
+                localStorage.setItem('layer1CustomImage', optimizedDataUrl);
+
+                // Update layer 1 with optimized image
+                const optimizedImg = new Image();
+                optimizedImg.onload = function() {
+                    layer1.images = [optimizedImg];
+                    layer1.currentImageIndex = 0;
+                    layer1.aspectRatio = optimizedImg.width / optimizedImg.height;
+                    layer1.isCustomImage = true;
+
+                    drawLayers();
+                    updatePreviews();
+                };
+                optimizedImg.src = optimizedDataUrl;
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Add image optimization before upload
+function optimizeImage(img) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set maximum dimensions while maintaining aspect ratio
+    const MAX_WIDTH = 1500;
+    const MAX_HEIGHT = 1500;
+    let width = img.width;
+    let height = img.height;
+
+    if (width > height) {
+        if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+        }
+    } else {
+        if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+        }
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+
+    // Draw and compress image
+    ctx.drawImage(img, 0, 0, width, height);
+    return canvas.toDataURL('image/png', 0.8); // Adjust quality as needed
+}
+
+// Update upload handler to use optimization
+document.getElementById('uploadLayer1').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+
+    if (file && allowedTypes.includes(file.type)) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = function() {
+                // Optimize image before storing
+                const optimizedDataUrl = optimizeImage(img);
+                localStorage.setItem('layer1CustomImage', optimizedDataUrl);
+
+                // Update layer 1 with optimized image
+                const optimizedImg = new Image();
+                optimizedImg.onload = function() {
+                    layer1.images = [optimizedImg];
+                    layer1.currentImageIndex = 0;
+                    layer1.aspectRatio = optimizedImg.width / optimizedImg.height;
+                    layer1.isCustomImage = true;
+
+                    drawLayers();
+                    updatePreviews();
+                };
+                optimizedImg.src = optimizedDataUrl;
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Background loader function
+async function loadBackground() {
+    // Start with an empty array of paths to try
+    let backgroundPaths = [];
+
+    // First try to load uploaded background images from the server
+    try {
+        const response = await fetch('/api/images/background');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.images && data.images.length > 0) {
+                // Add uploaded images first (highest priority)
+                data.images.forEach(image => {
+                    backgroundPaths.push(`/images/background/${image}`);
+                });
+                console.log('Found uploaded backgrounds:', data.images);
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching background images:', error);
+    }
+
+    // Then add fallback paths if no uploaded backgrounds worked
+    backgroundPaths = backgroundPaths.concat([
+        '/images/background/image1.png',
+        '/images/background/background.gif',
+        '/background/background.gif',
+        'background/background.gif',
+        '/images/background/background.png',
+        '/images/background/background.jpg',
+        '/images/background/background.jpeg'
+    ]);
+
+    console.log('Trying to load background from these paths:', backgroundPaths);
+
+    // Try each path and set the first one that works
+    for (const path of backgroundPaths) {
+        try {
+            // Use a promise to properly handle image loading
+            const loaded = await new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    console.log('Successfully loaded background from:', path);
+                    document.body.style.backgroundImage = `url('${path}')`;
+                    resolve(true);
+                };
+                img.onerror = () => {
+                    console.log(`Failed to load background from: ${path}`);
+                    resolve(false);
+                };
+                img.src = path;
+            });
+
+            if (loaded) {
+                console.log('Using background image:', path);
+                return; // Exit after successfully loading an image
+            }
+        } catch (error) {
+            console.error('Error loading background from:', path, error);
+        }
+    }
+
+    // Only fall back to the default if all other options failed
+    console.log('All background images failed to load, using fallback');
+    document.body.style.backgroundImage = "url('background/background.gif')";
+}
+
+// Call the function when page loads
+window.addEventListener('load', loadBackground);
+
+function centerLayer2() {
+    const img2 = layer2.getCurrentImage();
+    if (img2) {
+        const originalAspectRatio = img2.width / img2.height;
+        const baseSize = canvas.width * layer2.scale;
+        let scaledWidth, scaledHeight;
+
+        if (originalAspectRatio > 1) {
+            scaledWidth = baseSize;
+            scaledHeight = baseSize / originalAspectRatio;
+        } else {
+            scaledHeight = baseSize;
+            scaledWidth = baseSize * originalAspectRatio;
+        }
+
+        // Center the image
+        layer2.x = (canvas.width - scaledWidth) / 2;
+        layer2.y = (canvas.height - scaledHeight) / 2;
+
+        drawLayers();
+    }
+}
+
+// Add this to the Layer class loadImages method after line 107:
+if (this.id === 2 && i === 1) {
+    centerLayer2();
+}
+
+// Helper function to calculate distance between two touch points
+function getTouchDistance(touch1, touch2) {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Update canvas size setup
+function initCanvas() {
+    // Set a more reasonable base size for the canvas
+    const baseSize = 800; // Reduced from 1500
+    canvas.width = baseSize;
+    canvas.height = baseSize;
+
+    // Initial draw
+    drawLayers();
+}
+
+// Update export canvas size to match
+function createExportCanvas() {
     const exportCanvas = document.createElement('canvas');
     const exportCtx = exportCanvas.getContext('2d');
 
@@ -769,117 +1172,380 @@ function downloadImage() {
     exportCanvas.width = 800;  // Reduced from 1500
     exportCanvas.height = 800;
 
-    // Clear the export canvas
-    exportCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+    // Rest of your export code...
+}
 
-    // Draw layer 1 (scaled for export)
-    if (layer1.images.length > 0) {
-        const img = layer1.images[layer1.currentImageIndex];
-        const scale = 0.8 * (exportCanvas.width / canvas.width);
-        const x = (exportCanvas.width - img.width * scale) / 2;
-        const y = (exportCanvas.height - img.height * scale) / 2;
+// Add this after your other event listeners
+document.querySelector('.flip-btn').addEventListener('click', () => {
+    if (layer2) {
+        layer2.isFlipped = !layer2.isFlipped;
+        drawLayers();
+    }
+});
 
-        exportCtx.drawImage(img, x, y, img.width * scale, img.height * scale);
+// Add flip handle check function
+function isInFlipHandle(x, y) {
+    const img2 = layer2.getCurrentImage();
+    if (!img2 || !selectedLayer || selectedLayer.id !== 2) return false;
+
+    const originalAspectRatio = img2.width / img2.height;
+    const baseSize = canvas.width * layer2.scale;
+    const scaledWidth = originalAspectRatio > 1 ? baseSize : baseSize * originalAspectRatio;
+    const scaledHeight = originalAspectRatio > 1 ? baseSize / originalAspectRatio : baseSize;
+
+    const handleX = layer2.x;  // Left side of the image
+    const handleY = layer2.y + scaledHeight;  // Bottom of the image
+    const handleRadius = window.innerWidth <= 768 ? 20 : 15;
+
+    const dx = x - handleX;
+    const dy = y - handleY;
+    return Math.sqrt(dx * dx + dy * dy) <= handleRadius;
+}
+
+// Add rotation slider functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const rotationSlider = document.getElementById('rotationSlider');
+    const rotationValue = document.querySelector('.rotation-value');
+
+    rotationSlider.addEventListener('input', function() {
+        layer2.rotation = parseInt(this.value);
+        rotationValue.textContent = `${this.value}°`;
+        drawLayers();
+    });
+});
+
+// Music player functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const audio = document.getElementById('bgMusic');
+    const audioToggle = document.getElementById('audioToggle');
+    const iconOn = audioToggle.querySelector('.audio-icon-on');
+    const iconOff = audioToggle.querySelector('.audio-icon-off');
+    let isPlaying = false;
+    let currentTrackIndex = 0;
+    let musicTracks = ['background.mp3']; // Default track
+    let trackSource = document.querySelector('#bgMusic source');
+
+    // Function to load available music tracks
+    async function loadMusicTracks() {
+        try {
+            const response = await fetch('/api/images/music');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.images && data.images.length > 0) {
+                    musicTracks = data.images;
+                    console.log('Available music tracks:', musicTracks);
+
+                    // Set initial track
+                    loadTrack(currentTrackIndex);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching music tracks:', error);
+        }
     }
 
-    // Draw layer 2 (scaled for export)
-    if (layer2.images.length > 0) {
-        const img = layer2.images[layer2.currentImageIndex];
+    // Load a specific track by index
+    function loadTrack(index) {
+        if (musicTracks.length === 0) return;
 
-        // Scale factors for export
-        const scaleRatio = exportCanvas.width / canvas.width;
+        // Ensure index is within bounds
+        index = ((index % musicTracks.length) + musicTracks.length) % musicTracks.length;
+        currentTrackIndex = index;
 
-        exportCtx.save();
+        const wasPlaying = !audio.paused;
 
-        // Calculate the scaled position
-        const scaledX = layer2.x * scaleRatio;
-        const scaledY = layer2.y * scaleRatio;
-        const scaledImgScale = layer2.scale * scaleRatio;
+        // Update track source
+        trackSource.src = `/music/${musicTracks[index]}`;
+        audio.load();
 
-        // Set up transform for rotation around center
-        const centerX = scaledX + img.width * scaledImgScale / 2;
-        const centerY = scaledY + img.height * scaledImgScale / 2;
-
-        exportCtx.translate(centerX, centerY);
-        exportCtx.rotate(layer2.angle);
-
-        // Apply flip if needed
-        if (layer2.isFlipped) {
-            exportCtx.scale(-1, 1);
+        // Display current track name
+        const trackDisplay = document.querySelector('.track-name');
+        if (trackDisplay) {
+            trackDisplay.textContent = musicTracks[index].replace(/\.[^/.]+$/, ""); // Remove file extension
         }
 
-        // Draw the image with translation and scaling
-        exportCtx.drawImage(
-            img, 
-            -img.width * scaledImgScale / 2, 
-            -img.height * scaledImgScale / 2,
-            img.width * scaledImgScale,
-            img.height * scaledImgScale
-        );
-
-        exportCtx.restore();
+        // Resume playing if it was playing before
+        if (wasPlaying) {
+            audio.play().catch(error => console.log("Audio play failed:", error));
+        }
     }
 
-    // Create download link
-    const link = document.createElement('a');
-    link.download = 'my-ordinarinos.png';
-    link.href = exportCanvas.toDataURL('image/png');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// Update all layer previews
-function updatePreviews() {
-    if (layer1.images.length > 0) {
-        updatePreviewForLayer(1);
-    }
-
-    if (layer2.images.length > 0) {
-        updatePreviewForLayer(2);
-    }
-
-    // Print layer content for debugging
-    console.log("Layer 1 images:");
-    for (let i = 0; i < layer1.images.length; i++) {
-        console.log(`Image ${i+1}: ${layer1.images[i].src}`);
-    }
-
-    console.log("Layer 2 images:");
-    for (let i = 0; i < layer2.images.length; i++) {
-        console.log(`Image ${i+1}: ${layer2.images[i].src}`);
-    }
-}
-
-// Add image optimization before upload
-function optimizeImage(img) {
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-
-    // Set dimensions (limit max size)
-    const maxDimension = 800;
-    let width = img.width;
-    let height = img.height;
-
-    if (width > maxDimension || height > maxDimension) {
-        if (width > height) {
-            height = height * (maxDimension / width);
-            width = maxDimension;
+    // Function to toggle audio
+    function toggleAudio() {
+        if (isPlaying) {
+            audio.pause();
+            iconOn.style.display = 'none';
+            iconOff.style.display = 'block';
         } else {
-            width = width * (maxDimension / height);
-            height = maxDimension;
+            audio.play().catch(function(error) {
+                console.log("Audio play failed:", error);
+            });
+            iconOn.style.display = 'block';
+            iconOff.style.display = 'none';
         }
+        isPlaying = !isPlaying;
     }
 
-    tempCanvas.width = width;
-    tempCanvas.height = height;
+    // Add click event listener to toggle button
+    audioToggle.addEventListener('click', toggleAudio);
 
-    // Draw and compress
-    tempCtx.drawImage(img, 0, 0, width, height);
-    return tempCanvas.toDataURL('image/png', 0.85); // Adjust quality as needed
+    // Create previous and next track buttons
+    const prevButton = document.getElementById('prevTrack');
+    const nextButton = document.getElementById('nextTrack');
+
+    if (prevButton) {
+        prevButton.addEventListener('click', function() {
+            loadTrack(currentTrackIndex - 1);
+        });
+    }
+
+    if (nextButton) {
+        nextButton.addEventListener('click', function() {
+            loadTrack(currentTrackIndex + 1);
+        });
+    }
+
+    // Optional: Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.key.toLowerCase() === 'm') {
+            toggleAudio();
+        } else if (e.key === 'ArrowLeft' && e.altKey) {
+            loadTrack(currentTrackIndex - 1);
+        } else if (e.key === 'ArrowRight' && e.altKey) {
+            loadTrack(currentTrackIndex + 1);
+        }
+    });
+
+    // Set initial volume
+    audio.volume = 0.5; // Adjust this value between 0.0 and 1.0
+
+    // Load available tracks
+    loadMusicTracks();
+});
+
+// Add this to help debug
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        // Debug both layers
+        if (layer1) {
+            console.log('Layer 1 images:');
+            layer1.debugImages();
+        }
+        if (layer2) {
+            console.log('Layer 2 images:');
+            layer2.debugImages();
+        }
+    }, 2000); // Wait 2 seconds after load to check images
+});
+
+// Add delay helper function
+
+// Load site text settings and contributors
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // Load site settings
+        const response = await fetch('/api/site-settings');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.settings) {
+                // Update text content
+                document.getElementById('siteTitle').textContent = data.settings.title || 'GOBLINARINOS';
+                document.getElementById('siteSubtitle').textContent = data.settings.subtitle || 'Merry Christmas Gobos';
+                document.getElementById('siteSubtext').textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
+
+                // Apply color settings
+                if (data.settings.subtitleColor) {
+                    document.getElementById('siteSubtitle').style.color = data.settings.subtitleColor;
+                }
+
+                if (data.settings.subtextColor) {
+                    document.getElementById('siteSubtext').style.color = data.settings.subtextColor;
+                }
+
+                if (data.settings.buttonColor) {
+                    // Apply button color to all layer row buttons, rotation and flip controls
+                    document.querySelectorAll('.layer-row, .preview-btn, .rotation-control, .flip-btn').forEach(el => {
+                        el.style.backgroundColor = data.settings.buttonColor;
+                    });
+                }
+
+                if (data.settings.buttonTextColor) {
+                    // Apply text color to all layer row buttons, rotation and flip controls
+                    document.querySelectorAll('.layer-row, .preview-btn, .rotation-control, .flip-btn').forEach(el => {
+                        el.style.color = data.settings.buttonTextColor;
+                    });
+
+                    // Additional elements that need the text color
+                    document.querySelectorAll('.nav-btn, .upload-text, .select-text, .rotation-label, .rotation-value').forEach(el => {
+                        el.style.color = data.settings.buttonTextColor;
+                    });
+
+                    // Style the upload input label
+                    const uploadLabels = document.querySelectorAll('input[type="file"] + label');
+                    uploadLabels.forEach(label => {
+                        label.style.color = data.settings.buttonTextColor;
+                    });
+                }
+
+                if (data.settings.buttonColor) {
+                    // Apply button color to input elements and their labels
+                    document.querySelectorAll('input[type="file"]').forEach(input => {
+                        const label = input.nextElementSibling;
+                        if (label && label.tagName === 'LABEL') {
+                            label.style.backgroundColor = data.settings.buttonColor;
+                        }
+                    });
+
+                    // Apply to rotation slider
+                    const rotationSliders = document.querySelectorAll('.rotation-slider');
+                    rotationSliders.forEach(slider => {
+                        // For WebKit browsers
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            .rotation-slider::-webkit-slider-thumb {
+                                background: ${data.settings.buttonTextColor} !important;
+                            }
+                            .rotation-slider::-moz-range-thumb {
+                                background: ${data.settings.buttonTextColor} !important;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    });
+                }
+
+                // Update donation addresses if available in settings
+                if (data.settings.donationAddresses) {
+                    if (data.settings.donationAddresses.btc) {
+                        DONATION_ADDRESSES.btc = data.settings.donationAddresses.btc;
+                    }
+                    if (data.settings.donationAddresses.eth) {
+                        DONATION_ADDRESSES.eth = data.settings.donationAddresses.eth;
+                    }
+                    if (data.settings.donationAddresses.sol) {
+                        DONATION_ADDRESSES.sol = data.settings.donationAddresses.sol;
+                    }
+                }
+
+                if (data.settings.downloadBtnColor) {
+                    // Apply color to download button
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    if (downloadBtn) {
+                        downloadBtn.style.backgroundColor = data.settings.downloadBtnColor;
+                    }
+                }
+
+                if (data.settings.downloadBtnTextColor) {
+                    // Apply text color to download button
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    if (downloadBtn) {
+                        downloadBtn.style.color = data.settings.downloadBtnTextColor;
+                    }
+                }
+            }
+        }
+
+        // Load contributors
+        const contributorsResponse = await fetch('/api/contributors');
+        if (contributorsResponse.ok) {
+            const contributorsData = await contributorsResponse.json();
+            if (contributorsData) {
+                // Update contributors in UI
+                displayContributors(contributorsData);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading site settings or contributors:', error);
+    }
+});
+
+// Function to display contributors in the UI
+function displayContributors(data) {
+    const developersSection = document.querySelector('.contributors-section .contributors-list .contributors-category:nth-of-type(1)');
+    const contributorsSection = document.querySelector('.contributors-section .contributors-list .contributors-category:nth-of-type(2)');
+
+    if (!developersSection || !contributorsSection) return;
+
+    // Clear existing contributors
+    let nextElement = developersSection.nextElementSibling;
+    while (nextElement && !nextElement.classList.contains('contributors-category')) {
+        const nextAfter = nextElement.nextElementSibling;
+        nextElement.remove();
+        nextElement = nextAfter;
+    }
+
+    nextElement = contributorsSection.nextElementSibling;
+    while (nextElement) {
+        const nextAfter = nextElement.nextElementSibling;
+        nextElement.remove();
+        nextElement = nextAfter;
+    }
+
+    // Add developers
+    if (data.developers && data.developers.length > 0) {
+        data.developers.forEach(dev => {
+            const contributorDiv = document.createElement('div');
+            contributorDiv.className = 'contributor';
+
+            const link = document.createElement('a');
+            link.href = `https://twitter.com/${dev.xAccount.replace('@', '')}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+
+            const img = document.createElement('img');
+            img.src = dev.image || 'images/contributors/image3.png'; // Default image if none provided
+            img.alt = dev.name;
+            img.className = 'contributor-image';
+            link.appendChild(img);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'contributor-name';
+            nameSpan.textContent = dev.xAccount;
+
+            const roleSpan = document.createElement('span');
+            roleSpan.className = 'contributor-role';
+            roleSpan.textContent = dev.role || 'Developer';
+
+            contributorDiv.appendChild(link);
+            contributorDiv.appendChild(nameSpan);
+            contributorDiv.appendChild(roleSpan);
+
+            developersSection.parentNode.insertBefore(contributorDiv, contributorsSection);
+        });
+    }
+
+    // Add contributors
+    if (data.contributors && data.contributors.length > 0) {
+        data.contributors.forEach(contrib => {
+            const contributorDiv = document.createElement('div');
+            contributorDiv.className = 'contributor';
+
+            const link = document.createElement('a');
+            link.href = `https://twitter.com/${contrib.xAccount.replace('@', '')}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+
+            const img = document.createElement('img');
+            img.src = contrib.image || 'images/contributors/image1.png'; // Default image if none provided
+            img.alt = contrib.name;
+            img.className = 'contributor-image';
+            link.appendChild(img);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'contributor-name';
+            nameSpan.textContent = contrib.xAccount;
+
+            const roleSpan = document.createElement('span');
+            roleSpan.className = 'contributor-role';
+            roleSpan.textContent = contrib.role || 'Contributor';
+
+            contributorDiv.appendChild(link);
+            contributorDiv.appendChild(nameSpan);
+            contributorDiv.appendChild(roleSpan);
+
+            contributorsSection.parentNode.appendChild(contributorDiv);
+        });
+    }
 }
-
-// Helper function for delay
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const RATE_LIMIT_DELAY = 500;
 
@@ -930,66 +1596,80 @@ async function fetchDonationSettings() {
 
 // Function to load and play background music
 function setupBackgroundMusic() {
-    const musicPlayer = document.getElementById('bgMusic');
-    const playButton = document.getElementById('playMusicBtn');
+    const bgMusic = document.getElementById('bgMusic');
+    const playMusicBtn = document.getElementById('playMusicBtn');
 
-    if (musicPlayer && playButton) {
-        playButton.addEventListener('click', function() {
-            if (musicPlayer.paused) {
-                musicPlayer.volume = 0.3; // Lower volume
-                musicPlayer.play().then(() => {
-                    playButton.textContent = 'Pause Music';
-                }).catch(error => {
-                    console.error('Error playing music:', error);
-                });
+    if (bgMusic && playMusicBtn) {
+        playMusicBtn.addEventListener('click', function() {
+            if (bgMusic.paused) {
+                bgMusic.play();
+                playMusicBtn.textContent = '🔊 Pause Music';
             } else {
-                musicPlayer.pause();
-                playButton.textContent = 'Play Music';
+                bgMusic.pause();
+                playMusicBtn.textContent = '🔈 Play Music';
             }
         });
     }
 }
 
-// Set up donation buttons
+// Function to setup donation buttons
 async function setupDonationButtons() {
-    try {
-        const donationSettings = await fetchDonationSettings();
-        if (!donationSettings) return;
+    const donationResult = await fetchDonationSettings();
 
-        const donationContainer = document.getElementById('donationContainer');
-        if (!donationContainer) return;
+    if (!donationResult || !donationResult.settings) {
+        return;
+    }
 
-        const btcBtn = document.getElementById('btcDonateBtn');
-        const ethBtn = document.getElementById('ethDonateBtn');
-        const solBtn = document.getElementById('solBtn');
+    const settings = donationResult.settings;
+    const donationBox = document.getElementById('donationBox');
+    const donationText = document.getElementById('donationText');
+    const solanaDonateBtn = document.getElementById('solanaDonateBtn');
+    const ethereumDonateBtn = document.getElementById('ethereumDonateBtn');
+    const bitcoinDonateBtn = document.getElementById('bitcoinDonateBtn');
 
-        if (btcBtn && donationSettings.settings.bitcoinAddress) {
-            btcBtn.addEventListener('click', () => {
-                copyToClipboard(donationSettings.settings.bitcoinAddress);
-                showNotification('Bitcoin address copied to clipboard!');
-            });
+    // Only show donation box if at least one address is provided
+    if (settings.solanaAddress || settings.ethereumAddress || settings.bitcoinAddress) {
+        donationBox.style.display = 'block';
+
+        // Update donation text if provided
+        if (settings.donationText) {
+            donationText.textContent = settings.donationText;
         }
 
-        if (ethBtn && donationSettings.settings.ethereumAddress) {
-            ethBtn.addEventListener('click', () => {
-                copyToClipboard(donationSettings.settings.ethereumAddress);
-                showNotification('Ethereum address copied to clipboard!');
+        // Setup Solana button
+        if (settings.solanaAddress) {
+            solanaDonateBtn.style.display = 'flex';
+            solanaDonateBtn.addEventListener('click', function() {
+                copyToClipboard(settings.solanaAddress, 'Solana address copied!');
             });
+        } else {
+            solanaDonateBtn.style.display = 'none';
         }
 
-        if (solBtn && donationSettings.settings.solanaAddress) {
-            solBtn.addEventListener('click', () => {
-                copyToClipboard(donationSettings.settings.solanaAddress);
-                showNotification('Solana address copied to clipboard!');
+        // Setup Ethereum button
+        if (settings.ethereumAddress) {
+            ethereumDonateBtn.style.display = 'flex';
+            ethereumDonateBtn.addEventListener('click', function() {
+                copyToClipboard(settings.ethereumAddress, 'Ethereum address copied!');
             });
+        } else {
+            ethereumDonateBtn.style.display = 'none';
         }
-    } catch (error) {
-        console.error('Error setting up donation buttons:', error);
+
+        // Setup Bitcoin button
+        if (settings.bitcoinAddress) {
+            bitcoinDonateBtn.style.display = 'flex';
+            bitcoinDonateBtn.addEventListener('click', function() {
+                copyToClipboard(settings.bitcoinAddress, 'Bitcoin address copied!');
+            });
+        } else {
+            bitcoinDonateBtn.style.display = 'none';
+        }
     }
 }
 
-// Helper function to copy text to clipboard
-function copyToClipboard(text) {
+// Function to copy text to clipboard
+function copyToClipboard(text, message) {
     navigator.clipboard.writeText(text).then(() => {
         // Show a temporary notification
         const notification = document.createElement('div');
@@ -1003,7 +1683,7 @@ function copyToClipboard(text) {
         notification.style.borderRadius = '4px';
         notification.style.zIndex = '1000';
         notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-        notification.textContent = 'Copied to clipboard!';
+        notification.textContent = message || 'Copied to clipboard!';
         document.body.appendChild(notification);
 
         // Remove notification after 3 seconds
@@ -1019,173 +1699,79 @@ function copyToClipboard(text) {
     });
 }
 
-// Show notification message
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-
-    document.body.appendChild(notification);
-
-    // Fade in
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-
-    // Remove after delay
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
-}
-
-// Load and display site settings on DOMContentLoaded
+// When DOM is loaded, initialize
 document.addEventListener('DOMContentLoaded', async function() {
-    try {
-        // Fetch site settings
-        const siteSettings = await fetchSiteSettings();
-        if (siteSettings && siteSettings.settings) {
-            // Apply site title and subtitle
-            if (siteSettings.settings.title) {
-                document.title = siteSettings.settings.title;
-                const titleElement = document.getElementById('siteTitle');
-                if (titleElement) titleElement.textContent = siteSettings.settings.title;
-            }
+    // Initialize canvas
+    canvas = document.getElementById('mainCanvas');
+    ctx = canvas.getContext('2d');
+    backgroundImage = new Image();
 
-            if (siteSettings.settings.subtitle) {
-                const subtitleElement = document.getElementById('siteSubtitle');
-                if (subtitleElement) {
-                    subtitleElement.textContent = siteSettings.settings.subtitle;
-                    if (siteSettings.settings.subtitleColor) {
-                        subtitleElement.style.color = siteSettings.settings.subtitleColor;
-                    }
-                }
-            }
-
-            if (siteSettings.settings.subtext) {
-                const subtextElement = document.getElementById('siteSubtext');
-                if (subtextElement) {
-                    subtextElement.textContent = siteSettings.settings.subtext;
-                    if (siteSettings.settings.subtextColor) {
-                        subtextElement.style.color = siteSettings.settings.subtextColor;
-                    }
-                }
-            }
-
-             // Apply button colors
-            if (siteSettings.settings.buttonColor) {
-                const buttons = document.querySelectorAll('.layer-row, .preview-btn, .rotation-control, .flip-btn');
-                buttons.forEach(button => {
-                    button.style.backgroundColor = siteSettings.settings.buttonColor;
-
-                     if (siteSettings.settings.buttonTextColor) {
-                       button.style.color = siteSettings.settings.buttonTextColor;
-                     }
-                });
-            }
-
-             // Apply download button colors
-            if (siteSettings.settings.downloadBtnColor) {
-                const downloadBtn = document.getElementById('downloadBtn');
-                if (downloadBtn) {
-                    downloadBtn.style.backgroundColor = siteSettings.settings.downloadBtnColor;
-
-                     if (siteSettings.settings.downloadBtnTextColor) {
-                       downloadBtn.style.color = siteSettings.settings.downloadBtnTextColor;
-                     }
-                }
-            }
-        }
-
-        // Fetch and display contributors
-        const contributors = await fetchContributors();
-        if (contributors) {
-            displayContributors(contributors);
-        }
-    } catch (error) {
-        console.error('Error loading site settings or contributors:', error);
-    }
-});
-
-// Function to display contributors
-function displayContributors(contributors) {
-    const contributorsContainer = document.getElementById('contributorsContainer');
-    if (!contributorsContainer) return;
-
-    // Clear existing content
-    contributorsContainer.innerHTML = '';
-
-    // Check if contributors is null or undefined
-    if (!contributors) {
-        console.warn('Contributors data is null or undefined.');
-        return;
-    }
-
-    // Check if contributors is an array
-    if (!Array.isArray(contributors)) {
-        console.warn('Contributors data is not an array.');
-        return;
-    }
-
-    // Iterate through contributors and create elements
-    contributors.forEach(contributor => {
-        const contributorDiv = document.createElement('div');
-        contributorDiv.className = 'contributor';
-
-        // Check for valid avatar URL
-        if (contributor.avatar_url) {
-            const avatarImg = document.createElement('img');
-            avatarImg.src = contributor.avatar_url;
-            avatarImg.alt = contributor.login;
-            avatarImg.style.width = '50px';
-            avatarImg.style.height = '50px';
-            avatarImg.style.borderRadius = '50%';
-            contributorDiv.appendChild(avatarImg);
-        }
-
-        // Add login name
-        const loginSpan = document.createElement('span');
-        loginSpan.textContent = contributor.login;
-        contributorDiv.appendChild(loginSpan);
-
-        // Check for valid URL
-        if (contributor.html_url) {
-            const profileLink = document.createElement('a');
-            profileLink.href = contributor.html_url;
-            profileLink.textContent = 'View Profile';
-            profileLink.target = '_blank'; // Open in new tab
-            contributorDiv.appendChild(profileLink);
-        }
-
-        contributorsContainer.appendChild(contributorDiv);
+    // Disable right-click menu on canvas to prevent saving by right click
+    canvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
     });
-}
 
-// Call fetchSiteSettings, fetchContributors, and fetchDonationSettings on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', async function() {
-    // Setup site settings
-    await fetchSiteSettings();
+    // Initialize UI functionality
+    initButtonHandlers();
 
-    // Setup contributors
-    await fetchContributors();
-
-    // Setup donation buttons
-    await setupDonationButtons();
-
-    // Setup background music
+    // Load settings and contributors
+    fetchAndApplySiteSettings();
     setupBackgroundMusic();
+    displayContributors();
+    setupDonationButtons();
+
+    // Trigger initial draw
+    requestAnimationFrame(draw);
 });
 
-// Call updatePreviews initially to ensure all previews start with the correct images
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        updatePreviews();
-    }, 500); // Short delay to ensure images are loaded
-});
+// Define DONATION_ADDRESSES at the top scope, so can be accessible and updatable
+const DONATION_ADDRESSES = {
+    btc: '',
+    eth: '',
+    sol: ''
+};
 
-// Init canvas size
-document.addEventListener('DOMContentLoaded', () => {
-    initCanvas();
+// Setup donation buttons with proper clipboard functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Get donation buttons
+    const bitcoinBtn = document.getElementById('bitcoinDonateBtn');
+    const ethereumBtn = document.getElementById('ethereumDonateBtn');
+    const solanaBtn = document.getElementById('solanaDonateBtn');
+    
+    // Add click handlers for donation buttons
+    if (bitcoinBtn) {
+        bitcoinBtn.addEventListener('click', function() {
+            if (DONATION_ADDRESSES.btc) {
+                copyToClipboard(DONATION_ADDRESSES.btc, 'Bitcoin address copied!');
+            }
+        });
+    }
+    
+    if (ethereumBtn) {
+        ethereumBtn.addEventListener('click', function() {
+            if (DONATION_ADDRESSES.eth) {
+                copyToClipboard(DONATION_ADDRESSES.eth, 'Ethereum address copied!');
+            }
+        });
+    }
+    
+    if (solanaBtn) {
+        solanaBtn.addEventListener('click', function() {
+            if (DONATION_ADDRESSES.sol) {
+                copyToClipboard(DONATION_ADDRESSES.sol, 'Solana address copied!');
+            }
+        });
+    }
+
+    // Show donation box if addresses are configured
+    const donationBox = document.getElementById('donationBox');
+    if (donationBox) {
+        // Initially show the box if any addresses are configured
+        // Server will load them from settings
+        setTimeout(() => {
+            if (DONATION_ADDRESSES.btc || DONATION_ADDRESSES.eth || DONATION_ADDRESSES.sol) {
+                donationBox.style.display = 'block';
+            }
+        }, 1000);
+    }
 });

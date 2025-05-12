@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +22,7 @@
         <main id="adminContent" style="display: none;">
             <div class="upload-section">
                 <h2>Upload Images</h2>
-                
+
                 <div class="upload-container">
                     <div class="upload-box">
                         <h3>Layer 1 Images (Base)</h3>
@@ -35,7 +34,7 @@
                         </div>
                         <div id="layer1Queue" class="upload-queue"></div>
                     </div>
-                    
+
                     <div class="upload-box">
                         <h3>Layer 2 Images (Overlay)</h3>
                         <p>Upload overlay images for the movable layer</p>
@@ -46,10 +45,10 @@
                         </div>
                         <div id="layer2Queue" class="upload-queue"></div>
                     </div>
-                    
+
                     <div class="more-uploads-container">
                         <button id="toggleMoreUploads" class="toggle-more-btn">+ More Upload Options</button>
-                        
+
                         <div id="moreUploadsSection" class="more-uploads-section" style="display: none;">
                             <div class="upload-box">
                                 <h3>Background Images</h3>
@@ -61,7 +60,7 @@
                                 </div>
                                 <div id="backgroundQueue" class="upload-queue"></div>
                             </div>
-                            
+
                             <div class="upload-box">
                                 <h3>Music Files</h3>
                                 <p>Upload background music (MP3, WAV)</p>
@@ -75,11 +74,11 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="upload-actions">
                     <button id="uploadBtn" class="primary-btn">Upload All Files</button>
                 </div>
-                
+
                 <div id="progressContainer" class="progress-container" style="display: none;">
                     <div class="progress-bar">
                         <div id="progressBar" class="progress"></div>
@@ -87,107 +86,123 @@
                     <p id="progressText">Uploading... 0%</p>
                 </div>
             </div>
-            
+
             <div class="gallery-section">
                 <h2>Manage Existing Images</h2>
-                
+
                 <div class="tabs">
                     <button class="tab-btn active" data-target="layer1Gallery">Layer 1 Images</button>
                     <button class="tab-btn" data-target="layer2Gallery">Layer 2 Images</button>
                     <button class="tab-btn" data-target="backgroundGallery">Background</button>
                     <button class="tab-btn" data-target="musicGallery">Music</button>
                 </div>
-                
+
                 <div id="layer1Gallery" class="gallery active">
                     <div class="gallery-loading">Loading images...</div>
                     <div class="gallery-grid"></div>
                 </div>
-                
+
                 <div id="layer2Gallery" class="gallery">
                     <div class="gallery-loading">Loading images...</div>
                     <div class="gallery-grid"></div>
                 </div>
-                
+
                 <div id="backgroundGallery" class="gallery">
                     <div class="gallery-loading">Loading background images...</div>
                     <div class="gallery-grid"></div>
                 </div>
-                
+
                 <div id="musicGallery" class="gallery">
                     <div class="gallery-loading">Loading music files...</div>
                     <div class="gallery-grid"></div>
                 </div>
             </div>
-            
+
             <div class="advanced-section">
                 <h2>Advanced Settings</h2>
-                
+
                 <div class="advanced-dropdown-container">
                     <button id="toggleSiteTextSettings" class="toggle-settings-btn">+ Site Text & Colors</button>
-                    
+
                     <div id="siteTextSettingsSection" class="site-text-settings" style="display: none;">
                         <div class="form-group">
                             <label for="siteTitle">Main Title:</label>
                             <input type="text" id="siteTitle" placeholder="GOBLINARINOS">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="siteSubtitle">Subtitle:</label>
                             <input type="text" id="siteSubtitle" placeholder="Merry Christmas Gobos">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="siteSubtext">Subtext:</label>
                             <input type="text" id="siteSubtext" placeholder="Put you´r hat on!, Das it & Das all!">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="subtitleColor">Subtitle Color:</label>
                             <input type="color" id="subtitleColor" value="#000000">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="subtextColor">Subtext Color:</label>
                             <input type="color" id="subtextColor" value="#000000">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="buttonColor">Button Background Color:</label>
                             <input type="color" id="buttonColor" value="#ffffff">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="buttonTextColor">Button Text Color:</label>
                             <input type="color" id="buttonTextColor" value="#000000">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="downloadBtnColor">Download Button Color:</label>
                             <input type="color" id="downloadBtnColor" value="#1f78cc">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="downloadBtnTextColor">Download Button Text Color:</label>
                             <input type="color" id="downloadBtnTextColor" value="#ffffff">
                         </div>
-                        
+
+                        <h4>Donation Wallet Addresses</h4>
+                        <div class="form-group">
+                            <label for="btcAddress">Bitcoin Address:</label>
+                            <input type="text" id="btcAddress" placeholder="Enter Bitcoin wallet address">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ethAddress">Ethereum Address:</label>
+                            <input type="text" id="ethAddress" placeholder="Enter Ethereum wallet address">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="solAddress">Solana Address:</label>
+                            <input type="text" id="solAddress" placeholder="Enter Solana wallet address">
+                        </div>
+
                         <button id="saveTextBtn" class="primary-btn">Save All Settings</button>
                     </div>
                 </div>
-                
+
                 <div class="advanced-dropdown-container" style="margin-top: 20px;">
                     <button id="toggleContributorsSettings" class="toggle-settings-btn">+ Contributors</button>
-                    
+
                     <div id="contributorsSettingsSection" class="contributors-settings" style="display: none;">
                         <div class="contributors-tabs">
                             <button class="contributor-tab-btn active" data-type="developers">Developers</button>
                             <button class="contributor-tab-btn" data-type="contributors">Contributors</button>
                         </div>
-                        
+
                         <div class="contributor-panel" id="developersPanel">
                             <h3>Manage Developers</h3>
                             <div id="developersList" class="contributors-list-admin"></div>
-                            
+
                             <div class="add-contributor-form">
                                 <h4>Add New Developer</h4>
                                 <div class="form-group">
@@ -211,11 +226,11 @@
                                 <button id="addDevBtn" class="primary-btn">Add Developer</button>
                             </div>
                         </div>
-                        
+
                         <div class="contributor-panel" id="contributorsPanel" style="display: none;">
                             <h3>Manage Contributors</h3>
                             <div id="contributorsList" class="contributors-list-admin"></div>
-                            
+
                             <div class="add-contributor-form">
                                 <h4>Add New Contributor</h4>
                                 <div class="form-group">
@@ -239,16 +254,45 @@
                                 <button id="addContribBtn" class="primary-btn">Add Contributor</button>
                             </div>
                         </div>
-                        
+
                         <div class="contributor-actions">
                             <button id="saveContributorsBtn" class="primary-btn">Save All Contributors</button>
                         </div>
                     </div>
                 </div>
+
+                <div class="advanced-dropdown-container" style="margin-top: 20px;">
+                    <button id="toggleDonationSettings" class="toggle-settings-btn">+ Donation Settings</button>
+
+                    <div id="donationSettingsSection" class="donation-settings" style="display: none;">
+                        <div class="form-group">
+                            <label for="solanaAddress">Solana Address:</label>
+                            <input type="text" id="solanaAddress" placeholder="Solana wallet address">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ethereumAddress">Ethereum Address:</label>
+                            <input type="text" id="ethereumAddress" placeholder="Ethereum wallet address">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bitcoinAddress">Bitcoin Address:</label>
+                            <input type="text" id="bitcoinAddress" placeholder="Bitcoin wallet address">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="donationText">Donation Message:</label>
+                            <input type="text" id="donationText" placeholder="Please consider donating">
+                        </div>
+
+                        <button id="saveDonationBtn" class="primary-btn">Save Donation Settings</button>
+                    </div>
+                </div>
             </div>
+
         </main>
     </div>
-    
+
     <script src="admin.js"></script>
 </body>
 </html>
