@@ -211,6 +211,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Handle contributor tabs
+    const contributorTabBtns = document.querySelectorAll('.contributor-tab-btn');
+    const developerPanel = document.getElementById('developersPanel');
+    const contributorsPanel = document.getElementById('contributorsPanel');
+    
+    contributorTabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Update active state for tab buttons
+            contributorTabBtns.forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show the correct panel
+            const type = this.getAttribute('data-type');
+            if (type === 'developers') {
+                developerPanel.style.display = 'block';
+                contributorsPanel.style.display = 'none';
+            } else {
+                developerPanel.style.display = 'none';
+                contributorsPanel.style.display = 'block';
+            }
+        });
+    });
 
     // Tab functionality
     tabButtons.forEach(button => {
@@ -653,15 +676,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add developers
         contributorsSettings.developers.forEach(developer => {
-            const listItem = document.createElement('li');
-            listItem.textContent = developer.name + ' (' + developer.xAccount + ')';
+            const listItem = document.createElement('div');
+            listItem.className = 'contributor-item';
+            
+            // Show image if available
+            if (developer.image) {
+                const img = document.createElement('img');
+                img.src = developer.image;
+                img.alt = developer.name;
+                listItem.appendChild(img);
+            }
+            
+            const info = document.createElement('div');
+            info.className = 'contributor-item-info';
+            info.textContent = developer.name + ' (' + developer.xAccount + ')';
+            listItem.appendChild(info);
+            
             developersList.appendChild(listItem);
         });
 
         // Add contributors
         contributorsSettings.contributors.forEach(contributor => {
-            const listItem = document.createElement('li');
-            listItem.textContent = contributor.name + ' (' + contributor.xAccount + ')';
+            const listItem = document.createElement('div');
+            listItem.className = 'contributor-item';
+            
+            // Show image if available
+            if (contributor.image) {
+                const img = document.createElement('img');
+                img.src = contributor.image;
+                img.alt = contributor.name;
+                listItem.appendChild(img);
+            }
+            
+            const info = document.createElement('div');
+            info.className = 'contributor-item-info';
+            info.textContent = contributor.name + ' (' + contributor.xAccount + ')';
+            listItem.appendChild(info);
+            
             contributorsList.appendChild(listItem);
         });
     }
@@ -712,4 +763,132 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Failed to save settings. Please try again.');
         }
     });
+    
+    // Image preview functions for contributors
+    function setupContributorImageUploads() {
+        // Developer image upload
+        const devImageInput = document.getElementById('devImage');
+        const devImagePreview = document.getElementById('devImagePreview');
+        
+        devImageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    devImagePreview.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    devImagePreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Contributor image upload
+        const contribImageInput = document.getElementById('contribImage');
+        const contribImagePreview = document.getElementById('contribImagePreview');
+        
+        contribImageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    contribImagePreview.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    contribImagePreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Add and save contributor buttons
+    function setupContributorButtons() {
+        // Add developer button
+        document.getElementById('addDevBtn').addEventListener('click', function() {
+            const xAccount = document.getElementById('devTwitterHandle').value.trim();
+            const name = document.getElementById('devName').value.trim();
+            const role = document.getElementById('devRole').value.trim();
+            const imagePreview = document.getElementById('devImagePreview').querySelector('img');
+            
+            if (!xAccount || !name) {
+                alert('Twitter handle and name are required');
+                return;
+            }
+            
+            const newDeveloper = {
+                xAccount: xAccount,
+                name: name,
+                role: role || 'Developer',
+                image: imagePreview ? imagePreview.src : null
+            };
+            
+            contributorsSettings.developers.push(newDeveloper);
+            displayContributors();
+            
+            // Clear form
+            document.getElementById('devTwitterHandle').value = '';
+            document.getElementById('devName').value = '';
+            document.getElementById('devRole').value = '';
+            document.getElementById('devImagePreview').innerHTML = '';
+        });
+        
+        // Add contributor button
+        document.getElementById('addContribBtn').addEventListener('click', function() {
+            const xAccount = document.getElementById('contribTwitterHandle').value.trim();
+            const name = document.getElementById('contribName').value.trim();
+            const role = document.getElementById('contribRole').value.trim();
+            const imagePreview = document.getElementById('contribImagePreview').querySelector('img');
+            
+            if (!xAccount || !name) {
+                alert('Twitter handle and name are required');
+                return;
+            }
+            
+            const newContributor = {
+                xAccount: xAccount,
+                name: name,
+                role: role || 'Contributor',
+                image: imagePreview ? imagePreview.src : null
+            };
+            
+            contributorsSettings.contributors.push(newContributor);
+            displayContributors();
+            
+            // Clear form
+            document.getElementById('contribTwitterHandle').value = '';
+            document.getElementById('contribName').value = '';
+            document.getElementById('contribRole').value = '';
+            document.getElementById('contribImagePreview').innerHTML = '';
+        });
+        
+        // Save all contributors button
+        document.getElementById('saveContributorsBtn').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/contributors', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contributors: contributorsSettings
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('Contributors saved successfully!');
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error saving contributors:', error);
+                alert('Failed to save contributors. Please try again.');
+            }
+        });
+    }
+    
+    // Setup contributor-related functionality
+    setupContributorImageUploads();
+    setupContributorButtons();
 });
