@@ -1098,86 +1098,7 @@ async function loadBackground() {
                 };
                 img.src = path;
 
-// Function to setup crypto donation buttons
-function setupCryptoDonationButtons(settings) {
-    const ethBtn = document.getElementById('ethBtn');
-    const btcBtn = document.getElementById('btcBtn');
-    const solBtn = document.getElementById('solBtn');
-    const cryptoCopied = document.getElementById('cryptoCopied');
-
-    if (!ethBtn || !btcBtn || !solBtn || !cryptoCopied) {
-        console.error("Donation buttons not found in the DOM");
-        return;
-    }
-
-    try {
-        // Default addresses
-        let addresses = {
-            ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
-            btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
-            solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
-        };
-
-        // Override defaults with settings from parameter if available
-        if (settings) {
-            if (settings.ethAddress) addresses.ethAddress = settings.ethAddress;
-            if (settings.btcAddress) addresses.btcAddress = settings.btcAddress;
-            if (settings.solAddress) addresses.solAddress = settings.solAddress;
-        }
-
-        console.log("Setting up donation buttons with addresses:", addresses);
-
-        // Function to show the copied notification
-        function showCopiedNotification() {
-            cryptoCopied.classList.add('show');
-            setTimeout(() => {
-                cryptoCopied.classList.remove('show');
-            }, 2000);
-        }
-
-        // Setup click handlers
-        ethBtn.addEventListener('click', function() {
-            console.log("ETH button clicked");
-            navigator.clipboard.writeText(addresses.ethAddress)
-                .then(() => {
-                    showCopiedNotification();
-                    console.log("ETH address copied to clipboard");
-                })
-                .catch(err => {
-                    console.error("Failed to copy ETH address:", err);
-                    alert("Address copied: " + addresses.ethAddress);
-                });
-        });
-
-        btcBtn.addEventListener('click', function() {
-            console.log("BTC button clicked");
-            navigator.clipboard.writeText(addresses.btcAddress)
-                .then(() => {
-                    showCopiedNotification();
-                    console.log("BTC address copied to clipboard");
-                })
-                .catch(err => {
-                    console.error("Failed to copy BTC address:", err);
-                    alert("Address copied: " + addresses.btcAddress);
-                });
-        });
-
-        solBtn.addEventListener('click', function() {
-            console.log("SOL button clicked");
-            navigator.clipboard.writeText(addresses.solAddress)
-                .then(() => {
-                    showCopiedNotification();
-                    console.log("SOL address copied to clipboard");
-                })
-                .catch(err => {
-                    console.error("Failed to copy SOL address:", err);
-                    alert("Address copied: " + addresses.solAddress);
-                });
-        });
-    } catch (error) {
-        console.error("Error setting up crypto donation buttons:", error);
-    }
-}
+// We've moved the setupCryptoDonationButtons function to the top of the file
 
             });
 
@@ -1421,6 +1342,87 @@ window.addEventListener('load', () => {
 
 // Add delay helper function
 
+// Function to setup crypto donation buttons - moved up before it's called
+function setupCryptoDonationButtons(settings) {
+    const ethBtn = document.getElementById('ethBtn');
+    const btcBtn = document.getElementById('btcBtn');
+    const solBtn = document.getElementById('solBtn');
+    const cryptoCopied = document.getElementById('cryptoCopied');
+
+    if (!ethBtn || !btcBtn || !solBtn || !cryptoCopied) {
+        console.error("Donation buttons not found in the DOM");
+        return;
+    }
+
+    try {
+        // Default addresses
+        let addresses = {
+            ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
+            btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
+            solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
+        };
+
+        // Override defaults with settings from parameter if available
+        if (settings) {
+            if (settings.ethAddress) addresses.ethAddress = settings.ethAddress;
+            if (settings.btcAddress) addresses.btcAddress = settings.btcAddress;
+            if (settings.solAddress) addresses.solAddress = settings.solAddress;
+        }
+
+        console.log("Setting up donation buttons with addresses:", addresses);
+
+        // Function to show the copied notification
+        function showCopiedNotification() {
+            cryptoCopied.classList.add('show');
+            setTimeout(() => {
+                cryptoCopied.classList.remove('show');
+            }, 2000);
+        }
+
+        // Setup click handlers
+        ethBtn.addEventListener('click', function() {
+            console.log("ETH button clicked");
+            navigator.clipboard.writeText(addresses.ethAddress)
+                .then(() => {
+                    showCopiedNotification();
+                    console.log("ETH address copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Failed to copy ETH address:", err);
+                    alert("Address copied: " + addresses.ethAddress);
+                });
+        });
+
+        btcBtn.addEventListener('click', function() {
+            console.log("BTC button clicked");
+            navigator.clipboard.writeText(addresses.btcAddress)
+                .then(() => {
+                    showCopiedNotification();
+                    console.log("BTC address copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Failed to copy BTC address:", err);
+                    alert("Address copied: " + addresses.btcAddress);
+                });
+        });
+
+        solBtn.addEventListener('click', function() {
+            console.log("SOL button clicked");
+            navigator.clipboard.writeText(addresses.solAddress)
+                .then(() => {
+                    showCopiedNotification();
+                    console.log("SOL address copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Failed to copy SOL address:", err);
+                    alert("Address copied: " + addresses.solAddress);
+                });
+        });
+    } catch (error) {
+        console.error("Error setting up crypto donation buttons:", error);
+    }
+}
+
 // Load site text settings and contributors
 document.addEventListener('DOMContentLoaded', async function() {
     try {
@@ -1633,36 +1635,43 @@ const RATE_LIMIT_DELAY = 500;
 
 //NFT selector functionality removed
 
-// Add direct initialization at the end of the file to ensure it runs
-window.addEventListener('DOMContentLoaded', function() {
+// Initialize donation buttons with default values as fallback
+document.addEventListener('DOMContentLoaded', function() {
     // Add a small delay to make sure the DOM is fully loaded
     setTimeout(function() {
         try {
-            // Use the default settings as a fallback
-            setupCryptoDonationButtons({
-                ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
-                btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
-                solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
-            });
-
-            console.log("Donation buttons initialized with default addresses");
-            
-            // Try to fetch updated settings from server (non-blocking)
-            fetch('/api/site-settings')
-                .then(response => {
-                    if (response.ok) return response.json();
-                    throw new Error('Failed to fetch settings');
-                })
-                .then(data => {
-                    if (data && data.settings) {
-                        setupCryptoDonationButtons(data.settings);
-                        console.log("Donation buttons updated with server settings");
-                    }
-                })
-                .catch(err => {
-                    console.log("Using default donation addresses:", err);
+            // Check if elements exist before trying to set them up
+            if (document.getElementById('ethBtn') && 
+                document.getElementById('btcBtn') && 
+                document.getElementById('solBtn')) {
+                
+                // Use the default settings as a fallback
+                setupCryptoDonationButtons({
+                    ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
+                    btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
+                    solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
                 });
-            
+
+                console.log("Donation buttons initialized with default addresses");
+                
+                // Try to fetch updated settings from server (non-blocking)
+                fetch('/api/site-settings')
+                    .then(response => {
+                        if (response.ok) return response.json();
+                        throw new Error('Failed to fetch settings');
+                    })
+                    .then(data => {
+                        if (data && data.settings) {
+                            setupCryptoDonationButtons(data.settings);
+                            console.log("Donation buttons updated with server settings");
+                        }
+                    })
+                    .catch(err => {
+                        console.log("Using default donation addresses:", err);
+                    });
+            } else {
+                console.log("Donation buttons not found in the DOM");
+            }
         } catch (error) {
             console.error("Error initializing donation buttons:", error);
         }
