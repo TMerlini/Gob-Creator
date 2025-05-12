@@ -1,0 +1,446 @@
+Uncaught ReferenceError: setupCryptoDonationButtons is not defined
+    at HTMLDocument.<anonymous> (script.js:1621:5)Understand this error
+script.js:197 Started loading Layer 1 images
+script.js:197 Started loading Layer 2 images
+script.js:1310 Available music tracks: Array(3)
+script.js:1521 Error loading site settings or contributors: ReferenceError: setupCryptoDonationButtons is not defined
+    at HTMLDocument.<anonymous> (script.js:1507:17)
+(anonymous) @ script.js:1521Understand this error
+script.js:260 Successfully loaded layer1/image2.png
+script.js:260 Successfully loaded layer1/image3.png
+script.js:260 Successfully loaded layer1/image4.png
+script.js:260 Successfully loaded layer1/image5.png
+image1.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image1.png
+image6.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image6.png
+image7.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image7.png
+image8.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image8.png
+image9.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image10.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image9.png
+script.js:268 Failed to load layer1/image10.png
+image11.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image11.png
+image12.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image12.png
+image13.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image13.png
+image14.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image14.png
+image16.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image16.png
+image15.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image15.png
+image17.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image17.png
+image18.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image18.png
+image19.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image19.png
+image20.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image20.png
+image21.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image21.png
+image22.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image23.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image23.png
+script.js:268 Failed to load layer1/image22.png
+image24.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image24.png
+image25.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image25.png
+image26.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image26.png
+image29.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image29.png
+image28.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image28.png
+image27.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image27.png
+image30.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image30.png
+image31.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image31.png
+image32.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image32.png
+image33.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image34.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image33.png
+script.js:268 Failed to load layer1/image34.png
+image35.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image35.png
+image36.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image36.png
+image37.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image37.png
+image38.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image38.png
+image39.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image39.png
+image40.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image40.png
+image41.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image41.png
+image42.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image42.png
+image43.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image43.png
+image44.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image44.png
+image45.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image45.png
+image46.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image47.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image46.png
+script.js:268 Failed to load layer1/image47.png
+image48.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image48.png
+image49.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image49.png
+image50.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer1/image50.png
+script.js:291 Layer 1 loading complete:
+script.js:292 Successfully loaded: 4 images
+script.js:293 Failed to load: 46 images
+script.js:294 Total images in array: 4
+2script.js:934 Updated preview for layer 1 with image: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer1/image2.png
+script.js:260 Successfully loaded layer2/image2.png
+script.js:260 Successfully loaded layer2/image4.png
+script.js:260 Successfully loaded layer2/image3.png
+script.js:260 Successfully loaded layer2/image5.png
+script.js:260 Successfully loaded layer2/image6.png
+script.js:260 Successfully loaded layer2/image7.png
+script.js:260 Successfully loaded layer2/image8.png
+script.js:260 Successfully loaded layer2/image9.png
+script.js:260 Successfully loaded layer2/image10.png
+script.js:260 Successfully loaded layer2/image11.png
+script.js:260 Successfully loaded layer2/image12.png
+script.js:260 Successfully loaded layer2/image13.png
+script.js:260 Successfully loaded layer2/image15.png
+script.js:260 Successfully loaded layer2/image14.png
+script.js:260 Successfully loaded layer2/image16.png
+script.js:260 Successfully loaded layer2/image17.png
+script.js:260 Successfully loaded layer2/image18.png
+script.js:260 Successfully loaded layer2/image19.png
+script.js:260 Successfully loaded layer2/image21.png
+script.js:260 Successfully loaded layer2/image20.png
+script.js:260 Successfully loaded layer2/image22.png
+script.js:260 Successfully loaded layer2/image23.png
+script.js:260 Successfully loaded layer2/image24.png
+image1.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image1.png
+image26.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image25.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image26.png
+script.js:268 Failed to load layer2/image25.png
+image27.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image27.png
+image28.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image28.png
+image29.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image29.png
+image31.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image30.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image31.png
+script.js:268 Failed to load layer2/image30.png
+image32.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image32.png
+image33.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image33.png
+image34.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image34.png
+image35.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image35.png
+image37.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image36.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image37.png
+script.js:268 Failed to load layer2/image36.png
+image38.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image38.png
+image39.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image39.png
+image40.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image40.png
+image41.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image41.png
+image43.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image43.png
+image42.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image42.png
+image45.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image44.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image44.png
+script.js:268 Failed to load layer2/image45.png
+image46.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image46.png
+image47.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image47.png
+image48.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image48.png
+image49.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+image50.png:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:268 Failed to load layer2/image49.png
+script.js:268 Failed to load layer2/image50.png
+script.js:291 Layer 2 loading complete:
+script.js:292 Successfully loaded: 23 images
+script.js:293 Failed to load: 27 images
+script.js:294 Total images in array: 23
+2script.js:934 Updated preview for layer 1 with image: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer1/image2.png
+script.js:934 Updated preview for layer 2 with image: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image2.png
+script.js:1064 Found uploaded backgrounds: Array(1)
+script.js:1082 Trying to load background from these paths: Array(8)
+script.js:1091 Successfully loaded background from: /images/background/image1.gif
+script.js:1178 Using background image: /images/background/image1.gif
+script.js:1405 Layer 1 images:
+script.js:337 Layer 1 images:
+script.js:339 Image 1: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer1/image2.png
+script.js:339 Image 2: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer1/image3.png
+script.js:339 Image 3: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer1/image4.png
+script.js:339 Image 4: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer1/image5.png
+script.js:1409 Layer 2 images:
+script.js:337 Layer 2 images:
+script.js:339 Image 1: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image2.png
+script.js:339 Image 2: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image3.png
+script.js:339 Image 3: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image4.png
+script.js:339 Image 4: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image5.png
+script.js:339 Image 5: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image6.png
+script.js:339 Image 6: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image7.png
+script.js:339 Image 7: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image8.png
+script.js:339 Image 8: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image9.png
+script.js:339 Image 9: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image10.png
+script.js:339 Image 10: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image11.png
+script.js:339 Image 11: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image12.png
+script.js:339 Image 12: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image13.png
+script.js:339 Image 13: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image14.png
+script.js:339 Image 14: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image15.png
+script.js:339 Image 15: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image16.png
+script.js:339 Image 16: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image17.png
+script.js:339 Image 17: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image18.png
+script.js:339 Image 18: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image19.png
+script.js:339 Image 19: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image20.png
+script.js:339 Image 20: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image21.png
+script.js:339 Image 21: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image22.png
+script.js:339 Image 22: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.replit.dev/images/layer2/image23.png
+script.js:339 Image 23: https://374ff1b9-f343-4741-b6f3-14faf162b6db-00-ttrtxoq4t63h.spock.repli
