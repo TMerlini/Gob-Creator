@@ -1046,7 +1046,7 @@ label[for="uploadLayer1"] {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border: none,
+    border: none;
     background: none;
     color: #666;
     padding: 0;
@@ -1640,54 +1640,6 @@ label[for="uploadLayer1"] {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* Donation Box Styles */
-.donation-box {
-    position: fixed;
-    bottom: 60px;
-    right: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    max-width: 250px;
-}
-
-.donation-box p {
-    margin: 5px 0;
-    font-size: 14px;
-}
-
-.donation-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 10px 0;
-}
-
-.donation-btn {
-    background-color: #4a6cf7;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.2s ease;
-}
-
-.donation-btn:hover {
-    background-color: #3a5ce7;
-    transform: translateY(-2px);
-}
-
-.donation-note {
-    font-size: 11px !important;
-    opacity: 0.8;
-}
-
 /* Media queries for mobile */
 @media (max-width: 768px) {
     .audio-control {
@@ -1710,58 +1662,6 @@ label[for="uploadLayer1"] {
         max-width: 80px;
         font-size: 10px;
     }
-}
-
-/* Donation box styles */
-.donation-box {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    text-align: center;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.donation-text {
-    margin-bottom: 15px;
-    font-size: 16px;
-    color: #333;
-}
-
-.donation-buttons {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.donation-btn {
-    padding: 8px 16px;
-    background: #ffffff;
-    color: #333;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.donation-btn:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-2px);
-}
-
-.donation-note {
-    font-size: 12px;
-    color: #666;
-    margin-top: 8px;
 }
 
 /* NFT selector styles removed */
