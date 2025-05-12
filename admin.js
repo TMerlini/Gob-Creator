@@ -58,14 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
         developers: [],
         contributors: []
     };
-    
-    // Donation settings
-    let donationSettings = {
-        solanaAddress: '',
-        ethereumAddress: '',
-        bitcoinAddress: '',
-        donationText: 'Please consider donating'
-    };
 
     // Check authentication on page load
     checkAuth();
@@ -216,23 +208,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isHidden) {
                 // Load contributors data when opening the section
                 loadContributors();
-            }
-        });
-    }
-    
-    // Toggle donation settings section
-    const toggleDonationBtn = document.getElementById('toggleDonationSettings');
-    const donationSection = document.getElementById('donationSettingsSection');
-
-    if (toggleDonationBtn && donationSection) {
-        toggleDonationBtn.addEventListener('click', function() {
-            const isHidden = donationSection.style.display === 'none';
-            donationSection.style.display = isHidden ? 'block' : 'none';
-            this.textContent = isHidden ? '- Hide Donation Settings' : '+ Donation Settings';
-
-            if (isHidden) {
-                // Load donation data when opening the section
-                loadDonationSettings();
             }
         });
     }
@@ -499,7 +474,6 @@ document.addEventListener('DOMContentLoaded', function() {
         loadGallery('music');
         loadSiteTextSettings();
         loadContributors();
-        loadDonationSettings();
     }
 
     async function loadGallery(layerType) {
@@ -664,43 +638,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (siteTextSettings.downloadBtnTextColor) {
                         document.getElementById('downloadBtnTextColor').value = siteTextSettings.downloadBtnTextColor;
                     }
-                    
-                    // Load donation addresses if they exist
-                    if (siteTextSettings.donationAddresses) {
-                        if (siteTextSettings.donationAddresses.btc) {
-                            document.getElementById('btcAddress').value = siteTextSettings.donationAddresses.btc;
-                        }
-                        if (siteTextSettings.donationAddresses.eth) {
-                            document.getElementById('ethAddress').value = siteTextSettings.donationAddresses.eth;
-                        }
-                        if (siteTextSettings.donationAddresses.sol) {
-                            document.getElementById('solAddress').value = siteTextSettings.donationAddresses.sol;
-                        }
-                    }
                 }
             }
         } catch (error) {
             console.error('Error loading site settings:', error);
-        }
-    }
-    
-    // Load donation settings from server
-    async function loadDonationSettings() {
-        try {
-            const response = await fetch('/api/donation-settings');
-
-            if (response.ok) {
-                const data = await response.json();
-                if (data.settings) {
-                    donationSettings = data.settings;
-                    document.getElementById('solanaAddress').value = donationSettings.solanaAddress || '';
-                    document.getElementById('ethereumAddress').value = donationSettings.ethereumAddress || '';
-                    document.getElementById('bitcoinAddress').value = donationSettings.bitcoinAddress || '';
-                    document.getElementById('donationText').value = donationSettings.donationText || 'Please consider donating';
-                }
-            }
-        } catch (error) {
-            console.error('Error loading donation settings:', error);
         }
     }
 
@@ -808,12 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
             buttonColor: document.getElementById('buttonColor').value,
             buttonTextColor: document.getElementById('buttonTextColor').value,
             downloadBtnColor: document.getElementById('downloadBtnColor').value,
-            downloadBtnTextColor: document.getElementById('downloadBtnTextColor').value,
-            donationAddresses: {
-                btc: document.getElementById('btcAddress').value.trim(),
-                eth: document.getElementById('ethAddress').value.trim(),
-                sol: document.getElementById('solAddress').value.trim()
-            }
+            downloadBtnTextColor: document.getElementById('downloadBtnTextColor').value
         };
 
         // Validate inputs - ensure they're not empty
@@ -846,42 +782,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error saving site settings:', error);
             alert('Failed to save settings. Please try again.');
-        }
-    });
-    
-    // Save donation settings
-    document.getElementById('saveDonationBtn').addEventListener('click', async function() {
-        const newDonationSettings = {
-            solanaAddress: document.getElementById('solanaAddress').value.trim(),
-            ethereumAddress: document.getElementById('ethereumAddress').value.trim(),
-            bitcoinAddress: document.getElementById('bitcoinAddress').value.trim(),
-            donationText: document.getElementById('donationText').value.trim() || 'Please consider donating'
-        };
-
-        try {
-            console.log('Saving donation settings:', newDonationSettings);
-
-            const response = await fetch('/api/donation-settings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    settings: newDonationSettings
-                })
-            });
-
-            if (response.ok) {
-                alert('Donation settings saved successfully!');
-                donationSettings = newDonationSettings;
-            } else {
-                const errorText = await response.text();
-                console.error('Server error:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        } catch (error) {
-            console.error('Error saving donation settings:', error);
-            alert('Failed to save donation settings. Please try again.');
         }
     });
 
