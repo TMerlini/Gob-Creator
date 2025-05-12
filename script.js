@@ -933,8 +933,6 @@ function updatePreviews() {
                 previewImg.src = currentImage.src;
                 console.log(`Updated preview for layer ${layerId} with image: ${currentImage.src}`);
             }
-        }```text
-```text
         }
     });
 }
@@ -1680,4 +1678,85 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (error) {
         console.error('Error loading site settings or contributors:', error);
     }
+});
+
+// Function to display contributors
+function displayContributors(contributors) {
+    const contributorsContainer = document.getElementById('contributorsContainer');
+    if (!contributorsContainer) return;
+
+    // Clear existing content
+    contributorsContainer.innerHTML = '';
+
+    // Check if contributors is null or undefined
+    if (!contributors) {
+        console.warn('Contributors data is null or undefined.');
+        return;
+    }
+
+    // Check if contributors is an array
+    if (!Array.isArray(contributors)) {
+        console.warn('Contributors data is not an array.');
+        return;
+    }
+
+    // Iterate through contributors and create elements
+    contributors.forEach(contributor => {
+        const contributorDiv = document.createElement('div');
+        contributorDiv.className = 'contributor';
+
+        // Check for valid avatar URL
+        if (contributor.avatar_url) {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = contributor.avatar_url;
+            avatarImg.alt = contributor.login;
+            avatarImg.style.width = '50px';
+            avatarImg.style.height = '50px';
+            avatarImg.style.borderRadius = '50%';
+            contributorDiv.appendChild(avatarImg);
+        }
+
+        // Add login name
+        const loginSpan = document.createElement('span');
+        loginSpan.textContent = contributor.login;
+        contributorDiv.appendChild(loginSpan);
+
+        // Check for valid URL
+        if (contributor.html_url) {
+            const profileLink = document.createElement('a');
+            profileLink.href = contributor.html_url;
+            profileLink.textContent = 'View Profile';
+            profileLink.target = '_blank'; // Open in new tab
+            contributorDiv.appendChild(profileLink);
+        }
+
+        contributorsContainer.appendChild(contributorDiv);
+    });
+}
+
+// Call fetchSiteSettings, fetchContributors, and fetchDonationSettings on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', async function() {
+    // Setup site settings
+    await fetchSiteSettings();
+
+    // Setup contributors
+    await fetchContributors();
+
+    // Setup donation buttons
+    await setupDonationButtons();
+
+    // Setup background music
+    setupBackgroundMusic();
+});
+
+// Call updatePreviews initially to ensure all previews start with the correct images
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        updatePreviews();
+    }, 500); // Short delay to ensure images are loaded
+});
+
+// Init canvas size
+document.addEventListener('DOMContentLoaded', () => {
+    initCanvas();
 });
