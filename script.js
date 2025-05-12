@@ -934,6 +934,7 @@ function updatePreviews() {
                 console.log(`Updated preview for layer ${layerId} with image: ${currentImage.src}`);
             }
         }```text
+```text
         }
     });
 }
@@ -1215,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const audio = document.getElementById('bgMusic');
     const audioToggle = document.getElementById('audioToggle');
-    
+
     if (audio && audioToggle) {
         const iconOn = audioToggle.querySelector('.audio-icon-on');
         const iconOff = audioToggle.querySelector('.audio-icon-off');
@@ -1419,9 +1420,9 @@ async function setupDonationButtons() {
 
     const settings = donationResult.settings;
     const donationBox = document.getElementById('donationBox');
-    
+
     if (!donationBox) return;
-    
+
     const donationText = document.getElementById('donationText');
     const solanaDonateBtn = document.getElementById('solanaDonateBtn');
     const ethereumDonateBtn = document.getElementById('ethereumDonateBtn');
@@ -1512,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const bitcoinBtn = document.getElementById('bitcoinDonateBtn');
     const ethereumBtn = document.getElementById('ethereumDonateBtn');
     const solanaBtn = document.getElementById('solanaDonateBtn');
-    
+
     // Add click handlers for donation buttons
     if (bitcoinBtn) {
         bitcoinBtn.addEventListener('click', function() {
@@ -1521,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     if (ethereumBtn) {
         ethereumBtn.addEventListener('click', function() {
             if (DONATION_ADDRESSES.eth) {
@@ -1529,7 +1530,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     if (solanaBtn) {
         solanaBtn.addEventListener('click', function() {
             if (DONATION_ADDRESSES.sol) {
@@ -1563,23 +1564,23 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const siteTitle = document.getElementById('siteTitle');
                 const siteSubtitle = document.getElementById('siteSubtitle');
                 const siteSubtext = document.getElementById('siteSubtext');
-                
+
                 if (siteTitle) {
                     siteTitle.textContent = data.settings.title || 'GOBLINARINOS';
                 }
-                
+
                 if (siteSubtitle) {
                     siteSubtitle.textContent = data.settings.subtitle || 'Merry Christmas Gobos';
-                    
+
                     // Apply color settings
                     if (data.settings.subtitleColor) {
                         siteSubtitle.style.color = data.settings.subtitleColor;
                     }
                 }
-                
+
                 if (siteSubtext) {
                     siteSubtext.textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
-                    
+
                     if (data.settings.subtextColor) {
                         siteSubtext.style.color = data.settings.subtextColor;
                     }
