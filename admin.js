@@ -211,18 +211,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Handle contributor tabs
     const contributorTabBtns = document.querySelectorAll('.contributor-tab-btn');
     const developerPanel = document.getElementById('developersPanel');
     const contributorsPanel = document.getElementById('contributorsPanel');
-    
+
     contributorTabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             // Update active state for tab buttons
             contributorTabBtns.forEach(tab => tab.classList.remove('active'));
             this.classList.add('active');
-            
+
             // Show the correct panel
             const type = this.getAttribute('data-type');
             if (type === 'developers') {
@@ -679,7 +679,7 @@ document.addEventListener('DOMContentLoaded', function() {
         contributorsSettings.developers.forEach(developer => {
             const listItem = document.createElement('div');
             listItem.className = 'contributor-item';
-            
+
             // Show image if available
             if (developer.image) {
                 const img = document.createElement('img');
@@ -687,12 +687,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 img.alt = developer.name;
                 listItem.appendChild(img);
             }
-            
+
             const info = document.createElement('div');
             info.className = 'contributor-item-info';
             info.textContent = developer.name + ' (' + developer.xAccount + ')';
             listItem.appendChild(info);
-            
+
             developersList.appendChild(listItem);
         });
 
@@ -700,7 +700,7 @@ document.addEventListener('DOMContentLoaded', function() {
         contributorsSettings.contributors.forEach(contributor => {
             const listItem = document.createElement('div');
             listItem.className = 'contributor-item';
-            
+
             // Show image if available
             if (contributor.image) {
                 const img = document.createElement('img');
@@ -708,12 +708,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 img.alt = contributor.name;
                 listItem.appendChild(img);
             }
-            
+
             const info = document.createElement('div');
             info.className = 'contributor-item-info';
             info.textContent = contributor.name + ' (' + contributor.xAccount + ')';
             listItem.appendChild(info);
-            
+
             contributorsList.appendChild(listItem);
         });
     }
@@ -764,13 +764,13 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Failed to save settings. Please try again.');
         }
     });
-    
+
     // Image preview functions for contributors
     function setupContributorImageUploads() {
         // Developer image upload
         const devImageInput = document.getElementById('devImage');
         const devImagePreview = document.getElementById('devImagePreview');
-        
+
         devImageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -784,11 +784,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 reader.readAsDataURL(file);
             }
         });
-        
+
         // Contributor image upload
         const contribImageInput = document.getElementById('contribImage');
         const contribImagePreview = document.getElementById('contribImagePreview');
-        
+
         contribImageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -803,7 +803,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Add and save contributor buttons
     function setupContributorButtons() {
         // Add developer button
@@ -812,63 +812,63 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = document.getElementById('devName').value.trim();
             const role = document.getElementById('devRole').value.trim();
             const imagePreview = document.getElementById('devImagePreview').querySelector('img');
-            
+
             if (!xAccount || !name) {
                 alert('Twitter handle and name are required');
                 return;
             }
-            
+
             const newDeveloper = {
                 xAccount: xAccount,
                 name: name,
                 role: role || 'Developer',
                 image: imagePreview ? imagePreview.src : null
             };
-            
+
             contributorsSettings.developers.push(newDeveloper);
             displayContributors();
-            
+
             // Clear form
             document.getElementById('devTwitterHandle').value = '';
             document.getElementById('devName').value = '';
             document.getElementById('devRole').value = '';
             document.getElementById('devImagePreview').innerHTML = '';
         });
-        
+
         // Add contributor button
         document.getElementById('addContribBtn').addEventListener('click', function() {
             const xAccount = document.getElementById('contribTwitterHandle').value.trim();
             const name = document.getElementById('contribName').value.trim();
             const role = document.getElementById('contribRole').value.trim();
             const imagePreview = document.getElementById('contribImagePreview').querySelector('img');
-            
+
             if (!xAccount || !name) {
                 alert('Twitter handle and name are required');
                 return;
             }
-            
+
             const newContributor = {
                 xAccount: xAccount,
                 name: name,
                 role: role || 'Contributor',
                 image: imagePreview ? imagePreview.src : null
             };
-            
+
             contributorsSettings.contributors.push(newContributor);
             displayContributors();
-            
+
             // Clear form
             document.getElementById('contribTwitterHandle').value = '';
             document.getElementById('contribName').value = '';
             document.getElementById('contribRole').value = '';
             document.getElementById('contribImagePreview').innerHTML = '';
         });
-        
+
         // Save all contributors button
         document.getElementById('saveContributorsBtn').addEventListener('click', async function() {
             try {
                 console.log('Saving contributors:', contributorsSettings);
-                
+
                 const response = await fetch('/api/contributors', {
                     method: 'POST',
                     headers: {
@@ -878,9 +878,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         contributors: contributorsSettings
                     })
                 });
-                
+
                 const responseData = await response.json();
-                
+
                 if (response.ok) {
                     alert('Contributors saved successfully!');
                 } else {
@@ -893,7 +893,58 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
+    // Helper function to process contributor images
+    function processContributorImages(contributors) {
+        const contributorsDir = path.join(__dirname, 'images', 'contributors');
+
+        // Ensure directory exists
+        if (!fs.existsSync(contributorsDir)) {
+            fs.mkdirSync(contributorsDir, { recursive: true });
+        }
+
+        contributors.forEach((contributor, index) => {
+            try {
+                // Check if the image is a base64 data URL
+                if (contributor.image && typeof contributor.image === 'string' && contributor.image.startsWith('data:image')) {
+                    // Extract the base64 data
+                    const matches = contributor.image.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+
+                    if (matches && matches.length === 3) {
+                        const imageType = matches[1];
+                        const imageData = matches[2];
+
+                        // Generate a filename
+                        const filename = `contributor_${Date.now()}_${index}.${imageType}`;
+                        const filePath = path.join(contributorsDir, filename);
+
+                        try {
+                            // Check if the image size is reasonable (limit to 5MB)
+                            const buffer = Buffer.from(imageData, 'base64');
+                            if (buffer.length > 5 * 1024 * 1024) {
+                                console.warn(`Image for ${contributor.name} is too large (${Math.round(buffer.length/1024/1024)}MB), skipping`);
+                                return;
+                            }
+
+                            // Save the file
+                            fs.writeFileSync(filePath, buffer);
+
+                            // Update the contributor object with the file path
+                            contributor.image = `/images/contributors/${filename}`;
+                        } catch (imageError) {
+                            console.error('Error processing image:', imageError);
+                            // If there's an error, don't use the image
+                            contributor.image = null;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(`Error processing contributor ${index}:`, error);
+                // Ensure we don't break the entire process if one contributor has issues
+            }
+        });
+    }
+
     // Setup contributor-related functionality
     setupContributorImageUploads();
     setupContributorButtons();
