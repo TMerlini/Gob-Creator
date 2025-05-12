@@ -1339,9 +1339,10 @@ window.addEventListener('load', () => {
 
 // Add delay helper function
 
-// Load site text settings
+// Load site text settings and contributors
 document.addEventListener('DOMContentLoaded', async function() {
     try {
+        // Load site settings
         const response = await fetch('/api/site-settings');
         if (response.ok) {
             const data = await response.json();
@@ -1428,10 +1429,109 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }
             }
         }
+        
+        // Load contributors
+        const contributorsResponse = await fetch('/api/contributors');
+        if (contributorsResponse.ok) {
+            const contributorsData = await contributorsResponse.json();
+            if (contributorsData) {
+                // Update contributors in UI
+                displayContributors(contributorsData);
+            }
+        }
     } catch (error) {
-        console.error('Error loading site settings:', error);
+        console.error('Error loading site settings or contributors:', error);
     }
-});n
+});
+
+// Function to display contributors in the UI
+function displayContributors(data) {
+    const developersSection = document.querySelector('.contributors-section .contributors-list .contributors-category:nth-of-type(1)');
+    const contributorsSection = document.querySelector('.contributors-section .contributors-list .contributors-category:nth-of-type(2)');
+    
+    if (!developersSection || !contributorsSection) return;
+    
+    // Clear existing contributors
+    let nextElement = developersSection.nextElementSibling;
+    while (nextElement && !nextElement.classList.contains('contributors-category')) {
+        const nextAfter = nextElement.nextElementSibling;
+        nextElement.remove();
+        nextElement = nextAfter;
+    }
+    
+    nextElement = contributorsSection.nextElementSibling;
+    while (nextElement) {
+        const nextAfter = nextElement.nextElementSibling;
+        nextElement.remove();
+        nextElement = nextAfter;
+    }
+    
+    // Add developers
+    if (data.developers && data.developers.length > 0) {
+        data.developers.forEach(dev => {
+            const contributorDiv = document.createElement('div');
+            contributorDiv.className = 'contributor';
+            
+            const link = document.createElement('a');
+            link.href = `https://twitter.com/${dev.xAccount.replace('@', '')}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            
+            const img = document.createElement('img');
+            img.src = dev.image || 'images/contributors/image3.png'; // Default image if none provided
+            img.alt = dev.name;
+            img.className = 'contributor-image';
+            link.appendChild(img);
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'contributor-name';
+            nameSpan.textContent = dev.xAccount;
+            
+            const roleSpan = document.createElement('span');
+            roleSpan.className = 'contributor-role';
+            roleSpan.textContent = dev.role || 'Developer';
+            
+            contributorDiv.appendChild(link);
+            contributorDiv.appendChild(nameSpan);
+            contributorDiv.appendChild(roleSpan);
+            
+            developersSection.parentNode.insertBefore(contributorDiv, contributorsSection);
+        });
+    }
+    
+    // Add contributors
+    if (data.contributors && data.contributors.length > 0) {
+        data.contributors.forEach(contrib => {
+            const contributorDiv = document.createElement('div');
+            contributorDiv.className = 'contributor';
+            
+            const link = document.createElement('a');
+            link.href = `https://twitter.com/${contrib.xAccount.replace('@', '')}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            
+            const img = document.createElement('img');
+            img.src = contrib.image || 'images/contributors/image1.png'; // Default image if none provided
+            img.alt = contrib.name;
+            img.className = 'contributor-image';
+            link.appendChild(img);
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'contributor-name';
+            nameSpan.textContent = contrib.xAccount;
+            
+            const roleSpan = document.createElement('span');
+            roleSpan.className = 'contributor-role';
+            roleSpan.textContent = contrib.role || 'Contributor';
+            
+            contributorDiv.appendChild(link);
+            contributorDiv.appendChild(nameSpan);
+            contributorDiv.appendChild(roleSpan);
+            
+            contributorsSection.parentNode.appendChild(contributorDiv);
+        });
+    }
+}
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const RATE_LIMIT_DELAY = 500;
 

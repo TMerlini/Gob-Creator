@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
         contributorsList.innerHTML = '';
 
         // Add developers
-        contributorsSettings.developers.forEach(developer => {
+        contributorsSettings.developers.forEach((developer, index) => {
             const listItem = document.createElement('div');
             listItem.className = 'contributor-item';
 
@@ -692,12 +692,22 @@ document.addEventListener('DOMContentLoaded', function() {
             info.className = 'contributor-item-info';
             info.textContent = developer.name + ' (' + developer.xAccount + ')';
             listItem.appendChild(info);
+            
+            // Add remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-contributor-btn';
+            removeBtn.textContent = 'Remove';
+            removeBtn.addEventListener('click', function() {
+                contributorsSettings.developers.splice(index, 1);
+                displayContributors();
+            });
+            listItem.appendChild(removeBtn);
 
             developersList.appendChild(listItem);
         });
 
         // Add contributors
-        contributorsSettings.contributors.forEach(contributor => {
+        contributorsSettings.contributors.forEach((contributor, index) => {
             const listItem = document.createElement('div');
             listItem.className = 'contributor-item';
 
@@ -713,6 +723,16 @@ document.addEventListener('DOMContentLoaded', function() {
             info.className = 'contributor-item-info';
             info.textContent = contributor.name + ' (' + contributor.xAccount + ')';
             listItem.appendChild(info);
+            
+            // Add remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-contributor-btn';
+            removeBtn.textContent = 'Remove';
+            removeBtn.addEventListener('click', function() {
+                contributorsSettings.contributors.splice(index, 1);
+                displayContributors();
+            });
+            listItem.appendChild(removeBtn);
 
             contributorsList.appendChild(listItem);
         });
