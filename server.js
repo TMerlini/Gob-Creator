@@ -416,19 +416,19 @@ app.get('/api/contributors', (req, res) => {
         if (fs.existsSync(contributorsPath)) {
             const contributorsData = fs.readFileSync(contributorsPath, 'utf8');
             const contributors = JSON.parse(contributorsData);
-            res.json({ contributors });
+            res.json(contributors);
         } else {
             // Return default contributors data
             const defaultContributors = {
                 developers: [
                     {
-                        twitterHandle: '@ordinarino35380',
+                        xAccount: '@ordinarino35380',
                         name: '@ordinarino35380',
                         role: 'Developer',
                         image: '/images/contributors/image3.png'
                     },
                     {
-                        twitterHandle: '@MerloOfficial',
+                        xAccount: '@MerloOfficial',
                         name: '@MerloOfficial',
                         role: 'Developer',
                         image: '/images/contributors/image2.png'
@@ -436,20 +436,20 @@ app.get('/api/contributors', (req, res) => {
                 ],
                 contributors: [
                     {
-                        twitterHandle: '@Franku271',
+                        xAccount: '@Franku271',
                         name: '@Franku271',
                         role: 'Artist/Developer',
                         image: '/images/contributors/image1.png'
                     },
                     {
-                        twitterHandle: '@BetterBen33',
+                        xAccount: '@BetterBen33',
                         name: '@BetterBen33',
                         role: 'Artist/Developer',
                         image: '/images/contributors/image4.png'
                     }
                 ]
             };
-            res.json({ contributors: defaultContributors });
+            res.json(defaultContributors);
         }
     } catch (error) {
         console.error('Error getting contributors:', error);
@@ -460,10 +460,13 @@ app.get('/api/contributors', (req, res) => {
 app.post('/api/contributors', (req, res) => {
     try {
         const contributors = req.body.contributors;
+        
+        console.log('Received contributors data:', JSON.stringify(contributors, null, 2));
 
         // Validate the data
         if (!contributors || !Array.isArray(contributors.developers) || !Array.isArray(contributors.contributors)) {
-            return res.status(400).send('Invalid contributors data');
+            console.error('Invalid contributors data structure:', contributors);
+            return res.status(400).json({ error: 'Invalid contributors data structure' });
         }
 
         // Process image data (convert base64 to files)
@@ -475,7 +478,7 @@ app.post('/api/contributors', (req, res) => {
         res.json({ success: true });
     } catch (error) {
         console.error('Error saving contributors:', error);
-        res.status(500).send('Failed to save contributors');
+        res.status(500).json({ error: error.message });
     }
 });
 

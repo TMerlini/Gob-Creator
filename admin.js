@@ -654,6 +654,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 if (data) {
                     contributorsSettings = data;
+                    console.log('Loaded contributors:', contributorsSettings);
                     // Update the UI with the retrieved contributors
                     displayContributors();
                 }
@@ -866,6 +867,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Save all contributors button
         document.getElementById('saveContributorsBtn').addEventListener('click', async function() {
             try {
+                console.log('Saving contributors:', contributorsSettings);
+                
                 const response = await fetch('/api/contributors', {
                     method: 'POST',
                     headers: {
@@ -876,14 +879,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                 });
                 
+                const responseData = await response.json();
+                
                 if (response.ok) {
                     alert('Contributors saved successfully!');
                 } else {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    console.error('Server error:', responseData);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${responseData.error || 'Unknown error'}`);
                 }
             } catch (error) {
                 console.error('Error saving contributors:', error);
-                alert('Failed to save contributors. Please try again.');
+                alert('Failed to save contributors. Please try again. Error: ' + error.message);
             }
         });
     }
