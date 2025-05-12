@@ -1110,66 +1110,73 @@ function setupCryptoDonationButtons(settings) {
         return;
     }
 
-    // Set hardcoded addresses from settings.json
-    const addresses = {
-        ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
-        btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
-        solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
-    };
+    try {
+        // Fetch settings from server or use provided settings parameter
+        let addresses = {
+            ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
+            btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
+            solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
+        };
 
-    if (settings && settings.ethAddress) addresses.ethAddress = settings.ethAddress;
-    if (settings && settings.btcAddress) addresses.btcAddress = settings.btcAddress;
-    if (settings && settings.solAddress) addresses.solAddress = settings.solAddress;
+        // Override defaults with settings from parameter if available
+        if (settings) {
+            if (settings.ethAddress) addresses.ethAddress = settings.ethAddress;
+            if (settings.btcAddress) addresses.btcAddress = settings.btcAddress;
+            if (settings.solAddress) addresses.solAddress = settings.solAddress;
+        }
 
-    console.log("Setting up donation buttons with addresses:", addresses);
+        console.log("Setting up donation buttons with addresses:", addresses);
 
-    // Function to show the copied notification
-    function showCopiedNotification() {
-        cryptoCopied.classList.add('show');
-        setTimeout(() => {
-            cryptoCopied.classList.remove('show');
-        }, 2000);
+        // Function to show the copied notification
+        function showCopiedNotification() {
+            cryptoCopied.classList.add('show');
+            setTimeout(() => {
+                cryptoCopied.classList.remove('show');
+            }, 2000);
+        }
+
+        // Setup click handlers
+        ethBtn.addEventListener('click', function() {
+            console.log("ETH button clicked");
+            navigator.clipboard.writeText(addresses.ethAddress)
+                .then(() => {
+                    showCopiedNotification();
+                    console.log("ETH address copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Failed to copy ETH address:", err);
+                    alert("Address copied: " + addresses.ethAddress);
+                });
+        });
+
+        btcBtn.addEventListener('click', function() {
+            console.log("BTC button clicked");
+            navigator.clipboard.writeText(addresses.btcAddress)
+                .then(() => {
+                    showCopiedNotification();
+                    console.log("BTC address copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Failed to copy BTC address:", err);
+                    alert("Address copied: " + addresses.btcAddress);
+                });
+        });
+
+        solBtn.addEventListener('click', function() {
+            console.log("SOL button clicked");
+            navigator.clipboard.writeText(addresses.solAddress)
+                .then(() => {
+                    showCopiedNotification();
+                    console.log("SOL address copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Failed to copy SOL address:", err);
+                    alert("Address copied: " + addresses.solAddress);
+                });
+        });
+    } catch (error) {
+        console.error("Error setting up crypto donation buttons:", error);
     }
-
-    // Setup click handlers
-    ethBtn.addEventListener('click', function() {
-        console.log("ETH button clicked");
-        navigator.clipboard.writeText(addresses.ethAddress)
-            .then(() => {
-                showCopiedNotification();
-                console.log("ETH address copied to clipboard");
-            })
-            .catch(err => {
-                console.error("Failed to copy ETH address:", err);
-                alert("Address copied: " + addresses.ethAddress);
-            });
-    });
-
-    btcBtn.addEventListener('click', function() {
-        console.log("BTC button clicked");
-        navigator.clipboard.writeText(addresses.btcAddress)
-            .then(() => {
-                showCopiedNotification();
-                console.log("BTC address copied to clipboard");
-            })
-            .catch(err => {
-                console.error("Failed to copy BTC address:", err);
-                alert("Address copied: " + addresses.btcAddress);
-            });
-    });
-
-    solBtn.addEventListener('click', function() {
-        console.log("SOL button clicked");
-        navigator.clipboard.writeText(addresses.solAddress)
-            .then(() => {
-                showCopiedNotification();
-                console.log("SOL address copied to clipboard");
-            })
-            .catch(err => {
-                console.error("Failed to copy SOL address:", err);
-                alert("Address copied: " + addresses.solAddress);
-            });
-    });
 }
 
             });
@@ -1422,18 +1429,22 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (response.ok) {
             const data = await response.json();
             if (data.settings) {
-                // Update text content
-                document.getElementById('siteTitle').textContent = data.settings.title || 'GOBLINARINOS';
-                document.getElementById('siteSubtitle').textContent = data.settings.subtitle || 'Merry Christmas Gobos';
-                document.getElementById('siteSubtext').textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
+                // Update text content if elements exist
+                const siteTitle = document.getElementById('siteTitle');
+                const siteSubtitle = document.getElementById('siteSubtitle');
+                const siteSubtext = document.getElementById('siteSubtext');
+                
+                if (siteTitle) siteTitle.textContent = data.settings.title || 'GOBLINARINOS';
+                if (siteSubtitle) siteSubtitle.textContent = data.settings.subtitle || 'Merry Christmas Gobos';
+                if (siteSubtext) siteSubtext.textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
 
                 // Apply color settings
-                if (data.settings.subtitleColor) {
-                    document.getElementById('siteSubtitle').style.color = data.settings.subtitleColor;
+                if (data.settings.subtitleColor && siteSubtitle) {
+                    siteSubtitle.style.color = data.settings.subtitleColor;
                 }
 
-                if (data.settings.subtextColor) {
-                    document.getElementById('siteSubtext').style.color = data.settings.subtextColor;
+                if (data.settings.subtextColor && siteSubtext) {
+                    siteSubtext.style.color = data.settings.subtextColor;
                 }
 
                 if (data.settings.buttonColor) {
@@ -1504,7 +1515,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }
 
                 // Setup crypto donation buttons with the loaded settings
-                setupCryptoDonationButtons(data.settings);
+                // Make sure the elements exist first to prevent errors
+                if (document.getElementById('ethBtn') && 
+                    document.getElementById('btcBtn') && 
+                    document.getElementById('solBtn')) {
+                    setupCryptoDonationButtons(data.settings);
+                }
             }
         }
 
@@ -1513,8 +1529,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (contributorsResponse.ok) {
             const contributorsData = await contributorsResponse.json();
             if (contributorsData) {
-                // Update contributors in UI
-                displayContributors(contributorsData);
+                // Update contributors in UI if the function exists
+                if (typeof displayContributors === 'function') {
+                    displayContributors(contributorsData);
+                }
             }
         }
     } catch (error) {
@@ -1615,13 +1633,32 @@ const RATE_LIMIT_DELAY = 500;
 
 //NFT selector functionality removed
 
-// Call fetchSiteSettings, fetchContributors, and fetchDonationSettings on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup donation buttons
-    setupCryptoDonationButtons();
-
-    // Setup background music if it exists
-    if (typeof setupBackgroundMusic === 'function') {
-        setupBackgroundMusic();
+// Call the setup function directly on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // First try to fetch settings from the server
+        const response = await fetch('/api/site-settings');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.settings) {
+                // Set up crypto donation buttons with fetched settings
+                setupCryptoDonationButtons(data.settings);
+            } else {
+                // If no settings object in response, use defaults
+                setupCryptoDonationButtons();
+            }
+        } else {
+            // If fetch fails, use defaults
+            setupCryptoDonationButtons();
+        }
+        
+        // Setup background music if it exists
+        if (typeof setupBackgroundMusic === 'function') {
+            setupBackgroundMusic();
+        }
+    } catch (error) {
+        console.error("Error in DOMContentLoaded handler:", error);
+        // Fallback to defaults in case of any error
+        setupCryptoDonationButtons();
     }
 });
