@@ -7,5 +7,8 @@
   "buttonColor": "#c9d7d9",
   "buttonTextColor": "#000000",
   "downloadBtnColor": "#000000",
-  "downloadBtnTextColor": "#ffffff"
+  "downloadBtnTextColor": "#ffffff",
+  "ethAddress": "0x27958d7791140ab141363330a6BD1B76622a09D7",
+  "btcAddress": "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
+  "solAddress": "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
 }
