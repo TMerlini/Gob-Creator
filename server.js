@@ -402,12 +402,6 @@ app.post('/api/site-settings', (req, res) => {
     }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`API endpoint: /api/nft/:tokenId`);
-    console.log(`Admin panel: http://localhost:${PORT}/admin.html`);
-});
-
 // Contributors API endpoints
 app.get('/api/contributors', (req, res) => {
     try {
@@ -460,7 +454,7 @@ app.get('/api/contributors', (req, res) => {
 app.post('/api/contributors', (req, res) => {
     try {
         const contributors = req.body.contributors;
-        
+
         console.log('Received contributors data:', JSON.stringify(contributors, null, 2));
 
         // Validate the data
@@ -485,33 +479,107 @@ app.post('/api/contributors', (req, res) => {
 // Helper function to process contributor images
 function processContributorImages(contributors) {
     const contributorsDir = path.join(__dirname, 'images', 'contributors');
-    
+
     // Ensure directory exists
     if (!fs.existsSync(contributorsDir)) {
         fs.mkdirSync(contributorsDir, { recursive: true });
     }
-    
+
     contributors.forEach((contributor, index) => {
         // Check if the image is a base64 data URL
         if (contributor.image && contributor.image.startsWith('data:image')) {
             // Extract the base64 data
             const matches = contributor.image.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
-            
+
             if (matches && matches.length === 3) {
                 const imageType = matches[1];
                 const imageData = matches[2];
                 const buffer = Buffer.from(imageData, 'base64');
-                
+
                 // Generate a filename
                 const filename = `contributor_${index + 1}.${imageType}`;
                 const filePath = path.join(contributorsDir, filename);
-                
+
                 // Save the file
                 fs.writeFileSync(filePath, buffer);
-                
+
                 // Update the contributor object with the file path
                 contributor.image = `/images/contributors/${filename}`;
             }
         }
     });
 }
+
+// Create local file paths
+const PUBLIC_DIR = path.join(__dirname);
+const IMAGES_DIR = path.join(__dirname, 'images');
+const LAYER1_DIR = path.join(IMAGES_DIR, 'layer1');
+const LAYER2_DIR = path.join(IMAGES_DIR, 'layer2');
+const BACKGROUND_DIR = path.join(IMAGES_DIR, 'background');
+const MUSIC_DIR = path.join(__dirname, 'music');
+const SETTINGS_FILE = path.join(__dirname, 'settings.json');
+const CONTRIBUTORS_FILE = path.join(__dirname, 'contributors.json');
+const DONATION_FILE = path.join(__dirname, 'donation.json');
+
+// Helper function to ensure required directories exist
+function ensureDirectoriesExist() {
+    for (const dir of [IMAGES_DIR, LAYER1_DIR, LAYER2_DIR, BACKGROUND_DIR, MUSIC_DIR]) {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+    }
+
+    // Create donation.json if it doesn't exist
+    if (!fs.existsSync(DONATION_FILE)) {
+        fs.writeFileSync(DONATION_FILE, JSON.stringify({
+            solanaAddress: '',
+            ethereumAddress: '',
+            bitcoinAddress: '',
+            donationText: 'Please consider donating'
+        }));
+    }
+}
+
+const port = process.env.PORT || 3000;
+
+// Donation settings endpoints
+app.get('/api/donation-settings', (req, res) => {
+    try {
+        if (fs.existsSync(DONATION_FILE)) {
+            const data = fs.readFileSync(DONATION_FILE, 'utf8');
+            res.json({ settings: JSON.parse(data) });
+        } else {
+            // Create a default donation settings file
+            const defaultSettings = {
+                solanaAddress: '',
+                ethereumAddress: '',
+                bitcoinAddress: '',
+                donationText: 'Please consider donating'
+            };
+
+            fs.writeFileSync(DONATION_FILE, JSON.stringify(defaultSettings));
+            res.json({ settings: defaultSettings });
+        }
+    } catch (error) {
+        console.error('Error reading donation settings:', error);
+        res.status(500).json({ error: 'Failed to read donation settings' });
+    }
+});
+
+app.post('/api/donation-settings', (req, res) => {
+    try {
+        const settings = req.body.settings;
+        fs.writeFileSync(DONATION_FILE, JSON.stringify(settings));
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error saving donation settings:', error);
+        res.status(500).json({ error: 'Failed to save donation settings' });
+    }
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+    console.log(`API endpoint: /api/nft/:tokenId`);
+    console.log(`Admin panel: http://localhost:${port}/admin.html`);
+});

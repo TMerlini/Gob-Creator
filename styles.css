@@ -1046,7 +1046,7 @@ label[for="uploadLayer1"] {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border: none;
+    border: none,
     background: none;
     color: #666;
     padding: 0;
@@ -1662,6 +1662,58 @@ label[for="uploadLayer1"] {
         max-width: 80px;
         font-size: 10px;
     }
+}
+
+/* Donation box styles */
+.donation-box {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.donation-text {
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+.donation-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.donation-btn {
+    padding: 8px 16px;
+    background: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.donation-btn:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.donation-note {
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px;
 }
 
 /* NFT selector styles removed */
