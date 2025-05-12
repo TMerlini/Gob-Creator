@@ -937,7 +937,7 @@ function updatePreviews() {
     });
 }
 
-// Call updatePreviews initially to ensure all previews start with the correct images
+// Call updatePreviewsinitially to ensure all previews start with the correct images
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         updatePreviews();
@@ -1435,7 +1435,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const siteTitle = document.getElementById('siteTitle');
                 const siteSubtitle = document.getElementById('siteSubtitle');
                 const siteSubtext = document.getElementById('siteSubtext');
-                
+
                 if (siteTitle) siteTitle.textContent = data.settings.title || 'GOBLINARINOS';
                 if (siteSubtitle) siteSubtitle.textContent = data.settings.subtitle || 'Merry Christmas Gobos';
                 if (siteSubtext) siteSubtext.textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
@@ -1635,45 +1635,40 @@ const RATE_LIMIT_DELAY = 500;
 
 //NFT selector functionality removed
 
-// Initialize donation buttons with default values as fallback
+// Function to set up cryptocurrency donation buttons
+function setupCryptoDonationButtons() {
+    const cryptoButtons = document.querySelectorAll('.crypto-button');
+
+    cryptoButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const address = this.getAttribute('data-address');
+            if (address) {
+                navigator.clipboard.writeText(address)
+                    .then(() => {
+                        // Show success notification
+                        const notification = document.createElement('div');
+                        notification.className = 'copy-notification';
+                        notification.textContent = 'Address copied to clipboard!';
+                        document.body.appendChild(notification);
+
+                        // Remove notification after 2 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                            setTimeout(() => {
+                                document.body.removeChild(notification);
+                            }, 500);
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy address: ', err);
+                    });
+            }
+        });
+    });
+}
+
+// Add direct initialization at the end of the file to ensure it runs
 document.addEventListener('DOMContentLoaded', function() {
     // Add a small delay to make sure the DOM is fully loaded
     setTimeout(function() {
         try {
-            // Check if elements exist before trying to set them up
-            if (document.getElementById('ethBtn') && 
-                document.getElementById('btcBtn') && 
-                document.getElementById('solBtn')) {
-                
-                // Use the default settings as a fallback
-                setupCryptoDonationButtons({
-                    ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
-                    btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
-                    solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
-                });
-
-                console.log("Donation buttons initialized with default addresses");
-                
-                // Try to fetch updated settings from server (non-blocking)
-                fetch('/api/site-settings')
-                    .then(response => {
-                        if (response.ok) return response.json();
-                        throw new Error('Failed to fetch settings');
-                    })
-                    .then(data => {
-                        if (data && data.settings) {
-                            setupCryptoDonationButtons(data.settings);
-                            console.log("Donation buttons updated with server settings");
-                        }
-                    })
-                    .catch(err => {
-                        console.log("Using default donation addresses:", err);
-                    });
-            } else {
-                console.log("Donation buttons not found in the DOM");
-            }
-        } catch (error) {
-            console.error("Error initializing donation buttons:", error);
-        }
-    }, 500);
-});
