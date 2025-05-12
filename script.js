@@ -1379,44 +1379,68 @@ function setupCryptoDonationButtons(settings) {
             }, 2000);
         }
 
+        // Fallback copy function for browsers without clipboard API
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // Make the textarea out of viewport
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            let successful = false;
+            try {
+                successful = document.execCommand('copy');
+                if (successful) {
+                    showCopiedNotification();
+                    console.log("Address copied with fallback method");
+                } else {
+                    alert("Address: " + text);
+                }
+            } catch (err) {
+                console.error("Fallback copy failed:", err);
+                alert("Address: " + text);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        // Function that tries the clipboard API first, then falls back
+        function copyTextToClipboard(text) {
+            if (!navigator.clipboard) {
+                fallbackCopyTextToClipboard(text);
+                return;
+            }
+            
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    showCopiedNotification();
+                    console.log("Address copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Clipboard API failed:", err);
+                    fallbackCopyTextToClipboard(text);
+                });
+        }
+
         // Setup click handlers
         ethBtn.addEventListener('click', function() {
             console.log("ETH button clicked");
-            navigator.clipboard.writeText(addresses.ethAddress)
-                .then(() => {
-                    showCopiedNotification();
-                    console.log("ETH address copied to clipboard");
-                })
-                .catch(err => {
-                    console.error("Failed to copy ETH address:", err);
-                    alert("Address copied: " + addresses.ethAddress);
-                });
+            copyTextToClipboard(addresses.ethAddress);
         });
 
         btcBtn.addEventListener('click', function() {
             console.log("BTC button clicked");
-            navigator.clipboard.writeText(addresses.btcAddress)
-                .then(() => {
-                    showCopiedNotification();
-                    console.log("BTC address copied to clipboard");
-                })
-                .catch(err => {
-                    console.error("Failed to copy BTC address:", err);
-                    alert("Address copied: " + addresses.btcAddress);
-                });
+            copyTextToClipboard(addresses.btcAddress);
         });
 
         solBtn.addEventListener('click', function() {
             console.log("SOL button clicked");
-            navigator.clipboard.writeText(addresses.solAddress)
-                .then(() => {
-                    showCopiedNotification();
-                    console.log("SOL address copied to clipboard");
-                })
-                .catch(err => {
-                    console.error("Failed to copy SOL address:", err);
-                    alert("Address copied: " + addresses.solAddress);
-                });
+            copyTextToClipboard(addresses.solAddress);
         });
     } catch (error) {
         console.error("Error setting up crypto donation buttons:", error);
