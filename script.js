@@ -1337,10 +1337,18 @@ window.addEventListener('load', () => {
             console.log('Layer 2 images:');
             layer2.debugImages();
         }
+        
+        // Initialize donation buttons with default values
+        setupCryptoDonationButtons({
+            ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
+            btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
+            solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
+        });
     }, 2000); // Wait 2 seconds after load to check images
 });
 
 // Add delay helper function
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Function to setup crypto donation buttons - moved up before it's called
 function setupCryptoDonationButtons(settings) {
@@ -1645,15 +1653,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('btcBtn') && 
                 document.getElementById('solBtn')) {
                 
-                // Use the default settings as a fallback
-                setupCryptoDonationButtons({
-                    ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
-                    btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
-                    solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
-                });
-
-                console.log("Donation buttons initialized with default addresses");
-                
                 // Try to fetch updated settings from server (non-blocking)
                 fetch('/api/site-settings')
                     .then(response => {
@@ -1668,6 +1667,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .catch(err => {
                         console.log("Using default donation addresses:", err);
+                        // Use the default settings as a fallback
+                        setupCryptoDonationButtons({
+                            ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
+                            btcAddress: "3GzpE8PyW8XgNnmkxsNLpj2jVKvyxwRYFM",
+                            solAddress: "67uBk8TczpTBRZJPKs4waUsnkajxX6L5o1fLajwmNrda"
+                        });
                     });
             } else {
                 console.log("Donation buttons not found in the DOM");
