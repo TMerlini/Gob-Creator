@@ -1404,12 +1404,20 @@ label[for="uploadLayer1"] {
     margin-top: 10px;
 }
 
-.contributors-section h3 {
+.contributors-section h3, .contributors-section h4.contributors-category {
     color: #353838d2;
     font-size: 0.9em;
     margin-bottom: 5px;
     text-transform: uppercase;
     text-shadow: 2px 2px 4px rgba(155, 153, 153, 0.582);
+}
+
+.contributors-section h4.contributors-category {
+    width: 100%;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 0.85em;
 }
 
 .contributors-list {

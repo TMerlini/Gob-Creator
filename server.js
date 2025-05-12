@@ -37,6 +37,7 @@ const directories = [
     './images/layer1',
     './images/layer2',
     './images/background',
+    './images/contributors',
     './music'
 ];
 
@@ -406,3 +407,108 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`API endpoint: /api/nft/:tokenId`);
     console.log(`Admin panel: http://localhost:${PORT}/admin.html`);
 });
+
+// Contributors API endpoints
+app.get('/api/contributors', (req, res) => {
+    try {
+        // Check if contributors file exists
+        const contributorsPath = path.join(__dirname, 'contributors.json');
+        if (fs.existsSync(contributorsPath)) {
+            const contributorsData = fs.readFileSync(contributorsPath, 'utf8');
+            const contributors = JSON.parse(contributorsData);
+            res.json({ contributors });
+        } else {
+            // Return default contributors data
+            const defaultContributors = {
+                developers: [
+                    {
+                        twitterHandle: '@ordinarino35380',
+                        name: '@ordinarino35380',
+                        role: 'Developer',
+                        image: '/images/contributors/image3.png'
+                    },
+                    {
+                        twitterHandle: '@MerloOfficial',
+                        name: '@MerloOfficial',
+                        role: 'Developer',
+                        image: '/images/contributors/image2.png'
+                    }
+                ],
+                contributors: [
+                    {
+                        twitterHandle: '@Franku271',
+                        name: '@Franku271',
+                        role: 'Artist/Developer',
+                        image: '/images/contributors/image1.png'
+                    },
+                    {
+                        twitterHandle: '@BetterBen33',
+                        name: '@BetterBen33',
+                        role: 'Artist/Developer',
+                        image: '/images/contributors/image4.png'
+                    }
+                ]
+            };
+            res.json({ contributors: defaultContributors });
+        }
+    } catch (error) {
+        console.error('Error getting contributors:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/contributors', (req, res) => {
+    try {
+        const contributors = req.body.contributors;
+
+        // Validate the data
+        if (!contributors || !Array.isArray(contributors.developers) || !Array.isArray(contributors.contributors)) {
+            return res.status(400).send('Invalid contributors data');
+        }
+
+        // Process image data (convert base64 to files)
+        processContributorImages(contributors.developers);
+        processContributorImages(contributors.contributors);
+
+        // Save contributors to file
+        fs.writeFileSync('./contributors.json', JSON.stringify(contributors, null, 2));
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error saving contributors:', error);
+        res.status(500).send('Failed to save contributors');
+    }
+});
+
+// Helper function to process contributor images
+function processContributorImages(contributors) {
+    const contributorsDir = path.join(__dirname, 'images', 'contributors');
+    
+    // Ensure directory exists
+    if (!fs.existsSync(contributorsDir)) {
+        fs.mkdirSync(contributorsDir, { recursive: true });
+    }
+    
+    contributors.forEach((contributor, index) => {
+        // Check if the image is a base64 data URL
+        if (contributor.image && contributor.image.startsWith('data:image')) {
+            // Extract the base64 data
+            const matches = contributor.image.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+            
+            if (matches && matches.length === 3) {
+                const imageType = matches[1];
+                const imageData = matches[2];
+                const buffer = Buffer.from(imageData, 'base64');
+                
+                // Generate a filename
+                const filename = `contributor_${index + 1}.${imageType}`;
+                const filePath = path.join(contributorsDir, filename);
+                
+                // Save the file
+                fs.writeFileSync(filePath, buffer);
+                
+                // Update the contributor object with the file path
+                contributor.image = `/images/contributors/${filename}`;
+            }
+        }
+    });
+}

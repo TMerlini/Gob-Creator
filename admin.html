@@ -174,6 +174,77 @@
                         <button id="saveTextBtn" class="primary-btn">Save All Settings</button>
                     </div>
                 </div>
+                
+                <div class="advanced-dropdown-container" style="margin-top: 20px;">
+                    <button id="toggleContributorsSettings" class="toggle-settings-btn">+ Contributors</button>
+                    
+                    <div id="contributorsSettingsSection" class="contributors-settings" style="display: none;">
+                        <div class="contributors-tabs">
+                            <button class="contributor-tab-btn active" data-type="developers">Developers</button>
+                            <button class="contributor-tab-btn" data-type="contributors">Contributors</button>
+                        </div>
+                        
+                        <div class="contributor-panel" id="developersPanel">
+                            <h3>Manage Developers</h3>
+                            <div id="developersList" class="contributors-list-admin"></div>
+                            
+                            <div class="add-contributor-form">
+                                <h4>Add New Developer</h4>
+                                <div class="form-group">
+                                    <label for="devTwitterHandle">Twitter Handle:</label>
+                                    <input type="text" id="devTwitterHandle" placeholder="@username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="devName">Display Name:</label>
+                                    <input type="text" id="devName" placeholder="Display Name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="devRole">Role:</label>
+                                    <input type="text" id="devRole" placeholder="Developer">
+                                </div>
+                                <div class="form-group">
+                                    <label for="devImage">Profile Image:</label>
+                                    <input type="file" id="devImage" accept="image/*" style="display: none;">
+                                    <label for="devImage" class="upload-btn">Select Image</label>
+                                    <div id="devImagePreview" class="image-preview"></div>
+                                </div>
+                                <button id="addDevBtn" class="primary-btn">Add Developer</button>
+                            </div>
+                        </div>
+                        
+                        <div class="contributor-panel" id="contributorsPanel" style="display: none;">
+                            <h3>Manage Contributors</h3>
+                            <div id="contributorsList" class="contributors-list-admin"></div>
+                            
+                            <div class="add-contributor-form">
+                                <h4>Add New Contributor</h4>
+                                <div class="form-group">
+                                    <label for="contribTwitterHandle">Twitter Handle:</label>
+                                    <input type="text" id="contribTwitterHandle" placeholder="@username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contribName">Display Name:</label>
+                                    <input type="text" id="contribName" placeholder="Display Name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contribRole">Role:</label>
+                                    <input type="text" id="contribRole" placeholder="Role">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contribImage">Profile Image:</label>
+                                    <input type="file" id="contribImage" accept="image/*" style="display: none;">
+                                    <label for="contribImage" class="upload-btn">Select Image</label>
+                                    <div id="contribImagePreview" class="image-preview"></div>
+                                </div>
+                                <button id="addContribBtn" class="primary-btn">Add Contributor</button>
+                            </div>
+                        </div>
+                        
+                        <div class="contributor-actions">
+                            <button id="saveContributorsBtn" class="primary-btn">Save All Contributors</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
