@@ -11,12 +11,6 @@
       "name": "@MerloOfficial",
       "role": "Developer",
       "image": "/images/contributors/image2.png"
-    },
-    {
-      "xAccount": "@elemental_labs",
-      "name": "Elemental",
-      "role": "Supporter",
-      "image": "/images/contributors/contributor_3.png"
     }
   ],
   "contributors": [
@@ -31,6 +25,12 @@
       "name": "@BetterBen33",
       "role": "Artist/Developer",
       "image": "/images/contributors/image4.png"
+    },
+    {
+      "xAccount": "@elemental_labs",
+      "name": "Elemental",
+      "role": "Supporter",
+      "image": "/images/contributors/contributor_3.png"
     }
   ]
 }
