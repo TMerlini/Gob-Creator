@@ -1178,6 +1178,90 @@ label[for="uploadLayer1"] {
     flex-shrink: 0;
 }
 
+/* Crypto donation buttons */
+.crypto-donation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15px;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.crypto-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.crypto-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.crypto-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.crypto-btn.eth {
+    background-color: #627eea;
+    color: white;
+}
+
+.crypto-btn.btc {
+    background-color: #f7931a;
+    color: white;
+}
+
+.crypto-btn.sol {
+    background-color: #9945ff;
+    color: white;
+}
+
+.crypto-copied {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.crypto-copied.show {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .crypto-donation-container {
+        max-width: 100%;
+    }
+    
+    .crypto-buttons {
+        flex-direction: column;
+    }
+}
+}
+
 /* Mobile specific styles */
 @media (max-width: 768px) {
     .download-container {

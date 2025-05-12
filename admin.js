@@ -50,7 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
         buttonColor: '#ffffff',
         buttonTextColor: '#000000',
         downloadBtnColor: '#1f78cc',
-        downloadBtnTextColor: '#ffffff'
+        downloadBtnTextColor: '#ffffff',
+        ethAddress: '',
+        btcAddress: '',
+        solAddress: ''
     };
 
     // Contributors settings
@@ -638,6 +641,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (siteTextSettings.downloadBtnTextColor) {
                         document.getElementById('downloadBtnTextColor').value = siteTextSettings.downloadBtnTextColor;
                     }
+                    
+                    // Load crypto addresses if they exist
+                    if (siteTextSettings.ethAddress) {
+                        document.getElementById('ethAddress').value = siteTextSettings.ethAddress;
+                    }
+                    if (siteTextSettings.btcAddress) {
+                        document.getElementById('btcAddress').value = siteTextSettings.btcAddress;
+                    }
+                    if (siteTextSettings.solAddress) {
+                        document.getElementById('solAddress').value = siteTextSettings.solAddress;
+                    }
                 }
             }
         } catch (error) {
@@ -749,7 +763,10 @@ document.addEventListener('DOMContentLoaded', function() {
             buttonColor: document.getElementById('buttonColor').value,
             buttonTextColor: document.getElementById('buttonTextColor').value,
             downloadBtnColor: document.getElementById('downloadBtnColor').value,
-            downloadBtnTextColor: document.getElementById('downloadBtnTextColor').value
+            downloadBtnTextColor: document.getElementById('downloadBtnTextColor').value,
+            ethAddress: document.getElementById('ethAddress').value.trim(),
+            btcAddress: document.getElementById('btcAddress').value.trim(),
+            solAddress: document.getElementById('solAddress').value.trim()
         };
 
         // Validate inputs - ensure they're not empty

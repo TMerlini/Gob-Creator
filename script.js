@@ -1097,6 +1097,86 @@ async function loadBackground() {
                     resolve(false);
                 };
                 img.src = path;
+
+// Function to setup crypto donation buttons
+function setupCryptoDonationButtons(settings) {
+    const ethBtn = document.getElementById('ethBtn');
+    const btcBtn = document.getElementById('btcBtn');
+    const solBtn = document.getElementById('solBtn');
+    const cryptoCopied = document.getElementById('cryptoCopied');
+    
+    // Hide buttons if no address is set
+    if (!settings.ethAddress) {
+        ethBtn.style.display = 'none';
+    }
+    
+    if (!settings.btcAddress) {
+        btcBtn.style.display = 'none';
+    }
+    
+    if (!settings.solAddress) {
+        solBtn.style.display = 'none';
+    }
+    
+    // Function to show the copied notification
+    function showCopiedNotification() {
+        cryptoCopied.classList.add('show');
+        setTimeout(() => {
+            cryptoCopied.classList.remove('show');
+        }, 2000);
+    }
+    
+    // Setup click handlers
+    ethBtn.addEventListener('click', function() {
+        if (settings.ethAddress) {
+            navigator.clipboard.writeText(settings.ethAddress).then(() => {
+                showCopiedNotification();
+            });
+        }
+    });
+    
+    btcBtn.addEventListener('click', function() {
+        if (settings.btcAddress) {
+            navigator.clipboard.writeText(settings.btcAddress).then(() => {
+                showCopiedNotification();
+            });
+        }
+    });
+    
+    solBtn.addEventListener('click', function() {
+        if (settings.solAddress) {
+            navigator.clipboard.writeText(settings.solAddress).then(() => {
+                showCopiedNotification();
+            });
+        }
+    });
+    
+    // Apply button styling from settings
+    if (settings.buttonColor) {
+        const buttons = document.querySelectorAll('.crypto-btn');
+        buttons.forEach(btn => {
+            // Only apply to buttons that don't have specific crypto classes
+            if (!btn.classList.contains('eth') && 
+                !btn.classList.contains('btc') && 
+                !btn.classList.contains('sol')) {
+                btn.style.backgroundColor = settings.buttonColor;
+            }
+        });
+    }
+    
+    if (settings.buttonTextColor) {
+        const buttons = document.querySelectorAll('.crypto-btn');
+        buttons.forEach(btn => {
+            // Only apply to buttons that don't have specific crypto classes
+            if (!btn.classList.contains('eth') && 
+                !btn.classList.contains('btc') && 
+                !btn.classList.contains('sol')) {
+                btn.style.color = settings.buttonTextColor;
+            }
+        });
+    }
+}
+
             });
             
             if (loaded) {
@@ -1423,7 +1503,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 if (data.settings.downloadBtnTextColor) {
                     // Apply text color to download button
                     const downloadBtn = document.getElementById('downloadBtn');
-                    if (downloadBtn) {
+                    if (downloadBtn)
+                        
+                // Setup crypto donation buttons
+                setupCryptoDonationButtons(data.settings); {
                         downloadBtn.style.color = data.settings.downloadBtnTextColor;
                     }
                 }
