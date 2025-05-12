@@ -1,0 +1,36 @@
+{
+  "developers": [
+    {
+      "xAccount": "@ordinarino35380",
+      "name": "@ordinarino35380",
+      "role": "Developer",
+      "image": "/images/contributors/image3.png"
+    },
+    {
+      "xAccount": "@MerloOfficial",
+      "name": "@MerloOfficial",
+      "role": "Developer",
+      "image": "/images/contributors/image2.png"
+    },
+    {
+      "xAccount": "@elemental_labs",
+      "name": "Elemental",
+      "role": "Supporter",
+      "image": "/images/contributors/contributor_3.png"
+    }
+  ],
+  "contributors": [
+    {
+      "xAccount": "@Franku271",
+      "name": "@Franku271",
+      "role": "Artist/Developer",
+      "image": "/images/contributors/image1.png"
+    },
+    {
+      "xAccount": "@BetterBen33",
+      "name": "@BetterBen33",
+      "role": "Artist/Developer",
+      "image": "/images/contributors/image4.png"
+    }
+  ]
+}
