@@ -16,9 +16,9 @@ html, body {
 body {
     margin: 0;
     padding: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background-color: #000000;
-    background: url('images/background.gif') center/cover no-repeat fixed;  /* Updated this line */
+    background: url('background/background.gif') center/cover no-repeat fixed;  /* Fixed this line */
     min-height: 100vh;
     background-size: cover;
     background-repeat: no-repeat;
@@ -205,7 +205,7 @@ h1 {
     position: absolute;
     left: 320px;
     right: 0;
-    bottom: 2; /* Align to bottom */
+    bottom: 2px; /* Fixed to use pixels */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1653,6 +1653,7 @@ label[for="uploadLayer1"] {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     max-width: 250px;
+    display: none; /* Initially hidden, will be shown by JavaScript */
 }
 
 .donation-box p {
