@@ -1206,11 +1206,12 @@ label[for="uploadLayer1"] {
     color: #000000;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 6px;
-    padding: 8px 15px;
+    padding: 6px 12px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
 
 .crypto-btn:hover {
@@ -1245,6 +1246,7 @@ label[for="uploadLayer1"] {
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.3s ease;
+    font-size: 14px;
 }
 
 .crypto-copied.show {
@@ -1670,6 +1672,37 @@ label[for="uploadLayer1"] {
     border-radius: 30px;
 }
 
+.donation-section {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 10px;
+    width: 180px;
+}
+
+.donation-text {
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    line-height: 1.3;
+}
+
+.donation-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 5px;
+}
+
 .audio-toggle {
     background: rgba(11, 173, 179, 0.658);
     border: none;
@@ -1745,6 +1778,22 @@ label[for="uploadLayer1"] {
     .track-name {
         max-width: 80px;
         font-size: 10px;
+    }
+    
+    .donation-section {
+        top: 65px;
+        right: 10px;
+        width: 160px;
+        padding: 8px;
+    }
+    
+    .donation-text {
+        font-size: 11px;
+    }
+    
+    .crypto-btn {
+        padding: 5px 10px;
+        font-size: 12px;
     }
 }
 

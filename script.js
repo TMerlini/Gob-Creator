@@ -1105,16 +1105,26 @@ function setupCryptoDonationButtons(settings) {
     const solBtn = document.getElementById('solBtn');
     const cryptoCopied = document.getElementById('cryptoCopied');
     
+    // Set default addresses if settings not available
+    const defaultSettings = {
+        ethAddress: "0xYourDefaultEthAddress",
+        btcAddress: "YourDefaultBtcAddress",
+        solAddress: "YourDefaultSolAddress"
+    };
+    
+    // Use settings if available, otherwise use defaults
+    const addresses = settings || defaultSettings;
+    
     // Hide buttons if no address is set
-    if (!settings.ethAddress) {
+    if (!addresses.ethAddress) {
         ethBtn.style.display = 'none';
     }
     
-    if (!settings.btcAddress) {
+    if (!addresses.btcAddress) {
         btcBtn.style.display = 'none';
     }
     
-    if (!settings.solAddress) {
+    if (!addresses.solAddress) {
         solBtn.style.display = 'none';
     }
     
@@ -1128,31 +1138,31 @@ function setupCryptoDonationButtons(settings) {
     
     // Setup click handlers
     ethBtn.addEventListener('click', function() {
-        if (settings.ethAddress) {
-            navigator.clipboard.writeText(settings.ethAddress).then(() => {
+        if (addresses.ethAddress) {
+            navigator.clipboard.writeText(addresses.ethAddress).then(() => {
                 showCopiedNotification();
             });
         }
     });
     
     btcBtn.addEventListener('click', function() {
-        if (settings.btcAddress) {
-            navigator.clipboard.writeText(settings.btcAddress).then(() => {
+        if (addresses.btcAddress) {
+            navigator.clipboard.writeText(addresses.btcAddress).then(() => {
                 showCopiedNotification();
             });
         }
     });
     
     solBtn.addEventListener('click', function() {
-        if (settings.solAddress) {
-            navigator.clipboard.writeText(settings.solAddress).then(() => {
+        if (addresses.solAddress) {
+            navigator.clipboard.writeText(addresses.solAddress).then(() => {
                 showCopiedNotification();
             });
         }
     });
     
     // Apply button styling from settings
-    if (settings.buttonColor) {
+    if (settings && settings.buttonColor) {
         const buttons = document.querySelectorAll('.crypto-btn');
         buttons.forEach(btn => {
             // Only apply to buttons that don't have specific crypto classes
@@ -1164,7 +1174,7 @@ function setupCryptoDonationButtons(settings) {
         });
     }
     
-    if (settings.buttonTextColor) {
+    if (settings && settings.buttonTextColor) {
         const buttons = document.querySelectorAll('.crypto-btn');
         buttons.forEach(btn => {
             // Only apply to buttons that don't have specific crypto classes
@@ -1176,6 +1186,26 @@ function setupCryptoDonationButtons(settings) {
         });
     }
 }
+
+// Initialize donation buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Try to fetch donation settings
+    fetch('/api/donation-settings')
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Failed to fetch donation settings');
+        })
+        .then(data => {
+            setupCryptoDonationButtons(data.settings);
+        })
+        .catch(error => {
+            console.log('Failed to fetch donation settings');
+            // Initialize with default settings if fetch fails
+            setupCryptoDonationButtons();
+        });
+});
 
             });
             
