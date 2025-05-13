@@ -28,7 +28,53 @@ function startLoadingAnimation() {
 }
 
 // Start loading animation when page loads
-window.addEventListener('DOMContentLoaded', startLoadingAnimation);
+window.addEventListener('DOMContentLoaded', () => {
+    startLoadingAnimation();
+    initializeDynamicLogo();
+});
+
+// Function to add interactive effects to the logo
+function initializeDynamicLogo() {
+    const logo = document.getElementById('dynamicLogo');
+    if (!logo) return;
+    
+    // Add interactive mousemove effect
+    document.addEventListener('mousemove', (e) => {
+        const { clientX, clientY } = e;
+        const rect = logo.getBoundingClientRect();
+        const logoX = rect.left + rect.width / 2;
+        const logoY = rect.top + rect.height / 2;
+        
+        // Calculate distance from mouse to logo center
+        const distX = clientX - logoX;
+        const distY = clientY - logoY;
+        const distance = Math.sqrt(distX * distX + distY * distY);
+        
+        // Only apply effect when mouse is near the logo (within 300px)
+        if (distance < 300) {
+            // Calculate rotation based on mouse position
+            const rotateX = distY * 0.02;
+            const rotateY = -distX * 0.02;
+            
+            // Apply the transform with more intensity when closer
+            const intensity = 1 - (distance / 300);
+            logo.style.transform = `perspective(800px) rotateX(${rotateX * intensity}deg) rotateY(${rotateY * intensity}deg) scale(${1 + (intensity * 0.1)})`;
+            logo.style.filter = `drop-shadow(0 0 ${8 + (intensity * 10)}px rgba(255, 255, 255, ${0.5 + (intensity * 0.3)}))`;
+        } else {
+            // Reset when mouse is far away (let the CSS animation take over)
+            logo.style.transform = '';
+            logo.style.filter = '';
+        }
+    });
+    
+    // Add click effect
+    logo.addEventListener('click', () => {
+        logo.style.animation = 'shake 0.5s ease';
+        setTimeout(() => {
+            logo.style.animation = 'pulse 3s infinite alternate';
+        }, 500);
+    });
+}
 
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
