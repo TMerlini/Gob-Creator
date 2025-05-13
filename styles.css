@@ -1041,8 +1041,6 @@ label[for="uploadLayer1"] {
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     display: flex;
-This code modifies the contributor section to use smaller images and a separate box layout for developers and contributors.
-```
     align-items: center;
     justify-content: center;
     padding: 4px;
@@ -1324,7 +1322,7 @@ This code modifies the contributor section to use smaller images and a separate 
     .crypto-donation-container {
         max-width: 100%;
     }
-
+    
     .crypto-buttons {
         flex-direction: column;
     }
@@ -1582,16 +1580,11 @@ This code modifies the contributor section to use smaller images and a separate 
 }
 
 .contributors-section h3, .contributors-section h4.contributors-category {
-    color: #ffffff;
-    font-size: 1em;
-    margin-bottom: 10px;
+    color: #353838d2;
+    font-size: 0.9em;
+    margin-bottom: 5px;
     text-transform: uppercase;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-    background: linear-gradient(90deg, #4a6cf7, #6a4cf7);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    padding: 5px;
+    text-shadow: 2px 2px 4px rgba(155, 153, 153, 0.582);
 }
 
 .contributors-section h4.contributors-category {
@@ -1606,9 +1599,8 @@ This code modifies the contributor section to use smaller images and a separate 
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 15px;
-    padding: 10px;
-    margin-bottom: 20px;
+    gap: 30px;
+    padding: 0 20px;
 }
 
 .contributor {
@@ -1616,53 +1608,32 @@ This code modifies the contributor section to use smaller images and a separate 
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    background-color: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 10px;
-    margin: 5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    width: 120px;
-}
-
-.contributor:hover {
-    background-color: rgba(255, 255, 255, 0.25);
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.contributor-name {
-    color: #ffffff;
-    font-size: 0.9em;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 5px;
-    word-break: break-word;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-.contributor-role {
-    color: #cccccc;
-    font-size: 0.75em;
-    text-align: center;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .contributor-image {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #ffffff;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.3s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .contributor a:hover .contributor-image {
-    transform: scale(1.1) rotate(5deg);
-    border-color: #4a6cf7;
-    box-shadow: 0 4px 8px rgba(74, 108, 247, 0.4);
+    transform: scale(1.1);
+    border-color: #4a9eff;
+}
+
+.contributor-name {
+    color: #000000a1;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.contributor-role {
+    color: #cccccc8c;
+    font-size: 0.9em;
 }
 
 /* Mobile adjustments */
@@ -1692,42 +1663,19 @@ This code modifies the contributor section to use smaller images and a separate 
     margin-bottom: 10px;
 }
 
-/* Contributors section styling */
-.contributors-section {
-    margin-top: 5px;
-    padding: 15px;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-    width: 90%;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.contributors-section:hover {
-    background-color: rgba(0, 0, 0, 0.75);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
 /* Mobile adjustments */
 @media (max-width: 768px) {
     .contributors-section {
         margin-top: 5px;
-        padding: 15px;
+        padding: 10px 0;
     }
 }
-/* Position contributors section appropriately */
+/* Move contributors section up */
 .contributors-section {
-    margin-top: 20px;
-    position: relative;
-    z-index: 2;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-top: -300px;  /* Negative margin to move it up */
+    padding: -5px 0;
+    position: relative;  /* Add this to ensure it stays above background */
+    z-index: 2;  /* Add this to ensure it stays above background */
 }
 
 /* First, add the gradient animation keyframes */
@@ -1920,18 +1868,18 @@ This code modifies the contributor section to use smaller images and a separate 
         max-width: 80px;
         font-size: 10px;
     }
-
+    
     .donation-section {
         top: 65px;
         right: 10px;
         width: 160px;
         padding: 8px;
     }
-
+    
     .donation-text {
         font-size: 11px;
     }
-
+    
     .crypto-btn {
         padding: 5px 10px;
         font-size: 12px;
@@ -1939,110 +1887,3 @@ This code modifies the contributor section to use smaller images and a separate 
 }
 
 /* NFT selector styles removed */
-// Style the container
-.contributors-container {
-    display: flex;
-    flex-direction: row; /* Display side by side */
-    justify-content: center; /* Center the boxes */
-    gap: 20px; /* Space between the boxes */
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-// Style each box
-.contributor-box {
-    width: 45%; /* Distribute width equally */
-    background-color: rgba(0, 0, 0, 0.6);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-    text-align: center;
-    padding: 20px;
-}
-
-.contributor-box:hover {
-    background-color: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-// Style the heading
-.contributor-box h3 {
-    color: #ffffff;
-    font-size: 1.2em;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-    background: linear-gradient(90deg, #4a6cf7, #6a4cf7);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    padding: 5px;
-    display: inline-block;
-}
-
-// Style the list within each box
-.contributor-box .contributors-list {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-// Style each contributor item
-.contributor-box .contributor {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background-color: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 10px;
-    margin: 5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    width: 110px;
-}
-
-.contributor-box .contributor:hover {
-    background-color: rgba(255, 255, 255, 0.25);
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-// Style contributor name
-.contributor-box .contributor-name {
-    color: #ffffff;
-    font-size: 0.9em;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 5px;
-    word-break: break-word;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-// Style contributor role
-.contributor-box .contributor-role {
-    color: #cccccc;
-    font-size: 0.75em;
-    text-align: center;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-/* Media queries for mobile */
-@media (max-width: 768px) {
-    .contributors-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .contributor-box {
-        width: 80%;
-        margin-bottom: 20px;
-    }
-}
