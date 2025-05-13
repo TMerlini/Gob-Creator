@@ -3,6 +3,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // Authentication variables
     const ADMIN_PASSWORD = 'GobAdmin123'; // Change this to your desired password
     const AUTH_TOKEN_KEY = 'gobAdmin_auth';
+    const THEME_KEY = 'gobAdmin_theme';
+    
+    // Set up dark mode toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    
+    // Check for saved theme preference or prefer-color-scheme
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Apply theme based on saved preference or system preference
+    if (savedTheme === 'dark' || (!savedTheme && prefersDarkMode)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        darkModeToggle.checked = true;
+    }
+    
+    // Handle theme toggle
+    darkModeToggle.addEventListener('change', function() {
+        if (this.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem(THEME_KEY, 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem(THEME_KEY, 'light');
+        }
+    });
 
     // DOM Elements
     const loginForm = document.getElementById('loginForm');

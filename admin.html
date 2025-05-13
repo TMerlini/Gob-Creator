@@ -11,12 +11,22 @@
     <div class="container">
         <header>
             <h1>Goblinarinos Admin Panel</h1>
-            <div class="auth-section">
-                <div id="loginForm" class="auth-form">
-                    <input type="password" id="passwordInput" placeholder="Enter admin password">
-                    <button id="loginBtn">Login</button>
+            <div class="header-controls">
+                <div class="theme-toggle">
+                    <span>Light</span>
+                    <label class="switch">
+                        <input type="checkbox" id="darkModeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Dark</span>
                 </div>
-                <button id="logoutBtn" style="display: none;">Logout</button>
+                <div class="auth-section">
+                    <div id="loginForm" class="auth-form">
+                        <input type="password" id="passwordInput" placeholder="Enter admin password">
+                        <button id="loginBtn">Login</button>
+                    </div>
+                    <button id="logoutBtn" style="display: none;">Logout</button>
+                </div>
             </div>
         </header>
 
