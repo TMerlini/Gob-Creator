@@ -1,6 +1,4 @@
 // Cloudflare Worker configuration
-const ME_API_KEY = '902ff98b-33f5-4f04-9a60-2a51058eb6e8';
-const ME_USERNAME = 'ordinarinos@gmail.com';
 const API_BASE_URL = 'https://api-mainnet.magiceden.dev/v3/rtp/ethereum';
 const COLLECTION_ADDRESS = '0x616f2ac5dd4f760db693c21e9ca7a8aa962cf93b';
 
@@ -39,11 +37,7 @@ async function handleRequest(request) {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'ME-Pub-API-Metadata': JSON.stringify({ paging: true }),
-        'Authorization': `Bearer ${ME_API_KEY}`,
-        'Type': 'Bearer Token',
-        'Username': ME_USERNAME,
-        'Credential': ME_API_KEY
+        'ME-Pub-API-Metadata': JSON.stringify({ paging: true })
       }
     });
 

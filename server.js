@@ -23,9 +23,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Serve static files from the current directory
 app.use(express.static('./'));
 
-// API credentials and constants
-const ME_API_KEY = process.env.ME_API_KEY;
-const ME_USERNAME = process.env.ME_USERNAME;
+// API constants
 const API_BASE_URL = 'https://api-mainnet.magiceden.dev/v3/rtp/ethereum';
 const COLLECTION_ADDRESS = '0x616f2ac5dd4f760db693c21e9ca7a8aa962cf93b';
 
@@ -143,11 +141,7 @@ app.get('/api/nft/:tokenId', async (req, res) => {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'ME-Pub-API-Metadata': JSON.stringify({ paging: true }),
-                'Authorization': `Bearer ${ME_API_KEY}`,
-                'Type': 'Bearer Token',
-                'Username': ME_USERNAME,
-                'Credential': ME_API_KEY
+                'ME-Pub-API-Metadata': JSON.stringify({ paging: true })
             }
         });
 
