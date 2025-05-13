@@ -1,3 +1,35 @@
+// Handle loading screen with 5-second timer
+const loadingScreen = document.getElementById('loadingScreen');
+const loadingBar = document.getElementById('loadingBar');
+
+// Simple 5-second loading animation
+function startLoadingAnimation() {
+    let progress = 0;
+    const totalTime = 5000; // 5 seconds
+    const interval = 50; // Update every 50ms
+    const increment = (interval / totalTime) * 100;
+    
+    const timer = setInterval(() => {
+        progress += increment;
+        loadingBar.style.width = `${progress}%`;
+        
+        if (progress >= 100) {
+            clearInterval(timer);
+            // Hide loading screen after animation completes
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    console.log('Loading screen removed after 5 seconds');
+                }, 500);
+            }, 200);
+        }
+    }, interval);
+}
+
+// Start loading animation when page loads
+window.addEventListener('DOMContentLoaded', startLoadingAnimation);
+
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
 
