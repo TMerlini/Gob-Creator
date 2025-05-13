@@ -213,10 +213,11 @@ class Layer {
                 if (percentage >= 100) {
                     const loadingScreen = document.getElementById('loadingScreen');
                     if (loadingScreen) {
-                        loadingScreen.style.opacity = '0';
+                        loadingScreen.classList.add('hidden');
+                        loadingScreen.classList.remove('fade');
                         setTimeout(() => {
                             loadingScreen.style.display = 'none';
-                        }, 500);
+                        }, 600);
                     }
                 }
             }
@@ -1733,6 +1734,21 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const RATE_LIMIT_DELAY = 500;
 
 //NFT selector functionality removed
+
+// Ensure loading screen is removed after a timeout period even if loading doesn't complete
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen && loadingScreen.style.display !== 'none') {
+            console.log('Force removing loading screen after timeout');
+            loadingScreen.classList.add('hidden');
+            loadingScreen.classList.remove('fade');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 600);
+        }
+    }, 5000); // 5 second fallback timeout
+});
 
 // Initialize donation buttons with default values as fallback
 document.addEventListener('DOMContentLoaded', function() {
