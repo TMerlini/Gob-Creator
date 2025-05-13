@@ -477,6 +477,11 @@ document.addEventListener('DOMContentLoaded', function() {
         loadGallery('music');
         loadSiteTextSettings();
         loadContributors();
+        
+        // Initialize sortable galleries after loading
+        setTimeout(() => {
+            initSortableGalleries();
+        }, 1000);
     }
 
     async function loadGallery(layerType) {
@@ -841,6 +846,163 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Initialize sortable galleries
+    function initSortableGalleries() {
+        const sortableLists = document.querySelectorAll('.gallery-grid.sortable');
+        
+        sortableLists.forEach(sortable => {
+            const layerType = sortable.getAttribute('data-layer');
+            initSortable(sortable, layerType);
+        });
+        
+        // Add event listeners to save order buttons
+        document.querySelectorAll('.save-order-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const layerType = this.getAttribute('data-layer');
+                saveImageOrder(layerType);
+            });
+        });
+    }
+    
+    // Initialize sortable functionality for a specific gallery
+    function initSortable(element, layerType) {
+        let draggedItem = null;
+        
+        // Get all gallery items within this sortable container
+        const items = element.querySelectorAll('.gallery-item');
+        
+        items.forEach(item => {
+            // Make each item draggable
+            item.setAttribute('draggable', 'true');
+            
+            // Add data attribute for layer and filename
+            if (item.querySelector('.gallery-img')) {
+                const img = item.querySelector('.gallery-img');
+                const filename = img.alt;
+                item.setAttribute('data-filename', filename);
+            } else if (item.querySelector('.gallery-audio')) {
+                const filename = item.querySelector('.gallery-filename').textContent;
+                item.setAttribute('data-filename', filename);
+            }
+            
+            // Drag start event
+            item.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                setTimeout(() => {
+                    this.classList.add('dragging');
+                }, 0);
+            });
+            
+            // Drag end event
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                draggedItem = null;
+            });
+            
+            // Drag over event - needed to allow dropping
+            item.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
+            
+            // Drop event
+            item.addEventListener('drop', function(e) {
+                e.preventDefault();
+                if (draggedItem && draggedItem !== this) {
+                    const allItems = Array.from(element.querySelectorAll('.gallery-item'));
+                    const draggedIndex = allItems.indexOf(draggedItem);
+                    const dropIndex = allItems.indexOf(this);
+                    
+                    if (draggedIndex < dropIndex) {
+                        this.parentNode.insertBefore(draggedItem, this.nextSibling);
+                    } else {
+                        this.parentNode.insertBefore(draggedItem, this);
+                    }
+                    
+                    // Enable the save button for this layer
+                    const saveBtn = document.querySelector(`.save-order-btn[data-layer="${layerType}"]`);
+                    if (saveBtn) {
+                        saveBtn.disabled = false;
+                    }
+                    
+                    // Show message that changes aren't saved yet
+                    const statusSpan = document.querySelector(`.order-status[data-layer="${layerType}"]`);
+                    if (statusSpan) {
+                        statusSpan.textContent = 'Order changed. Click "Save Order" to apply.';
+                        statusSpan.style.color = '#ff9800';
+                    }
+                }
+            });
+        });
+    }
+    
+    // Save the current image order
+    async function saveImageOrder(layerType) {
+        const gallery = document.querySelector(`.gallery-grid[data-layer="${layerType}"]`);
+        const statusSpan = document.querySelector(`.order-status[data-layer="${layerType}"]`);
+        const saveBtn = document.querySelector(`.save-order-btn[data-layer="${layerType}"]`);
+        
+        if (!gallery) return;
+        
+        // Disable save button during save
+        if (saveBtn) {
+            saveBtn.disabled = true;
+        }
+        
+        // Update status
+        if (statusSpan) {
+            statusSpan.textContent = 'Saving...';
+            statusSpan.style.color = '#2196F3';
+        }
+        
+        // Get all items and their filenames in order
+        const items = gallery.querySelectorAll('.gallery-item');
+        const orderedFilenames = Array.from(items).map(item => {
+            return item.getAttribute('data-filename');
+        });
+        
+        try {
+            // Send order to server
+            const response = await fetch('/api/reorder-images', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    layer: layerType,
+                    order: orderedFilenames
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            // Update status on success
+            if (statusSpan) {
+                statusSpan.textContent = 'Order saved successfully!';
+                statusSpan.style.color = '#4CAF50';
+                
+                // Clear message after 3 seconds
+                setTimeout(() => {
+                    statusSpan.textContent = '';
+                }, 3000);
+            }
+        } catch (error) {
+            console.error('Error saving image order:', error);
+            
+            // Update status on error
+            if (statusSpan) {
+                statusSpan.textContent = 'Error saving order. Please try again.';
+                statusSpan.style.color = '#f44336';
+            }
+            
+            // Re-enable save button
+            if (saveBtn) {
+                saveBtn.disabled = false;
+            }
+        }
+    }
+    
     // Add and save contributor buttons
     function setupContributorButtons() {
         // Add developer button

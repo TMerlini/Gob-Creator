@@ -274,46 +274,92 @@ app.post('/api/upload', (req, res) => {
     });
 });
 
-// Get images for a layer
-app.get('/api/images/:layer', (req, res) => {
+// API endpoint for reordering images
+app.post('/api/reorder-images', async (req, res) => {
     try {
-        const { layer } = req.params;
-        if (!['layer1', 'layer2', 'background', 'music'].includes(layer)) {
-            return res.status(400).json({ error: 'Invalid layer specified' });
+        const { layer, order } = req.body;
+
+        if (!layer || !Array.isArray(order)) {
+            return res.status(400).json({ error: 'Invalid request parameters' });
         }
 
-        let dir;
-        if (layer === 'music') {
-            dir = path.join(__dirname, 'music');
-        } else {
-            dir = path.join(__dirname, 'images', layer);
-        }
+        // Create a settings file that stores the image order
+        const settingsPath = path.join(__dirname, `${layer}_order.json`);
 
-        if (!fs.existsSync(dir)) {
+        // Write the order to the file
+        fs.writeFileSync(settingsPath, JSON.stringify({ order }));
+
+        // Return success
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error reordering images:', error);
+        res.status(500).json({ error: 'Failed to reorder images' });
+    }
+});
+
+// Modify the get images API to respect order
+app.get('/api/images/:layer', (req, res) => {
+    const layer = req.params.layer;
+    let imagesDir;
+
+    // Determine the correct directory based on the layer
+    if (layer === 'layer1' || layer === 'layer2') {
+        imagesDir = path.join(__dirname, 'images', layer);
+    } else if (layer === 'background') {
+        imagesDir = path.join(__dirname, 'images', 'background');
+    } else if (layer === 'music') {
+        imagesDir = path.join(__dirname, 'music');
+    } else {
+        return res.status(400).json({ error: 'Invalid layer parameter' });
+    }
+
+    try {
+        // Check if directory exists
+        if (!fs.existsSync(imagesDir)) {
             return res.json({ images: [] });
         }
 
-        const files = fs.readdirSync(dir);
-        let filteredFiles;
+        // Get all files in the directory
+        let files = fs.readdirSync(imagesDir)
+            .filter(file => {
+                // Filter based on file type
+                if (layer === 'layer1' || layer === 'layer2' || layer === 'background') {
+                    return file.match(/\.(png|jpg|jpeg|gif|webp)$/i);
+                } else if (layer === 'music') {
+                    return file.match(/\.(mp3|wav|ogg)$/i);
+                }
+                return false;
+            });
 
-        if (layer === 'music') {
-            filteredFiles = files.filter(file => {
-                const ext = path.extname(file).toLowerCase();
-                return ['.mp3', '.wav', '.ogg', '.m4a'].includes(ext);
-            });
-        } else if (layer === 'background') {
-            filteredFiles = files.filter(file => {
-                const ext = path.extname(file).toLowerCase();
-                return ['.png', '.jpg', '.jpeg', '.gif', '.webp'].includes(ext);
-            });
-        } else {
-            filteredFiles = files.filter(file => file.endsWith('.png'));
+        // Check if a custom order exists
+        const orderFilePath = path.join(__dirname, `${layer}_order.json`);
+        if (fs.existsSync(orderFilePath)) {
+            try {
+                const orderData = JSON.parse(fs.readFileSync(orderFilePath, 'utf8'));
+
+                if (orderData.order && Array.isArray(orderData.order)) {
+                    // Create a map for O(1) lookup to check if files exist in the directory
+                    const fileMap = new Set(files);
+
+                    // Filter the order to only include files that actually exist
+                    const validOrderedFiles = orderData.order.filter(file => fileMap.has(file));
+
+                    // Find files that are in the directory but not in the order
+                    const unorderedFiles = files.filter(file => !orderData.order.includes(file));
+
+                    // Combine ordered files with any new files that aren't in the order yet
+                    files = [...validOrderedFiles, ...unorderedFiles];
+                }
+            } catch (error) {
+                console.error('Error reading image order:', error);
+                // If there's an error reading the order, just use the default order
+            }
         }
 
-        res.json({ images: filteredFiles });
+        res.json({ images: files });
     } catch (error) {
         console.error('Error getting images:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to get images' });
     }
 });
 
@@ -460,7 +506,7 @@ app.get('/api/contributors', (req, res) => {
 app.post('/api/contributors', (req, res) => {
     try {
         const contributors = req.body.contributors;
-        
+
         console.log('Received contributors data:', JSON.stringify(contributors, null, 2));
 
         // Validate the data
@@ -485,30 +531,30 @@ app.post('/api/contributors', (req, res) => {
 // Helper function to process contributor images
 function processContributorImages(contributors) {
     const contributorsDir = path.join(__dirname, 'images', 'contributors');
-    
+
     // Ensure directory exists
     if (!fs.existsSync(contributorsDir)) {
         fs.mkdirSync(contributorsDir, { recursive: true });
     }
-    
+
     contributors.forEach((contributor, index) => {
         // Check if the image is a base64 data URL
         if (contributor.image && contributor.image.startsWith('data:image')) {
             // Extract the base64 data
             const matches = contributor.image.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
-            
+
             if (matches && matches.length === 3) {
                 const imageType = matches[1];
                 const imageData = matches[2];
                 const buffer = Buffer.from(imageData, 'base64');
-                
+
                 // Generate a filename
                 const filename = `contributor_${index + 1}.${imageType}`;
                 const filePath = path.join(contributorsDir, filename);
-                
+
                 // Save the file
                 fs.writeFileSync(filePath, buffer);
-                
+
                 // Update the contributor object with the file path
                 contributor.image = `/images/contributors/${filename}`;
             }

@@ -100,12 +100,22 @@
                 
                 <div id="layer1Gallery" class="gallery active">
                     <div class="gallery-loading">Loading images...</div>
-                    <div class="gallery-grid"></div>
+                    <div class="gallery-controls">
+                        <button class="save-order-btn" data-layer="layer1">Save Order</button>
+                        <span class="order-status" data-layer="layer1"></span>
+                    </div>
+                    <p class="reorder-instructions">Drag and drop images to reorder them. Images will appear in this order in the main app.</p>
+                    <div class="gallery-grid sortable" data-layer="layer1"></div>
                 </div>
                 
                 <div id="layer2Gallery" class="gallery">
                     <div class="gallery-loading">Loading images...</div>
-                    <div class="gallery-grid"></div>
+                    <div class="gallery-controls">
+                        <button class="save-order-btn" data-layer="layer2">Save Order</button>
+                        <span class="order-status" data-layer="layer2"></span>
+                    </div>
+                    <p class="reorder-instructions">Drag and drop images to reorder them. Images will appear in this order in the main app.</p>
+                    <div class="gallery-grid sortable" data-layer="layer2"></div>
                 </div>
                 
                 <div id="backgroundGallery" class="gallery">

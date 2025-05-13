@@ -246,68 +246,78 @@ class Layer {
     }
 
     loadImages() {
-        // Use the improved loading method for both layers
-        const maxImages = 50; // Adjust based on expected maximum number of images
         let loadedCount = 0;
         let errors = 0;
 
-        const preloadImage = (index) => {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "Anonymous";
-
-                img.onload = () => {
-                    console.log(`Successfully loaded layer${this.id}/image${index}.png`);
-                    this.images[index - 1] = img;
-                    this.originalImages[index - 1] = img;
-                    loadedCount++;
-                    resolve(true);
-                };
-
-                img.onerror = () => {
-                    console.log(`Failed to load layer${this.id}/image${index}.png`);
-                    errors++;
-                    resolve(false);
-                };
-
-                const imagePath = `images/layer${this.id}/image${index}.png`;
-                img.src = imagePath;
-            });
+        // First fetch the image list from the server, respecting custom order
+        const fetchImageList = async () => {
+            try {
+                const response = await fetch(`/api/images/layer${this.id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.images || [];
+                }
+            } catch (error) {
+                console.error(`Error fetching layer${this.id} images:`, error);
+            }
+            
+            // Fallback to sequential loading if API fails
+            return Array.from({ length: 50 }, (_, i) => `image${i + 1}.png`);
         };
 
-        // Load all images concurrently
+        // Load all images based on the fetched list
         const loadAllImages = async () => {
-            const loadPromises = [];
-            for (let i = 1; i <= maxImages; i++) {
-                loadPromises.push(preloadImage(i));
-            }
-
+            // Get the image list first
+            const imageFiles = await fetchImageList();
+            
+            // Function to load a single image
+            const loadSingleImage = (filename) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    
+                    img.onload = () => {
+                        console.log(`Successfully loaded layer${this.id}/${filename}`);
+                        this.images.push(img);
+                        this.originalImages.push(img);
+                        loadedCount++;
+                        resolve(true);
+                    };
+                    
+                    img.onerror = () => {
+                        console.log(`Failed to load layer${this.id}/${filename}`);
+                        errors++;
+                        resolve(false);
+                    };
+                    
+                    img.src = `images/layer${this.id}/${filename}`;
+                });
+            };
+            
+            // Load all images from the list
+            const loadPromises = imageFiles.map(filename => loadSingleImage(filename));
             await Promise.all(loadPromises);
-
-            // Clean up array by removing undefined entries
-            this.images = this.images.filter(img => img);
-            this.originalImages = this.originalImages.filter(img => img);
-
+            
             console.log(`Layer ${this.id} loading complete:`);
             console.log(`Successfully loaded: ${loadedCount} images`);
             console.log(`Failed to load: ${errors} images`);
             console.log(`Total images in array: ${this.images.length}`);
-
+            
             // Update display after loading
             if (this.images.length > 0) {
                 this.currentImageIndex = 0;
                 this.aspectRatio = this.images[0].width / this.images[0].height;
-
+                
                 // Center Layer 2 if needed
                 if (this.id === 2) {
                     centerLayer2();
                 }
-
+                
                 drawLayers();
                 updatePreviews();
             }
         };
-
+        
         loadAllImages();
     }
 
