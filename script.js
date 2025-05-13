@@ -497,6 +497,11 @@ class Layer {
 const layer1 = new Layer(1); // Static layer
 const layer2 = new Layer(2); // Movable layer
 
+// Center layer2 after images are loaded
+setTimeout(() => {
+    centerLayer2();
+}, 1000);
+
 // Variables for drag functionality
 let isDragging = false;
 let dragStartX, dragStartY;
@@ -1292,11 +1297,6 @@ function centerLayer2() {
 
         drawLayers();
     }
-}
-
-// Add this to the Layer class loadImages method after line 107:
-if (this.id === 2 && i === 1) {
-    centerLayer2();
 }
 
 // Helper function to calculate distance between two touch points

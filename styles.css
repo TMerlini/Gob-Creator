@@ -1580,11 +1580,11 @@ label[for="uploadLayer1"] {
 }
 
 .contributors-section h3, .contributors-section h4.contributors-category {
-    color: #353838;
+    color: #ffffff;
     font-size: 1em;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     text-transform: uppercase;
-    text-shadow: 1px 1px 2px rgba(155, 153, 153, 0.5);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
     background: linear-gradient(90deg, #4a6cf7, #6a4cf7);
     background-clip: text;
     -webkit-background-clip: text;
@@ -1676,19 +1676,22 @@ label[for="uploadLayer1"] {
 /* Contributors section styling */
 .contributors-section {
     margin-top: 5px;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.7);
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.7);
     border-radius: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
     transition: all 0.3s ease;
+    width: 90%;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .contributors-section:hover {
-    background-color: rgba(255, 255, 255, 0.8);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.75);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile adjustments */
@@ -1698,12 +1701,14 @@ label[for="uploadLayer1"] {
         padding: 15px;
     }
 }
-/* Move contributors section up */
+/* Position contributors section appropriately */
 .contributors-section {
-    margin-top: -300px;  /* Negative margin to move it up */
-    padding: -5px 0;
-    position: relative;  /* Add this to ensure it stays above background */
-    z-index: 2;  /* Add this to ensure it stays above background */
+    margin-top: 20px;
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* First, add the gradient animation keyframes */
