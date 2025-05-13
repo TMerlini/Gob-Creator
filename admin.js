@@ -871,7 +871,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get all gallery items within this sortable container
         const items = element.querySelectorAll('.gallery-item');
         
+        // Add visual indicator for draggable items
         items.forEach(item => {
+            // Add a drag handle to make it clear items can be dragged
+            const dragHandle = document.createElement('div');
+            dragHandle.className = 'drag-handle';
+            dragHandle.innerHTML = '⋮⋮'; // Drag indicator icon
+            dragHandle.title = 'Drag to reorder';
+            item.prepend(dragHandle);
+            
             // Make each item draggable
             item.setAttribute('draggable', 'true');
             
@@ -887,26 +895,49 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Drag start event
             item.addEventListener('dragstart', function(e) {
+                e.stopPropagation();
                 draggedItem = this;
                 setTimeout(() => {
                     this.classList.add('dragging');
+                    // Add a visual indicator on all potential drop zones
+                    Array.from(element.querySelectorAll('.gallery-item')).forEach(otherItem => {
+                        if (otherItem !== this) {
+                            otherItem.classList.add('drop-target');
+                        }
+                    });
                 }, 0);
             });
             
             // Drag end event
             item.addEventListener('dragend', function() {
                 this.classList.remove('dragging');
+                // Remove drop zone indicators
+                Array.from(element.querySelectorAll('.gallery-item')).forEach(item => {
+                    item.classList.remove('drop-target');
+                    item.classList.remove('drop-target-active');
+                });
                 draggedItem = null;
             });
             
-            // Drag over event - needed to allow dropping
+            // Drag over event - needed to allow dropping and show visual feedback
             item.addEventListener('dragover', function(e) {
                 e.preventDefault();
+                if (draggedItem && draggedItem !== this) {
+                    this.classList.add('drop-target-active');
+                }
+            });
+            
+            // Drag leave event - remove active state
+            item.addEventListener('dragleave', function() {
+                this.classList.remove('drop-target-active');
             });
             
             // Drop event
             item.addEventListener('drop', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('drop-target-active');
+                
                 if (draggedItem && draggedItem !== this) {
                     const allItems = Array.from(element.querySelectorAll('.gallery-item'));
                     const draggedIndex = allItems.indexOf(draggedItem);
@@ -933,6 +964,84 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+        
+        // Add container level event listeners for better drag handling
+        element.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            
+            // Find the closest gallery item to the cursor position
+            const closestItem = findClosestItemToCursor(e, Array.from(items));
+            
+            if (closestItem && draggedItem && closestItem !== draggedItem) {
+                // Remove active state from all items
+                items.forEach(item => item.classList.remove('drop-target-active'));
+                
+                // Add active state to the closest item
+                closestItem.classList.add('drop-target-active');
+            }
+        });
+        
+        element.addEventListener('drop', function(e) {
+            e.preventDefault();
+            
+            // Find the closest gallery item to the cursor position
+            const closestItem = findClosestItemToCursor(e, Array.from(items));
+            
+            if (closestItem && draggedItem && closestItem !== draggedItem) {
+                const allItems = Array.from(element.querySelectorAll('.gallery-item'));
+                const draggedIndex = allItems.indexOf(draggedItem);
+                const dropIndex = allItems.indexOf(closestItem);
+                
+                if (draggedIndex < dropIndex) {
+                    closestItem.parentNode.insertBefore(draggedItem, closestItem.nextSibling);
+                } else {
+                    closestItem.parentNode.insertBefore(draggedItem, closestItem);
+                }
+                
+                // Enable the save button for this layer
+                const saveBtn = document.querySelector(`.save-order-btn[data-layer="${layerType}"]`);
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                }
+                
+                // Show message that changes aren't saved yet
+                const statusSpan = document.querySelector(`.order-status[data-layer="${layerType}"]`);
+                if (statusSpan) {
+                    statusSpan.textContent = 'Order changed. Click "Save Order" to apply.';
+                    statusSpan.style.color = '#ff9800';
+                }
+            }
+            
+            // Remove all drop target indicators
+            items.forEach(item => {
+                item.classList.remove('drop-target');
+                item.classList.remove('drop-target-active');
+            });
+        });
+    }
+    
+    // Helper function to find the closest item to the cursor position
+    function findClosestItemToCursor(event, items) {
+        let closest = null;
+        let closestDistance = Infinity;
+        
+        items.forEach(item => {
+            const rect = item.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const distance = Math.sqrt(
+                Math.pow(event.clientX - centerX, 2) + 
+                Math.pow(event.clientY - centerY, 2)
+            );
+            
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closest = item;
+            }
+        });
+        
+        return closest;
     }
     
     // Save the current image order
