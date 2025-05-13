@@ -199,7 +199,7 @@ class Layer {
 
         // Track loading progress for the loading screen
         window.loadingProgress = window.loadingProgress || {
-            total: 4, // Total number of assets to load (2 layers + bg + music)
+            total: 3, // Reduced to 3 total assets (2 layers + bg)
             completed: 0,
             updateProgress: function() {
                 this.completed++;
@@ -211,14 +211,19 @@ class Layer {
 
                 // Hide loading screen when everything is loaded
                 if (percentage >= 100) {
-                    const loadingScreen = document.getElementById('loadingScreen');
-                    if (loadingScreen) {
-                        loadingScreen.classList.add('hidden');
-                        loadingScreen.classList.remove('fade');
-                        setTimeout(() => {
-                            loadingScreen.style.display = 'none';
-                        }, 600);
-                    }
+                    this.hideLoadingScreen();
+                }
+            },
+            hideLoadingScreen: function() {
+                console.log('Hiding loading screen');
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                    loadingScreen.classList.remove('fade');
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                        console.log('Loading screen removed');
+                    }, 600);
                 }
             }
         };
@@ -1735,19 +1740,38 @@ const RATE_LIMIT_DELAY = 500;
 
 //NFT selector functionality removed
 
-// Ensure loading screen is removed after a timeout period even if loading doesn't complete
+// Force hide loading screen regardless of asset loading status
 window.addEventListener('load', function() {
+    // First timeout - try to hide it after 3 seconds
     setTimeout(() => {
+        console.log('First attempt to force remove loading screen');
         const loadingScreen = document.getElementById('loadingScreen');
         if (loadingScreen && loadingScreen.style.display !== 'none') {
-            console.log('Force removing loading screen after timeout');
-            loadingScreen.classList.add('hidden');
-            loadingScreen.classList.remove('fade');
+            if (window.loadingProgress && typeof window.loadingProgress.hideLoadingScreen === 'function') {
+                window.loadingProgress.hideLoadingScreen();
+            } else {
+                loadingScreen.classList.add('hidden');
+                loadingScreen.classList.remove('fade');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 600);
+            }
+        }
+    }, 3000); 
+    
+    // Second timeout - absolutely force it after 6 seconds as emergency fallback
+    setTimeout(() => {
+        console.log('EMERGENCY: Force removing loading screen after final timeout');
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.visibility = 'hidden';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
-            }, 600);
+                console.log('Loading screen forcibly removed');
+            }, 500);
         }
-    }, 5000); // 5 second fallback timeout
+    }, 6000);
 });
 
 // Initialize donation buttons with default values as fallback

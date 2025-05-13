@@ -1854,6 +1854,22 @@ label[for="uploadLayer1"] {
     color: white;
     font-size: 16px;
     text-align: center;
+    margin-bottom: 15px;
+}
+
+.loading-skip-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.loading-skip-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 @keyframes pulse {
