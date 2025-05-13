@@ -329,25 +329,38 @@ app.get('/api/images/:layer', (req, res) => {
         const orderFilePath = path.join(__dirname, `${layer}_order.json`);
         if (fs.existsSync(orderFilePath)) {
             try {
+                // Read the order file with proper error handling
                 const orderData = JSON.parse(fs.readFileSync(orderFilePath, 'utf8'));
+                console.log(`Read order data for ${layer}:`, orderData);
 
                 if (orderData.order && Array.isArray(orderData.order)) {
-                    // Create a map for O(1) lookup to check if files exist in the directory
-                    const fileMap = new Set(files);
-
-                    // Filter the order to only include files that actually exist
-                    const validOrderedFiles = orderData.order.filter(file => fileMap.has(file));
-
-                    // Find files that are in the directory but not in the order
-                    const unorderedFiles = files.filter(file => !orderData.order.includes(file));
-
-                    // Combine ordered files with any new files that aren't in the order yet
-                    files = [...validOrderedFiles, ...unorderedFiles];
+                    // Create a set for O(1) lookup of available files
+                    const fileSet = new Set(files);
+                    
+                    // Create an ordered result that respects the order file
+                    const orderedFiles = [];
+                    
+                    // First add all files that exist and are in the order
+                    for (const filename of orderData.order) {
+                        if (fileSet.has(filename)) {
+                            orderedFiles.push(filename);
+                            // Remove from file set to track what we've already added
+                            fileSet.delete(filename);
+                        }
+                    }
+                    
+                    // Then add any files that exist but weren't in the order file
+                    const remainingFiles = Array.from(fileSet);
+                    files = [...orderedFiles, ...remainingFiles];
+                    
+                    console.log(`${layer} final ordered files:`, files);
                 }
             } catch (error) {
-                console.error('Error reading image order:', error);
-                // If there's an error reading the order, just use the default order
+                console.error(`Error reading image order for ${layer}:`, error);
+                // If there's an error reading the order, log it but continue with default order
             }
+        } else {
+            console.log(`No order file found for ${layer}, using default alphabetical order`);
         }
 
         res.json({ images: files });

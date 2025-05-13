@@ -248,6 +248,7 @@ class Layer {
     loadImages() {
         let loadedCount = 0;
         let errors = 0;
+        let orderedImages = []; // Array to maintain the ordered images
 
         // First fetch the image list from the server, respecting custom order
         const fetchImageList = async () => {
@@ -269,17 +270,22 @@ class Layer {
         const loadAllImages = async () => {
             // Get the image list first
             const imageFiles = await fetchImageList();
+            console.log(`Layer ${this.id} image order from server:`, imageFiles);
+            
+            // Create a map to store images with their filenames as keys
+            const imageMap = new Map();
             
             // Function to load a single image
             const loadSingleImage = (filename) => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.crossOrigin = "Anonymous";
+                    img.dataset.filename = filename; // Store filename in the image object
                     
                     img.onload = () => {
                         console.log(`Successfully loaded layer${this.id}/${filename}`);
-                        this.images.push(img);
-                        this.originalImages.push(img);
+                        // Store in map instead of directly pushing to array
+                        imageMap.set(filename, img);
                         loadedCount++;
                         resolve(true);
                     };
@@ -298,10 +304,31 @@ class Layer {
             const loadPromises = imageFiles.map(filename => loadSingleImage(filename));
             await Promise.all(loadPromises);
             
+            // Now create the ordered images array using the order from imageFiles
+            this.images = [];
+            this.originalImages = [];
+            
+            // Add images in the exact order they were listed from the server
+            for (const filename of imageFiles) {
+                const img = imageMap.get(filename);
+                if (img) {
+                    this.images.push(img);
+                    this.originalImages.push(img);
+                }
+            }
+            
             console.log(`Layer ${this.id} loading complete:`);
             console.log(`Successfully loaded: ${loadedCount} images`);
             console.log(`Failed to load: ${errors} images`);
             console.log(`Total images in array: ${this.images.length}`);
+            
+            // Debug the final order
+            if (this.images.length > 0) {
+                console.log(`Layer ${this.id} final image order:`);
+                this.images.forEach((img, index) => {
+                    console.log(`Position ${index+1}: ${img.dataset.filename}`);
+                });
+            }
             
             // Update display after loading
             if (this.images.length > 0) {
