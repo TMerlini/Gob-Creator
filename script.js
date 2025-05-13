@@ -1,6 +1,35 @@
 // Handle loading screen with 5-second timer
 const loadingScreen = document.getElementById('loadingScreen');
 const loadingBar = document.getElementById('loadingBar');
+const loadingLogo = document.getElementById('loadingLogo');
+
+// Dynamic color effect for the loading logo
+function animateLoadingLogo() {
+    if (!loadingLogo) return;
+    
+    // Array of different glow colors to cycle through
+    const colors = [
+        'rgba(255, 38, 0, 0.4)',   // Red
+        'rgba(235, 109, 5, 0.4)',   // Orange
+        'rgba(136, 6, 212, 0.4)'    // Purple
+    ];
+    
+    let colorIndex = 0;
+    
+    // Create color cycling effect
+    const colorInterval = setInterval(() => {
+        if (!loadingLogo || loadingLogo.style.display === 'none') {
+            clearInterval(colorInterval);
+            return;
+        }
+        
+        // Change glow color
+        loadingLogo.style.filter = `drop-shadow(0 0 8px ${colors[colorIndex]})`;
+        
+        // Move to next color
+        colorIndex = (colorIndex + 1) % colors.length;
+    }, 800);
+}
 
 // Simple 5-second loading animation
 function startLoadingAnimation() {
@@ -8,6 +37,9 @@ function startLoadingAnimation() {
     const totalTime = 5000; // 5 seconds
     const interval = 50; // Update every 50ms
     const increment = (interval / totalTime) * 100;
+    
+    // Start the logo animation
+    animateLoadingLogo();
     
     const timer = setInterval(() => {
         progress += increment;

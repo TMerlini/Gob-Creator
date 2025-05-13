@@ -47,6 +47,29 @@ body {
     max-width: 80%;
 }
 
+.loading-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+    animation: loading-pulse 2s infinite alternate;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+}
+
+@keyframes loading-pulse {
+    0% {
+        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+        transform: scale(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 8px rgba(184, 184, 184, 0.4));
+        transform: scale(1.04);
+    }
+    100% {
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        transform: scale(1.02);
+    }
+}
+
 .loading-bar-container {
     width: 300px;
     height: 20px;
