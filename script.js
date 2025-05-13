@@ -6,26 +6,26 @@ const loadingLogo = document.getElementById('loadingLogo');
 // Dynamic color effect for the loading logo
 function animateLoadingLogo() {
     if (!loadingLogo) return;
-    
+
     // Array of different glow colors to cycle through
     const colors = [
         'rgba(255, 38, 0, 0.4)',   // Red
         'rgba(235, 109, 5, 0.4)',   // Orange
         'rgba(136, 6, 212, 0.4)'    // Purple
     ];
-    
+
     let colorIndex = 0;
-    
+
     // Create color cycling effect
     const colorInterval = setInterval(() => {
         if (!loadingLogo || loadingLogo.style.display === 'none') {
             clearInterval(colorInterval);
             return;
         }
-        
+
         // Change glow color
         loadingLogo.style.filter = `drop-shadow(0 0 8px ${colors[colorIndex]})`;
-        
+
         // Move to next color
         colorIndex = (colorIndex + 1) % colors.length;
     }, 800);
@@ -37,14 +37,14 @@ function startLoadingAnimation() {
     const totalTime = 5000; // 5 seconds
     const interval = 50; // Update every 50ms
     const increment = (interval / totalTime) * 100;
-    
+
     // Start the logo animation
     animateLoadingLogo();
-    
+
     const timer = setInterval(() => {
         progress += increment;
         loadingBar.style.width = `${progress}%`;
-        
+
         if (progress >= 100) {
             clearInterval(timer);
             // Hide loading screen after animation completes
@@ -69,25 +69,25 @@ window.addEventListener('DOMContentLoaded', () => {
 function initializeDynamicLogo() {
     const logo = document.getElementById('dynamicLogo');
     if (!logo) return;
-    
+
     // Add interactive mousemove effect
     document.addEventListener('mousemove', (e) => {
         const { clientX, clientY } = e;
         const rect = logo.getBoundingClientRect();
         const logoX = rect.left + rect.width / 2;
         const logoY = rect.top + rect.height / 2;
-        
+
         // Calculate distance from mouse to logo center
         const distX = clientX - logoX;
         const distY = clientY - logoY;
         const distance = Math.sqrt(distX * distX + distY * distY);
-        
+
         // Only apply effect when mouse is near the logo (within 300px)
         if (distance < 300) {
             // Calculate rotation based on mouse position
             const rotateX = distY * 0.02;
             const rotateY = -distX * 0.02;
-            
+
             // Apply the transform with more intensity when closer
             const intensity = 1 - (distance / 300);
             logo.style.transform = `perspective(800px) rotateX(${rotateX * intensity}deg) rotateY(${rotateY * intensity}deg) scale(${1 + (intensity * 0.1)})`;
@@ -98,7 +98,7 @@ function initializeDynamicLogo() {
             logo.style.filter = '';
         }
     });
-    
+
     // Add click effect
     logo.addEventListener('click', () => {
         logo.style.animation = 'shake 0.5s ease';
@@ -371,7 +371,7 @@ class Layer {
             } catch (error) {
                 console.error(`Error fetching layer${this.id} images:`, error);
             }
-            
+
             // Fallback to sequential loading if API fails
             return Array.from({ length: 50 }, (_, i) => `image${i + 1}.png`);
         };
@@ -381,17 +381,17 @@ class Layer {
             // Get the image list first
             const imageFiles = await fetchImageList();
             console.log(`Layer ${this.id} image order from server:`, imageFiles);
-            
+
             // Create a map to store images with their filenames as keys
             const imageMap = new Map();
-            
+
             // Function to load a single image
             const loadSingleImage = (filename) => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.crossOrigin = "Anonymous";
                     img.dataset.filename = filename; // Store filename in the image object
-                    
+
                     img.onload = () => {
                         console.log(`Successfully loaded layer${this.id}/${filename}`);
                         // Store in map instead of directly pushing to array
@@ -399,20 +399,20 @@ class Layer {
                         loadedCount++;
                         resolve(true);
                     };
-                    
+
                     img.onerror = () => {
                         console.log(`Failed to load layer${this.id}/${filename}`);
                         errors++;
                         resolve(false);
                     };
-                    
+
                     img.src = `images/layer${this.id}/${filename}`;
                 });
             };
-            
+
             // Load images sequentially to maintain order
             const successfullyLoadedImages = [];
-            
+
             // First try to load each image in the specified order
             for (const filename of imageFiles) {
                 try {
@@ -427,16 +427,16 @@ class Layer {
                     console.error(`Error loading ${filename}:`, error);
                 }
             }
-            
+
             // Now set the arrays with successful images only
             this.images = [...successfullyLoadedImages];
             this.originalImages = [...successfullyLoadedImages];
-            
+
             console.log(`Layer ${this.id} loading complete:`);
             console.log(`Successfully loaded: ${loadedCount} images`);
             console.log(`Failed to load: ${errors} images`);
             console.log(`Total images in array: ${this.images.length}`);
-            
+
             // Debug the final order
             if (this.images.length > 0) {
                 console.log(`Layer ${this.id} final image order:`);
@@ -444,22 +444,22 @@ class Layer {
                     console.log(`Position ${index+1}: ${img.dataset.filename}`);
                 });
             }
-            
+
             // Update display after loading
             if (this.images.length > 0) {
                 this.currentImageIndex = 0;
                 this.aspectRatio = this.images[0].width / this.images[0].height;
-                
+
                 // Center Layer 2 if needed
                 if (this.id === 2) {
                     centerLayer2();
                 }
-                
+
                 drawLayers();
                 updatePreviews();
             }
         };
-        
+
         loadAllImages();
     }
 
@@ -923,6 +923,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
         // Get layer ID from button's data attribute or from parent row
         let layerId;
         if (this.hasAttribute('data-layer')) {
+            ```text
             layerId = this.getAttribute('data-layer');
         } else {
             const layerRow = this.closest('.layer-row');
@@ -1535,7 +1536,7 @@ function setupCryptoDonationButtons(settings) {
         function fallbackCopyTextToClipboard(text) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
-            
+
             // Make the textarea out of viewport
             textArea.style.position = "fixed";
             textArea.style.left = "-999999px";
@@ -1567,7 +1568,7 @@ function setupCryptoDonationButtons(settings) {
                 fallbackCopyTextToClipboard(text);
                 return;
             }
-            
+
             navigator.clipboard.writeText(text)
                 .then(() => {
                     showCopiedNotification();
@@ -1611,7 +1612,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const siteTitle = document.getElementById('siteTitle');
                 const siteSubtitle = document.getElementById('siteSubtitle');
                 const siteSubtext = document.getElementById('siteSubtext');
-                
+
                 if (siteTitle) siteTitle.textContent = data.settings.title || 'GOBLINARINOS';
                 if (siteSubtitle) siteSubtitle.textContent = data.settings.subtitle || 'Merry Christmas Gobos';
                 if (siteSubtext) siteSubtext.textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
@@ -1776,19 +1777,14 @@ function displayContributors(data) {
     // Add contributors
     if (data.contributors && data.contributors.length > 0) {
         data.contributors.forEach(contrib => {
-            const contributorDiv = document.createElement('div');
-            contributorDiv.className = 'contributor';
-
-            const link = document.createElement('a');
-            link.href = `https://twitter.com/${contrib.xAccount.replace('@', '')}`;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-
             const img = document.createElement('img');
-            img.src = contrib.image || 'images/contributors/image1.png'; // Default image if none provided
+            img.src = contrib.image || 'images/contributors/image1.png'; // Default image
             img.alt = contrib.name;
             img.className = 'contributor-image';
             link.appendChild(img);
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'contributor-info';
 
             const nameSpan = document.createElement('span');
             nameSpan.className = 'contributor-name';
@@ -1798,11 +1794,13 @@ function displayContributors(data) {
             roleSpan.className = 'contributor-role';
             roleSpan.textContent = contrib.role || 'Contributor';
 
-            contributorDiv.appendChild(link);
-            contributorDiv.appendChild(nameSpan);
-            contributorDiv.appendChild(roleSpan);
+            infoDiv.appendChild(nameSpan);
+            infoDiv.appendChild(roleSpan);
 
-            contributorsSection.parentNode.appendChild(contributorDiv);
+            contributorDiv.appendChild(link);
+            contributorDiv.appendChild(infoDiv);
+
+            contributorsSection.appendChild(contributorDiv);
         });
     }
 }
@@ -1820,7 +1818,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (document.getElementById('ethBtn') && 
                 document.getElementById('btcBtn') && 
                 document.getElementById('solBtn')) {
-                
+
                 // Use the default settings as a fallback
                 setupCryptoDonationButtons({
                     ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
@@ -1829,7 +1827,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 console.log("Donation buttons initialized with default addresses");
-                
+
                 // Try to fetch updated settings from server (non-blocking)
                 fetch('/api/site-settings')
                     .then(response => {
