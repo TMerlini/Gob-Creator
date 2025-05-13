@@ -506,9 +506,6 @@ setTimeout(() => {
 
 // Variables for drag functionality
 let isDragging = false;
-
-// Variables for drag functionality
-let isDragging = false;
 let dragStartX, dragStartY;
 let selectedLayer = null;
 
@@ -1303,6 +1300,11 @@ function centerLayer2() {
         drawLayers();
     }
 }
+
+// Variables for pinch/zoom functionality
+let isPinching = false;
+let initialTouchDistance = 0;
+let initialScale = 0;
 
 // Helper function to calculate distance between two touch points
 function getTouchDistance(touch1, touch2) {
