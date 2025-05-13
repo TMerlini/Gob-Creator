@@ -131,8 +131,8 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
-h1, h2, h3 {
-    color: #333;
+h1, h2, h3, h4 {
+    color: var(--text-color);
 }
 
 .auth-section {
@@ -187,6 +187,58 @@ button:hover {
 .more-uploads-container, .advanced-dropdown-container {
     width: 100%;
     margin-top: 20px;
+}
+
+/* Progress bar styles with dark mode support */
+.progress-container {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.progress-bar {
+    background-color: var(--dropzone-bg);
+}
+
+#progressText {
+    color: var(--text-color);
+}
+
+/* Dark mode for gallery elements */
+.gallery-loading, 
+.empty-gallery,
+.reorder-instructions,
+.order-status {
+    color: var(--text-color);
+}
+
+.gallery-controls button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: 1px solid var(--border-color);
+}
+
+/* Form elements in dark mode */
+.form-group label,
+.form-group input[type="text"],
+.form-group input[type="color"] {
+    color: var(--text-color);
+}
+
+.form-group input[type="text"] {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+}
+
+/* Fix dropdown container background in dark mode */
+.site-text-settings,
+.contributors-settings {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 15px;
 }
 
 /* Contributors management styles */
@@ -327,9 +379,9 @@ button:hover {
 .toggle-more-btn, .toggle-settings-btn {
     width: 100%;
     padding: 12px;
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ddd;
+    background-color: var(--hover-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     font-size: 16px;
     font-weight: 500;
@@ -340,7 +392,8 @@ button:hover {
 }
 
 .toggle-more-btn:hover, .toggle-settings-btn:hover {
-    background-color: #e0e0e0;
+    background-color: var(--button-bg);
+    color: var(--button-text);
 }
 
 .more-uploads-section {
@@ -661,11 +714,11 @@ button:hover {
 
 /* Advanced section styles */
 .advanced-section {
-    background-color: #fff;
+    background-color: var(--panel-bg);
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 30px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 .site-text-settings {
