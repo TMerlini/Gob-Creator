@@ -191,42 +191,11 @@ class Layer {
             localStorage.removeItem('layer1CustomImage');
         }
 
-        // Add a small delay to ensure DOM is ready
+        // Load images with a small delay to ensure DOM is ready
         setTimeout(() => {
             this.loadImages();
             console.log(`Started loading Layer ${this.id} images`);
         }, 100);
-
-        // Track loading progress for the loading screen
-        window.loadingProgress = window.loadingProgress || {
-            total: 3, // Reduced to 3 total assets (2 layers + bg)
-            completed: 0,
-            updateProgress: function() {
-                this.completed++;
-                const percentage = Math.min(100, Math.round((this.completed / this.total) * 100));
-                const loadingBar = document.getElementById('loadingBar');
-                if (loadingBar) {
-                    loadingBar.style.width = percentage + '%';
-                }
-
-                // Hide loading screen when everything is loaded
-                if (percentage >= 100) {
-                    this.hideLoadingScreen();
-                }
-            },
-            hideLoadingScreen: function() {
-                console.log('Hiding loading screen');
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.classList.add('hidden');
-                    loadingScreen.classList.remove('fade');
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                        console.log('Loading screen removed');
-                    }, 600);
-                }
-            }
-        };
     }
 
     loadCachedImage(cachedData) {
@@ -292,7 +261,7 @@ class Layer {
             } catch (error) {
                 console.error(`Error fetching layer${this.id} images:`, error);
             }
-
+            
             // Fallback to sequential loading if API fails
             return Array.from({ length: 50 }, (_, i) => `image${i + 1}.png`);
         };
@@ -302,17 +271,17 @@ class Layer {
             // Get the image list first
             const imageFiles = await fetchImageList();
             console.log(`Layer ${this.id} image order from server:`, imageFiles);
-
+            
             // Create a map to store images with their filenames as keys
             const imageMap = new Map();
-
+            
             // Function to load a single image
             const loadSingleImage = (filename) => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.crossOrigin = "Anonymous";
                     img.dataset.filename = filename; // Store filename in the image object
-
+                    
                     img.onload = () => {
                         console.log(`Successfully loaded layer${this.id}/${filename}`);
                         // Store in map instead of directly pushing to array
@@ -320,20 +289,20 @@ class Layer {
                         loadedCount++;
                         resolve(true);
                     };
-
+                    
                     img.onerror = () => {
                         console.log(`Failed to load layer${this.id}/${filename}`);
                         errors++;
                         resolve(false);
                     };
-
+                    
                     img.src = `images/layer${this.id}/${filename}`;
                 });
             };
-
+            
             // Load images sequentially to maintain order
             const successfullyLoadedImages = [];
-
+            
             // First try to load each image in the specified order
             for (const filename of imageFiles) {
                 try {
@@ -348,16 +317,16 @@ class Layer {
                     console.error(`Error loading ${filename}:`, error);
                 }
             }
-
+            
             // Now set the arrays with successful images only
             this.images = [...successfullyLoadedImages];
             this.originalImages = [...successfullyLoadedImages];
-
+            
             console.log(`Layer ${this.id} loading complete:`);
             console.log(`Successfully loaded: ${loadedCount} images`);
             console.log(`Failed to load: ${errors} images`);
             console.log(`Total images in array: ${this.images.length}`);
-
+            
             // Debug the final order
             if (this.images.length > 0) {
                 console.log(`Layer ${this.id} final image order:`);
@@ -365,25 +334,22 @@ class Layer {
                     console.log(`Position ${index+1}: ${img.dataset.filename}`);
                 });
             }
-
+            
             // Update display after loading
             if (this.images.length > 0) {
                 this.currentImageIndex = 0;
                 this.aspectRatio = this.images[0].width / this.images[0].height;
-
+                
                 // Center Layer 2 if needed
                 if (this.id === 2) {
                     centerLayer2();
                 }
-
+                
                 drawLayers();
                 updatePreviews();
             }
-
-            // Update loading progress
-            window.loadingProgress.updateProgress();
         };
-
+        
         loadAllImages();
     }
 
@@ -944,7 +910,7 @@ function createPreviewBox(layerId) {
 
     const img = document.createElement('img');
     img.style.cssText = `
-        width: 100%;```javascript
+        width: 100%;
         height: 100%;
         object-fit: contain;
     `;
@@ -1124,8 +1090,6 @@ document.getElementById('uploadLayer1').addEventListener('change', function(e) {
 
 // Background loader function
 async function loadBackground() {
-    // Update loading progress
-    window.loadingProgress.updateProgress();
     // Start with an empty array of paths to try
     let backgroundPaths = [];
 
@@ -1401,9 +1365,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load available tracks
     loadMusicTracks();
-
-    // Update loading progress after loading music
-    window.loadingProgress.updateProgress();
 });
 
 // Add this to help debug
@@ -1464,7 +1425,7 @@ function setupCryptoDonationButtons(settings) {
         function fallbackCopyTextToClipboard(text) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
-
+            
             // Make the textarea out of viewport
             textArea.style.position = "fixed";
             textArea.style.left = "-999999px";
@@ -1496,7 +1457,7 @@ function setupCryptoDonationButtons(settings) {
                 fallbackCopyTextToClipboard(text);
                 return;
             }
-
+            
             navigator.clipboard.writeText(text)
                 .then(() => {
                     showCopiedNotification();
@@ -1540,7 +1501,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const siteTitle = document.getElementById('siteTitle');
                 const siteSubtitle = document.getElementById('siteSubtitle');
                 const siteSubtext = document.getElementById('siteSubtext');
-
+                
                 if (siteTitle) siteTitle.textContent = data.settings.title || 'GOBLINARINOS';
                 if (siteSubtitle) siteSubtitle.textContent = data.settings.subtitle || 'Merry Christmas Gobos';
                 if (siteSubtext) siteSubtext.textContent = data.settings.subtext || 'Put you´r hat on!, Das it & Das all!';
@@ -1740,40 +1701,6 @@ const RATE_LIMIT_DELAY = 500;
 
 //NFT selector functionality removed
 
-// Force hide loading screen regardless of asset loading status
-window.addEventListener('load', function() {
-    // First timeout - try to hide it after 3 seconds
-    setTimeout(() => {
-        console.log('First attempt to force remove loading screen');
-        const loadingScreen = document.getElementById('loadingScreen');
-        if (loadingScreen && loadingScreen.style.display !== 'none') {
-            if (window.loadingProgress && typeof window.loadingProgress.hideLoadingScreen === 'function') {
-                window.loadingProgress.hideLoadingScreen();
-            } else {
-                loadingScreen.classList.add('hidden');
-                loadingScreen.classList.remove('fade');
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 600);
-            }
-        }
-    }, 3000); 
-    
-    // Second timeout - absolutely force it after 6 seconds as emergency fallback
-    setTimeout(() => {
-        console.log('EMERGENCY: Force removing loading screen after final timeout');
-        const loadingScreen = document.getElementById('loadingScreen');
-        if (loadingScreen) {
-            loadingScreen.style.opacity = '0';
-            loadingScreen.style.visibility = 'hidden';
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                console.log('Loading screen forcibly removed');
-            }, 500);
-        }
-    }, 6000);
-});
-
 // Initialize donation buttons with default values as fallback
 document.addEventListener('DOMContentLoaded', function() {
     // Add a small delay to make sure the DOM is fully loaded
@@ -1783,7 +1710,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (document.getElementById('ethBtn') && 
                 document.getElementById('btcBtn') && 
                 document.getElementById('solBtn')) {
-
+                
                 // Use the default settings as a fallback
                 setupCryptoDonationButtons({
                     ethAddress: "0x27958d7791140ab141363330a6BD1B76622a09D7",
@@ -1792,7 +1719,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 console.log("Donation buttons initialized with default addresses");
-
+                
                 // Try to fetch updated settings from server (non-blocking)
                 fetch('/api/site-settings')
                     .then(response => {
