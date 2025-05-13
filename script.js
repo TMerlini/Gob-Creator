@@ -300,22 +300,27 @@ class Layer {
                 });
             };
             
-            // Load all images from the list
-            const loadPromises = imageFiles.map(filename => loadSingleImage(filename));
-            await Promise.all(loadPromises);
+            // Load images sequentially to maintain order
+            const successfullyLoadedImages = [];
             
-            // Now create the ordered images array using the order from imageFiles
-            this.images = [];
-            this.originalImages = [];
-            
-            // Add images in the exact order they were listed from the server
+            // First try to load each image in the specified order
             for (const filename of imageFiles) {
-                const img = imageMap.get(filename);
-                if (img) {
-                    this.images.push(img);
-                    this.originalImages.push(img);
+                try {
+                    const success = await loadSingleImage(filename);
+                    if (success) {
+                        const img = imageMap.get(filename);
+                        if (img) {
+                            successfullyLoadedImages.push(img);
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error loading ${filename}:`, error);
                 }
             }
+            
+            // Now set the arrays with successful images only
+            this.images = [...successfullyLoadedImages];
+            this.originalImages = [...successfullyLoadedImages];
             
             console.log(`Layer ${this.id} loading complete:`);
             console.log(`Successfully loaded: ${loadedCount} images`);
