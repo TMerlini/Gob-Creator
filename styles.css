@@ -1322,7 +1322,7 @@ label[for="uploadLayer1"] {
     .crypto-donation-container {
         max-width: 100%;
     }
-    
+
     .crypto-buttons {
         flex-direction: column;
     }
@@ -1614,51 +1614,36 @@ label[for="uploadLayer1"] {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.15);
     border-radius: 8px;
     padding: 10px;
     margin: 5px;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     width: 120px;
 }
 
 .contributor:hover {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.25);
     transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.contributor-image {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ffffff;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.contributor a:hover .contributor-image {
-    transform: scale(1.1) rotate(5deg);
-    border-color: #4a6cf7;
-    box-shadow: 0 4px 8px rgba(74, 108, 247, 0.4);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .contributor-name {
-    color: #333333;
+    color: #ffffff;
     font-size: 0.9em;
     font-weight: bold;
     text-align: center;
     margin-top: 5px;
     word-break: break-word;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .contributor-role {
-    color: #666666;
+    color: #cccccc;
     font-size: 0.75em;
     text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Mobile adjustments */
@@ -1911,18 +1896,18 @@ label[for="uploadLayer1"] {
         max-width: 80px;
         font-size: 10px;
     }
-    
+
     .donation-section {
         top: 65px;
         right: 10px;
         width: 160px;
         padding: 8px;
     }
-    
+
     .donation-text {
         font-size: 11px;
     }
-    
+
     .crypto-btn {
         padding: 5px 10px;
         font-size: 12px;
